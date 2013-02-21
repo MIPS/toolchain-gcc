@@ -6942,6 +6942,9 @@ Use the @command{ld.gold} linker instead of the default linker.
 This option is only necessary if GCC has been configured with
 @option{--enable-gold=both} or @option{--enable-gold=both/ld}.
 
+@item -fuse-ld=mcld
+Use the @command{mclinker} instead of the default linker.
+
 @item -fuse-ld=bfd
 Use the @command{ld.bfd} linker instead of the default linker.
 This option is only necessary if GCC has been configured with

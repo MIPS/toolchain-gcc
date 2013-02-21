@@ -745,7 +745,10 @@ proper position among the other output files.  */
     %(linker) %l " LINK_PIE_SPEC \
     LINK_RPATH_SPEC \
    "%{fuse-ld=gold:%{fuse-ld=bfd:%e-fuse-ld=gold and -fuse-ld=bfd may not be used together}} \
+    %{fuse-ld=gold:%{fuse-ld=mcld:%e-fuse-ld=gold and -fuse-ld=mcld may not be used together}} \
+    %{fuse-ld=mcld:%{fuse-ld=bfd:%e-fuse-ld=mcld and -fuse-ld=bfd may not be used together}} \
     %{fuse-ld=gold:-use-gold} \
+    %{fuse-ld=mcld:-use-mcld} \
     %{fuse-ld=bfd:-use-ld}" \
    "%X %{o*} %{A} %{d} %{e*} %{m} %{N} %{n} %{r}\
     %{s} %{t} %{u*} %{x} %{z} %{Z} %{!A:%{!nostdlib:%{!nostartfiles:%S}}}\

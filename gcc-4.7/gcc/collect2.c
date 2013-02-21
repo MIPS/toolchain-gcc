@@ -1022,6 +1022,7 @@ main (int argc, char **argv)
 {
   static const char *const ld_suffix	= "ld";
   static const char *const gold_suffix       = "ld.gold";
+  static const char *const mcld_suffix       = "ld.mcld";
   static const char *const bfd_ld_suffix     = "ld.bfd";
   static const char *const plugin_ld_suffix = PLUGIN_LD;
   static const char *const real_ld_suffix = "real-ld";
@@ -1044,6 +1045,8 @@ main (int argc, char **argv)
     concat(target_machine, "-", ld_suffix, NULL);
   const char *const full_gold_suffix =
     concat (target_machine, "-", gold_suffix, NULL);
+  const char *const full_mcld_suffix =
+    concat (target_machine, "-", mcld_suffix, NULL);
   const char *const full_bfd_ld_suffix =
     concat (target_machine, "-", bfd_ld_suffix, NULL);
   const char *const full_plugin_ld_suffix =
@@ -1063,6 +1066,7 @@ main (int argc, char **argv)
 #else
   const char *const full_ld_suffix	= ld_suffix;
   const char *const full_gold_suffix	  = gold_suffix;
+  const char *const full_mcld_suffix	  = mcld_suffix;
   const char *const full_bfd_ld_suffix	  = bfd_ld_suffix;
   const char *const full_plugin_ld_suffix = plugin_ld_suffix;
   const char *const full_nm_suffix	= nm_suffix;
@@ -1090,6 +1094,7 @@ main (int argc, char **argv)
     DFLT_LINKER,
     PLUGIN_LINKER,
     GOLD_LINKER,
+    MCLD_LINKER,
     BFD_LINKER
   } selected_linker = DFLT_LINKER;
 
@@ -1194,6 +1199,8 @@ main (int argc, char **argv)
 	  }
 	else if (! strcmp (argv[i], "-use-gold"))
 	  selected_linker = GOLD_LINKER;
+	else if (! strcmp (argv[i], "-use-mcld"))
+	  selected_linker = MCLD_LINKER;
 	else if (! strcmp (argv[i], "-use-ld"))
 	  selected_linker = BFD_LINKER;
 
@@ -1308,6 +1315,9 @@ main (int argc, char **argv)
       case GOLD_LINKER:
 	ld_file_name = find_a_file (&cpath, gold_suffix);
 	break;
+      case MCLD_LINKER:
+	ld_file_name = find_a_file (&cpath, mcld_suffix);
+	break;
       case BFD_LINKER:
 	ld_file_name = find_a_file (&cpath, bfd_ld_suffix);
 	break;
@@ -1326,6 +1336,9 @@ main (int argc, char **argv)
 	break;
       case GOLD_LINKER:
 	ld_file_name = find_a_file (&path, full_gold_suffix);
+	break;
+      case MCLD_LINKER:
+	ld_file_name = find_a_file (&path, full_mcld_suffix);
 	break;
       case BFD_LINKER:
 	ld_file_name = find_a_file (&path, full_bfd_ld_suffix);
@@ -1359,6 +1372,7 @@ main (int argc, char **argv)
       case DFLT_LINKER:    s = ld_suffix; break;
       case PLUGIN_LINKER:  s = plugin_ld_suffix; break;
       case GOLD_LINKER:    s = gold_suffix; break;
+      case MCLD_LINKER:    s = mcld_suffix; break;
       case BFD_LINKER:     s = bfd_ld_suffix; break;
       }
       notice ("  %s\n", s);
@@ -1376,6 +1390,7 @@ main (int argc, char **argv)
       case DFLT_LINKER:    s = full_ld_suffix; break;
       case PLUGIN_LINKER:  s = full_plugin_ld_suffix; break;
       case GOLD_LINKER:    s = full_gold_suffix; break;
+      case MCLD_LINKER:    s = full_mcld_suffix; break;
       case BFD_LINKER:     s = full_bfd_ld_suffix; break;
       }
       notice ("  %s\n", s);
