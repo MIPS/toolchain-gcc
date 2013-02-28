@@ -68,6 +68,7 @@ along with GCC; see the file COPYING3.  If not see
 #undef LINUX_SUBTARGET_LINK_SPEC
 #define LINUX_SUBTARGET_LINK_SPEC \
  "%(endian_spec) \
+  %{!EB:%{!meb:-m elf32ltsmip}} %{EB|meb:-m elf32btsmip} \
   %{shared:-shared} \
   %{!shared: \
     %{!static: \
