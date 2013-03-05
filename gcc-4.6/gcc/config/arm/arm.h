@@ -1214,6 +1214,7 @@ enum reg_class
   (TARGET_32BIT ? (CLASS) :				\
    ((CLASS) == GENERAL_REGS || (CLASS) == HI_REGS	\
     || (CLASS) == NO_REGS || (CLASS) == STACK_REG	\
+    || (CLASS) == CORE_REGS                             \
    ? LO_REGS : (CLASS)))
 
 /* Must leave BASE_REGS reloads alone */
