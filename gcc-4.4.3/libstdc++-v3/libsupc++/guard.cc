@@ -33,7 +33,12 @@
 #if defined(__GTHREADS) && defined(__GTHREAD_HAS_COND) \
     && defined(_GLIBCXX_ATOMIC_BUILTINS_4) && defined(_GLIBCXX_HAVE_LINUX_FUTEX)
 # include <climits>
+#if defined(__ANDROID__)
+# include <sys/syscall.h>
+# define SYS_futex __NR_futex
+#else
 # include <syscall.h>
+#endif
 # define _GLIBCXX_USE_FUTEX
 # define _GLIBCXX_FUTEX_WAIT 0
 # define _GLIBCXX_FUTEX_WAKE 1
