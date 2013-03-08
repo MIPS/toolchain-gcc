@@ -32,6 +32,7 @@
 
 #pragma GCC visibility push(default)
 
+#undef _GNU_SOURCE  /* could be previously defined to 1 instead */
 #define _GNU_SOURCE 
 #include <unistd.h>
 #include <sys/syscall.h>
