@@ -14073,7 +14073,7 @@ mips_override_options (void)
        GNU ld 2.21 and GCC 4.5 have support for read-only .eh_frames,
        but for the time being, we should stick to the approach used
        in 4.3 and earlier.  */
-  flag_dwarf2_cfi_asm = 0;
+  flag_dwarf2_cfi_asm = 1;
 
   mips_init_print_operand_punct ();
 
