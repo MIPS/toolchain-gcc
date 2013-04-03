@@ -854,7 +854,7 @@ main (int argc, char **argv)
       "ld",
       PLUGIN_LD_SUFFIX,
       "ld.gold",
-      "ld.bfd"
+      "ld.bfd",
       "ld.mcld"
     };
   static const char *const real_ld_suffix = "real-ld";

@@ -2380,7 +2380,7 @@ extern void debug_dispatch_window (int);
 
 enum stack_protector_guard {
   SSP_TLS,      /* per-thread canary at %gs:20 */
-  SSP_GLOBAL,   /* global canary */
+  SSP_GLOBAL    /* global canary */
 };
 
 extern enum stack_protector_guard ix86_stack_protector_guard;
