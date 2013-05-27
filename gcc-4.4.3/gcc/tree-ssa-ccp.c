@@ -1238,6 +1238,7 @@ fold_const_aggregate_ref (tree t)
 	      && (GET_MODE_CLASS (TYPE_MODE (TREE_TYPE (TREE_TYPE (ctor))))
 	          == MODE_INT)
 	      && GET_MODE_SIZE (TYPE_MODE (TREE_TYPE (TREE_TYPE (ctor)))) == 1
+	      && tree_int_cst_sgn (idx) >= 0
 	      && compare_tree_int (idx, TREE_STRING_LENGTH (ctor)) < 0)
 	    return build_int_cst_type (TREE_TYPE (t),
 				       (TREE_STRING_POINTER (ctor)
