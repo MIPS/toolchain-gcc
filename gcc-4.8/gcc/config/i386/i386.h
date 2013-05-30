@@ -257,6 +257,7 @@ extern const struct processor_costs ix86_size_cost;
 #define TARGET_BTVER1 (ix86_tune == PROCESSOR_BTVER1)
 #define TARGET_BTVER2 (ix86_tune == PROCESSOR_BTVER2)
 #define TARGET_ATOM (ix86_tune == PROCESSOR_ATOM)
+#define TARGET_SLM (ix86_tune == PROCESSOR_SLM)
 
 /* Feature tests against the various tunings.  */
 enum ix86_tune_indices {
@@ -613,6 +614,7 @@ enum target_cpu_default
   TARGET_CPU_DEFAULT_corei7,
   TARGET_CPU_DEFAULT_haswell,
   TARGET_CPU_DEFAULT_atom,
+  TARGET_CPU_DEFAULT_slm,
 
   TARGET_CPU_DEFAULT_geode,
   TARGET_CPU_DEFAULT_k6,
@@ -2118,6 +2120,7 @@ enum processor_type
   PROCESSOR_BTVER1,
   PROCESSOR_BTVER2,
   PROCESSOR_ATOM,
+  PROCESSOR_SLM,
   PROCESSOR_max
 };
 
