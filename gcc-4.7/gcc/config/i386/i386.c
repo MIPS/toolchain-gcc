@@ -2252,6 +2252,10 @@ static unsigned int initial_ix86_tune_features[X86_TUNE_LAST] = {
   /* X86_TUNE_REASSOC_FP_TO_PARALLEL: Try to produce parallel computations
      during reassociation of fp computation.  */
   m_ATOM | m_SLM,
+
+  /* X86_TUNE_SPLIT_MEM_OPND_FOR_FP_CONVERTS: Try to split memory operand for
+     fp converts to destination register.  */
+  m_SLM
 };
 
 /* Feature tests against the various architecture variations.  */
@@ -16938,9 +16942,23 @@ distance_agu_use (unsigned int regno0, rtx insn)
 
 static bool
 ix86_lea_outperforms (rtx insn, unsigned int regno0, unsigned int regno1,
-		      unsigned int regno2, int split_cost)
+		      unsigned int regno2, int split_cost, bool has_scale)
 {
   int dist_define, dist_use;
+
+  /* For Silvermont if using a 2-source or 3-source LEA for
+     non-destructive destination purposes, or due to wanting
+     ability to use SCALE, the use of LEA is justified.  */
+  if (ix86_tune == PROCESSOR_SLM)
+    {
+      if (has_scale)
+	return true;
+      if (split_cost < 1)
+	return false;
+      if (regno0 == regno1 || regno0 == regno2)
+	return false;
+      return true;
+    }
 
   dist_define = distance_non_agu_define (regno1, regno2, insn);
   dist_use = distance_agu_use (regno0, insn);
@@ -17028,7 +17046,7 @@ ix86_avoid_lea_for_add (rtx insn, rtx operands[])
   if (regno0 == regno1 || regno0 == regno2)
     return false;
   else
-    return !ix86_lea_outperforms (insn, regno0, regno1, regno2, 1);
+    return !ix86_lea_outperforms (insn, regno0, regno1, regno2, 1, false);
 }
 
 /* Return true if we should emit lea instruction instead of mov
@@ -17051,7 +17069,7 @@ ix86_use_lea_for_mov (rtx insn, rtx operands[])
   regno0 = true_regnum (operands[0]);
   regno1 = true_regnum (operands[1]);
 
-  return ix86_lea_outperforms (insn, regno0, regno1, INVALID_REGNUM, 0);
+  return ix86_lea_outperforms (insn, regno0, regno1, INVALID_REGNUM, 0, false);
 }
 
 /* Return true if we need to split lea into a sequence of
@@ -17131,7 +17149,8 @@ ix86_avoid_lea_for_addr (rtx insn, rtx operands[])
       split_cost -= 1;
     }
 
-  return !ix86_lea_outperforms (insn, regno0, regno1, regno2, split_cost);
+  return !ix86_lea_outperforms (insn, regno0, regno1, regno2, split_cost,
+				parts.scale > 1);
 }
 
 /* Emit x86 binary operand CODE in mode MODE, where the first operand
@@ -17269,7 +17288,7 @@ ix86_lea_for_add_ok (rtx insn, rtx operands[])
   if (!TARGET_OPT_AGU || optimize_function_for_size_p (cfun))
     return false;
 
-  return ix86_lea_outperforms (insn, regno0, regno1, regno2, 0);
+  return ix86_lea_outperforms (insn, regno0, regno1, regno2, 0, false);
 }
 
 /* Return true if destination reg of SET_BODY is shift count of
@@ -23894,6 +23913,73 @@ ix86_agi_dependent (rtx set_insn, rtx use_insn)
   return false;
 }
 
+/* Helper function for exact_store_load_dependency.
+   Return true if addr is found in insn.  */
+static bool
+exact_dependency_1 (rtx addr, rtx insn)
+{
+  enum rtx_code code;
+  const char *format_ptr;
+  int i, j;
+
+  code = GET_CODE (insn);
+  switch (code)
+    {
+    case MEM:
+      if (rtx_equal_p (addr, insn))
+	return true;
+      break;
+    case REG:
+    CASE_CONST_ANY:
+    case SYMBOL_REF:
+    case CODE_LABEL:
+    case PC:
+    case CC0:
+    case EXPR_LIST:
+      return false;
+    default:
+      break;
+    }
+
+  format_ptr = GET_RTX_FORMAT (code);
+  for (i = 0; i < GET_RTX_LENGTH (code); i++)
+    {
+      switch (*format_ptr++)
+	{
+	case 'e':
+	  if (exact_dependency_1 (addr, XEXP (insn, i)))
+	    return true;
+	  break;
+	case 'E':
+	  for (j = 0; j < XVECLEN (insn, i); j++)
+	    if (exact_dependency_1 (addr, XVECEXP (insn, i, j)))
+	      return true;
+	    break;
+	}
+    }
+  return false;
+}
+
+/* Return true if there exists exact dependency for store & load, i.e.
+   the same memory address is used in them.  */
+static bool
+exact_store_load_dependency (rtx store, rtx load)
+{
+  rtx set1, set2;
+
+  set1 = single_set (store);
+  if (!set1)
+    return false;
+  if (!MEM_P (SET_DEST (set1)))
+    return false;
+  set2 = single_set (load);
+  if (!set2)
+    return false;
+  if (exact_dependency_1 (SET_DEST (set1), SET_SRC (set2)))
+    return true;
+  return false;
+}
+
 static int
 ix86_adjust_cost (rtx insn, rtx link, rtx dep_insn, int cost)
 {
@@ -24042,6 +24128,39 @@ ix86_adjust_cost (rtx insn, rtx link, rtx dep_insn, int cost)
 	    cost -= loadcost;
 	  else
 	    cost = 0;
+	}
+      break;
+
+    case PROCESSOR_SLM:
+      if (!reload_completed)
+	return cost;
+
+      /* Increase cost of integer loads.  */
+      memory = get_attr_memory (dep_insn);
+      if (memory == MEMORY_LOAD || memory == MEMORY_BOTH)
+	{
+	  enum attr_unit unit = get_attr_unit (dep_insn);
+	  if (unit == UNIT_INTEGER && cost == 1)
+	    {
+	      if (memory == MEMORY_LOAD)
+		cost = 3;
+	      else
+		{
+		  /* Increase cost of ld/st for short int types only
+		     because of store forwarding issue.  */
+		  rtx set = single_set (dep_insn);
+		  if (set && (GET_MODE (SET_DEST (set)) == QImode
+			      || GET_MODE (SET_DEST (set)) == HImode))
+		    {
+		      /* Increase cost of store/load insn if exact
+			 dependence exists and it is load insn.  */
+		      enum attr_memory insn_memory = get_attr_memory (insn);
+		      if (insn_memory == MEMORY_LOAD
+			  && exact_store_load_dependency (dep_insn, insn))
+			cost = 3;
+		    }
+		}
+	    }
 	}
 
     default:
