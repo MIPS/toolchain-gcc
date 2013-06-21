@@ -1,3 +1,10 @@
+http://gcc.gnu.org/viewcvs?root=gcc&view=rev&rev=193189
+2012-11-05  Eric Botcazou  <ebotcazou@adacore.com>
+
+	PR tree-optimization/54986
+	* gimple-fold.c (canonicalize_constructor_val): Strip again all no-op
+	conversions on entry but add them back on exit if needed.
+
 http://gcc.gnu.org/viewcvs?root=gcc&view=rev&rev=191571
 2012-09-17  Jakub Jelinek  <jakub@redhat.com>
 
