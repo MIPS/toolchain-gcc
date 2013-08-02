@@ -646,12 +646,13 @@ INHIBIT_LIBC_CFLAGS = -Dinhibit_libc
 endif
 
 # Options to use when compiling libgcc2.a.
+# Adding -funwind-tables to debug idiv0 cases for Android
 #
 LIBGCC2_DEBUG_CFLAGS = -g
 LIBGCC2_CFLAGS = -O2 $(LIBGCC2_INCLUDES) $(GCC_CFLAGS) $(TARGET_LIBGCC2_CFLAGS) \
 		 $(LIBGCC2_DEBUG_CFLAGS) $(GTHREAD_FLAGS) \
 		 -DIN_LIBGCC2 -D__GCC_FLOAT_NOT_NEEDED \
-		 -fno-stack-protector \
+		 -fno-stack-protector -funwind-tables \
 		 $(INHIBIT_LIBC_CFLAGS)
 
 # Additional options to use when compiling libgcc2.a.
