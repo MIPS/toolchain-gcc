@@ -124,7 +124,7 @@
 .\" ========================================================================
 .\"
 .IX Title "GCC 1"
-.TH GCC 1 "2013-03-22" "gcc-4.8.0" "GNU"
+.TH GCC 1 "2013-05-31" "gcc-4.8.1" "GNU"
 .\" For nroff, turn off justification.  Always turn off hyphenation; it makes
 .\" way too many mistakes in technical documents.
 .if n .ad l
@@ -934,7 +934,6 @@ See \s-1RS/6000\s0 and PowerPC Options.
 \&\-mfaster\-structs  \-mno\-faster\-structs  \-mflat  \-mno\-flat 
 \&\-mfpu  \-mno\-fpu  \-mhard\-float  \-msoft\-float 
 \&\-mhard\-quad\-float  \-msoft\-quad\-float 
-\&\-mlittle\-endian 
 \&\-mstack\-bias  \-mno\-stack\-bias 
 \&\-munaligned\-doubles  \-mno\-unaligned\-doubles 
 \&\-mv8plus  \-mno\-v8plus  \-mvis  \-mno\-vis 
@@ -7480,7 +7479,7 @@ compiled.  All public functions and variables with the exception of \f(CW\*(C`ma
 and those merged by attribute \f(CW\*(C`externally_visible\*(C'\fR become static functions
 and in effect are optimized more aggressively by interprocedural optimizers.
 .Sp
-In combination with \f(CW\*(C`\-flto\*(C'\fR using this option should not be used.
+This option should not be used in combination with \f(CW\*(C`\-flto\*(C'\fR.
 Instead relying on a linker plugin should provide safer and more precise
 information.
 .IP "\fB\-flto[=\fR\fIn\fR\fB]\fR" 4
@@ -10986,7 +10985,7 @@ points to.
 The startup code from libgcc never sets \f(CW\*(C`EIND\*(C'\fR.
 Notice that startup code is a blend of code from libgcc and AVR-LibC.
 For the impact of AVR-LibC on \f(CW\*(C`EIND\*(C'\fR, see the
-AVR-LibC\ user\ manual (\f(CW\*(C`http://nongnu.org/avr\-libc/user\-manual\*(C'\fR).
+AVR-LibC\ user\ manual (\f(CW\*(C`http://nongnu.org/avr\-libc/user\-manual/\*(C'\fR).
 .IP "\(bu" 4
 It is legitimate for user-specific startup code to set up \f(CW\*(C`EIND\*(C'\fR
 early, for example by means of initialization code located in
@@ -18302,10 +18301,6 @@ processor (which corresponds to erratum #13 of the \s-1AT697E\s0 processor).
 .PP
 These \fB\-m\fR options are supported in addition to the above
 on \s-1SPARC\-V9\s0 processors in 64\-bit environments:
-.IP "\fB\-mlittle\-endian\fR" 4
-.IX Item "-mlittle-endian"
-Generate code for a processor running in little-endian mode.  It is only
-available for a few configurations and most notably not on Solaris and Linux.
 .IP "\fB\-m32\fR" 4
 .IX Item "-m32"
 .PD 0
