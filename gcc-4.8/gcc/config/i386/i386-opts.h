@@ -86,7 +86,7 @@ enum ix86_veclibabi {
 };
 
 enum stack_protector_guard {
-  SSP_TLS,      /* per-thread canary at %gs:20 */
+  SSP_TLS,      /* per-thread canary in TLS block */
   SSP_GLOBAL    /* global canary */
 };
 
