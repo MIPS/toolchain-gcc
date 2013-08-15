@@ -1129,6 +1129,7 @@ struct mips_cpu_info {
 %{mdspr2} %{mno-dspr2} \
 %{msmartmips} %{mno-smartmips} \
 %{mmt} %{mno-mt} \
+%{mmxu} %{mno-mxu} \
 %{mfix-vr4120} %{mfix-vr4130} \
 %{mfix-24k} \
 %{noasmopt:-O0; O0|fno-delayed-branch:-O1; O*:-O2; :-O1} \

@@ -1130,6 +1130,7 @@ enum mips_code_readable_setting {
 %{mdspr2} %{mno-dspr2} \
 %{msmartmips} %{mno-smartmips} \
 %{mmt} %{mno-mt} \
+%{mmxu} %{mno-mxu} \
 %{mfix-vr4120} %{mfix-vr4130} \
 %(subtarget_asm_optimizing_spec) \
 %(subtarget_asm_debugging_spec) \
