@@ -1,3 +1,12 @@
+http://gcc.gnu.org/viewcvs/gcc?view=rev&rev=201780
+2013-08-16  Jakub Jelinek  <jakub@redhat.com>
+
+    PR tree-optimization/58165
+    * tree-call-cdce.c (shrink_wrap_one_built_in_call): If
+    bi_call must be the last stmt in a bb, don't split_block, instead
+    use fallthru edge from it and give up if there is none.
+    Release conds vector when returning early.
+
 http://gcc.gnu.org/viewcvs/gcc?view=rev&rev=198332
 2013-04-26  Jakub Jelinek  <jakub@redhat.com>
 
