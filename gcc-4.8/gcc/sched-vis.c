@@ -344,11 +344,11 @@ print_exp (pretty_printer *pp, const_rtx x, int verbose)
 	pp_string (pp, "unspec");
 	if (GET_CODE (x) == UNSPEC_VOLATILE)
 	  pp_string (pp, "/v");
-	pp_character (pp, '[');
+	pp_left_bracket (pp);
 	for (i = 0; i < XVECLEN (x, 0); i++)
 	  {
 	    if (i != 0)
-	      pp_character (pp, ',');
+	      pp_comma (pp);
 	    print_pattern (pp, XVECEXP (x, 0, i), verbose);
 	  }
 	pp_string (pp, "] ");
@@ -390,7 +390,7 @@ print_exp (pretty_printer *pp, const_rtx x, int verbose)
   if (fun)
     {
       pp_string (pp, fun);
-      pp_character (pp, '(');
+      pp_left_paren (pp);
     }
 
   for (i = 0; i < 4; i++)
@@ -401,13 +401,13 @@ print_exp (pretty_printer *pp, const_rtx x, int verbose)
       if (op[i])
 	{
 	  if (fun && i != 0)
-	    pp_character (pp, ',');
+	    pp_comma (pp);
 	  print_value (pp, op[i], verbose);
 	}
     }
 
   if (fun)
-    pp_character (pp, ')');
+    pp_right_paren (pp);
 }		/* print_exp */
 
 /* Prints rtxes, I customarily classified as values.  They're constants,
@@ -459,13 +459,13 @@ print_value (pretty_printer *pp, const_rtx x, int verbose)
     case STRICT_LOW_PART:
       pp_printf (pp, "%s(", GET_RTX_NAME (GET_CODE (x)));
       print_value (pp, XEXP (x, 0), verbose);
-      pp_character (pp, ')');
+      pp_right_paren (pp);
       break;
     case REG:
       if (REGNO (x) < FIRST_PSEUDO_REGISTER)
 	{
 	  if (ISDIGIT (reg_names[REGNO (x)][0]))
-	    pp_character (pp, '%');
+	    pp_modulo (pp);
 	  pp_string (pp, reg_names[REGNO (x)]);
 	}
       else
@@ -483,9 +483,9 @@ print_value (pretty_printer *pp, const_rtx x, int verbose)
       pp_string (pp, GET_RTX_NAME (GET_CODE (x)));
       break;
     case MEM:
-      pp_character (pp, '[');
+      pp_left_bracket (pp);
       print_value (pp, XEXP (x, 0), verbose);
-      pp_character (pp, ']');
+      pp_right_bracket (pp);
       break;
     case DEBUG_EXPR:
       pp_printf (pp, "D#%i", DEBUG_TEMP_UID (DEBUG_EXPR_TREE_DECL (x)));
@@ -511,7 +511,7 @@ print_pattern (pretty_printer *pp, const_rtx x, int verbose)
     {
     case SET:
       print_value (pp, SET_DEST (x), verbose);
-      pp_character (pp, '=');
+      pp_equal (pp);
       print_value (pp, SET_SRC (x), verbose);
       break;
     case RETURN:
@@ -532,14 +532,14 @@ print_pattern (pretty_printer *pp, const_rtx x, int verbose)
       print_value (pp, PAT_VAR_LOCATION_LOC (x), verbose);
       break;
     case COND_EXEC:
-      pp_character (pp, '(');
+      pp_left_paren (pp);
       if (GET_CODE (COND_EXEC_TEST (x)) == NE
 	  && XEXP (COND_EXEC_TEST (x), 1) == const0_rtx)
 	print_value (pp, XEXP (COND_EXEC_TEST (x), 0), verbose);
       else if (GET_CODE (COND_EXEC_TEST (x)) == EQ
 	       && XEXP (COND_EXEC_TEST (x), 1) == const0_rtx)
 	{
-	  pp_character (pp, '!');
+	  pp_exclamation (pp);
 	  print_value (pp, XEXP (COND_EXEC_TEST (x), 0), verbose);
 	}
       else
@@ -551,13 +551,13 @@ print_pattern (pretty_printer *pp, const_rtx x, int verbose)
       {
 	int i;
 
-	pp_character (pp, '{');
+	pp_left_brace (pp);
 	for (i = 0; i < XVECLEN (x, 0); i++)
 	  {
 	    print_pattern (pp, XVECEXP (x, 0, i), verbose);
-	    pp_character (pp, ';');
+	    pp_semicolon (pp);
 	  }
-	pp_character (pp, '}');
+	pp_right_brace (pp);
       }
       break;
     case SEQUENCE:
@@ -568,9 +568,9 @@ print_pattern (pretty_printer *pp, const_rtx x, int verbose)
 	for (i = 0; i < XVECLEN (x, 0); i++)
 	  {
 	    print_pattern (pp, XVECEXP (x, 0, i), verbose);
-	    pp_character (pp, ';');
+		pp_semicolon (pp);
 	  }
-	pp_character (pp, '}');
+	pp_right_brace (pp);
       }
       break;
     case ASM_INPUT:
@@ -700,9 +700,9 @@ print_insn (pretty_printer *pp, const_rtx x, int verbose)
 
 	  case NOTE_INSN_VAR_LOCATION:
 	  case NOTE_INSN_CALL_ARG_LOCATION:
-	    pp_character (pp, '{');
+	    pp_left_brace (pp);
 	    print_pattern (pp, NOTE_VAR_LOCATION (x), verbose);
-	    pp_character (pp, '}');
+	    pp_right_brace (pp);
 	    break;
 
 	  default:
@@ -813,7 +813,7 @@ rtl_dump_bb_for_graph (pretty_printer *pp, basic_block bb)
     {
       if (! first)
 	{
-	  pp_character (pp, '|');
+	  pp_bar (pp);
 	  pp_write_text_to_stream (pp);
 	}
       first = false;

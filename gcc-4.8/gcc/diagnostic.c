@@ -72,9 +72,12 @@ build_message_string (const char *msg, ...)
 
 /* Same as diagnostic_build_prefix, but only the source FILE is given.  */
 char *
-file_name_as_prefix (const char *f)
+file_name_as_prefix (diagnostic_context *context, const char *f)
 {
-  return build_message_string ("%s: ", f);
+  const char *locus_cs
+    = colorize_start (pp_show_color (context->printer), "locus");
+  const char *locus_ce = colorize_stop (pp_show_color (context->printer));
+  return build_message_string ("%s%s:%s ", locus_cs, f, locus_ce);
 }
 
 
@@ -303,7 +306,7 @@ diagnostic_show_locus (diagnostic_context * context,
   pp_newline (context->printer);
   saved_prefix = pp_get_prefix (context->printer);
   pp_set_prefix (context->printer, NULL);
-  pp_character (context->printer, ' ');
+  pp_space (context->printer);
   while (max_width > 0 && *line != '\0')
     {
       char c = *line == '\t' ? ' ' : *line;
@@ -514,18 +517,18 @@ diagnostic_report_current_module (diagnostic_context *context, location_t where)
 	  map = INCLUDED_FROM (line_table, map);
 	  if (context->show_column)
 	    pp_verbatim (context->printer,
-			 "In file included from %s:%d:%d",
+			 "In file included from %r%s:%d:%d%R", "locus",
 			 LINEMAP_FILE (map),
 			 LAST_SOURCE_LINE (map), LAST_SOURCE_COLUMN (map));
 	  else
 	    pp_verbatim (context->printer,
-			 "In file included from %s:%d",
+			 "In file included from %r%s:%d%R", "locus",
 			 LINEMAP_FILE (map), LAST_SOURCE_LINE (map));
 	  while (! MAIN_FILE_P (map))
 	    {
 	      map = INCLUDED_FROM (line_table, map);
 	      pp_verbatim (context->printer,
-			   ",\n                 from %s:%d",
+			   ",\n                 from %r%s:%d%R", "locus",
 			   LINEMAP_FILE (map), LAST_SOURCE_LINE (map));
 	    }
 	  pp_verbatim (context->printer, ":");
@@ -551,7 +554,8 @@ default_diagnostic_finalizer (diagnostic_context *context ATTRIBUTE_UNUSED,
 
 /* Interface to specify diagnostic kind overrides.  Returns the
    previous setting, or DK_UNSPECIFIED if the parameters are out of
-   range.  */
+   range.  If OPTION_INDEX is zero, the new setting is for all the
+   diagnostics.  */
 diagnostic_t
 diagnostic_classify_diagnostic (diagnostic_context *context,
 				int option_index,
@@ -560,7 +564,7 @@ diagnostic_classify_diagnostic (diagnostic_context *context,
 {
   diagnostic_t old_kind;
 
-  if (option_index <= 0
+  if (option_index < 0
       || option_index >= context->n_opts
       || new_kind >= DK_LAST_DIAGNOSTIC_KIND)
     return DK_UNSPECIFIED;
@@ -692,9 +696,8 @@ diagnostic_report_diagnostic (diagnostic_context *context,
       /* This tests for #pragma diagnostic changes.  */
       if (context->n_classification_history > 0)
 	{
-	  int i;
 	  /* FIXME: Stupid search.  Optimize later. */
-	  for (i = context->n_classification_history - 1; i >= 0; i --)
+	  for (int i = context->n_classification_history - 1; i >= 0; i --)
 	    {
 	      if (linemap_location_before_p
 		  (line_table,
@@ -706,7 +709,9 @@ diagnostic_report_diagnostic (diagnostic_context *context,
 		      i = context->classification_history[i].option;
 		      continue;
 		    }
-		  if (context->classification_history[i].option == diagnostic->option_index)
+		  int option = context->classification_history[i].option;
+		  /* The option 0 is for all the diagnostics.  */
+		  if (option == 0 || option == diagnostic->option_index)
 		    {
 		      diag_class = context->classification_history[i].kind;
 		      if (diag_class != DK_UNSPECIFIED)

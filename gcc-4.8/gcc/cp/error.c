@@ -663,7 +663,7 @@ dump_aggr_type (tree t, int flags)
       if (lambda_function (t))
 	dump_parameters (FUNCTION_FIRST_USER_PARMTYPE (lambda_function (t)),
 			 flags);
-      pp_character(cxx_pp, '>');
+      pp_greater (cxx_pp);
     }
   else
     pp_cxx_tree_identifier (cxx_pp, name);
@@ -710,13 +710,13 @@ dump_type_prefix (tree t, int flags)
 				     TYPE_ATTRIBUTES (sub));
 	  }
 	if (TREE_CODE (t) == POINTER_TYPE)
-	  pp_character(cxx_pp, '*');
+	  pp_star (cxx_pp);
 	else if (TREE_CODE (t) == REFERENCE_TYPE)
 	{
 	  if (TYPE_REF_IS_RVALUE (t))
 	    pp_string (cxx_pp, "&&");
 	  else
-	    pp_character (cxx_pp, '&');
+	    pp_ampersand (cxx_pp);
 	}
 	pp_base (cxx_pp)->padding = pp_before;
 	pp_cxx_cv_qualifier_seq (cxx_pp, t);
@@ -2813,7 +2813,7 @@ type_to_string (tree typ, int verbose)
       /* And remember the start of the aka dump.  */
       aka_start = obstack_object_size (ob);
       dump_type (aka, flags);
-      pp_character (cxx_pp, '}');
+      pp_right_brace (cxx_pp);
       p = (char*)obstack_base (ob);
       /* If they are identical, cut off the aka with a NUL.  */
       if (memcmp (p, p+aka_start, len) == 0)
@@ -2936,7 +2936,7 @@ cp_print_error_function (diagnostic_context *context,
       const char *file = LOCATION_FILE (diagnostic->location);
       tree abstract_origin = diagnostic_abstract_origin (diagnostic);
       char *new_prefix = (file && abstract_origin == NULL)
-			 ? file_name_as_prefix (file) : NULL;
+			 ? file_name_as_prefix (context, file) : NULL;
 
       pp_base_set_prefix (context->printer, new_prefix);
 

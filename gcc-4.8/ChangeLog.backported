@@ -7,6 +7,86 @@ http://gcc.gnu.org/viewcvs/gcc?view=rev&rev=201780
     use fallthru edge from it and give up if there is none.
     Release conds vector when returning early.
 
+http://gcc.gnu.org/viewcvs/gcc?view=rev&rev=201574
+2013-08-07  Eric Botcazou  <ebotcazou@adacore.com>
+
+    * diagnostic.c (diagnostic_classify_diagnostic): Accept zero index and
+    document its semantics.
+    (diagnostic_report_diagnostic): Adjust accordingly.
+    * gnat.dg/warn9.adb: New test.
+
+http://gcc.gnu.org/viewcvs/gcc?view=rev&rev=201467
+2013-08-03  Gabriel Dos Reis  <gdr@integrable-solutions.net>
+
+    * pretty-print.h (pp_underscore): New.
+    (pp_comma): Tidy.
+    * gimple-pretty-print.c (dump_unary_rhs): Use specialized pretty
+    printer functions instead of pp_character.
+    (dump_binary_rhs): Likewise.
+    (dump_ternary_rhs): Likewise.
+    (dump_gimple_call_args): Likewise.
+    (pp_points_to_solution): Likewise.
+    (dump_gimple_call): Likewise.
+    (dump_gimple_switch): Likewise.
+    (dump_gimple_cond): Likewise.
+    (dump_gimple_bind): Likewise.
+    (dump_gimple_try): Likewise.
+    (dump_gimple_omp_for): Likewise.
+    (dump_gimple_omp_continue): Likewise.
+    (dump_gimple_omp_single): Likewise.
+    (dump_gimple_omp_sections): Likewise.
+    (dump_gimple_omp_block): Likewise.
+    (dump_gimple_omp_critical): Likewise.
+    (dump_gimple_transaction): Likewise.
+    (dump_gimple_asm): Likewise.
+    (dump_gimple_phi): Likewise.
+    (dump_gimple_omp_parallel): Likewise.
+    (dump_gimple_omp_task): Likewise.
+    (dump_gimple_omp_atomic_load): Likewise.
+    (dump_gimple_omp_atomic_store): Likewise.
+    (dump_gimple_mem_ops): Likewise.
+    (pp_gimple_stmt_1): Likewise.
+    (pp_cfg_jump): Likewise.
+    (dump_implicit_edges): Likewise.
+    (gimple_dump_bb_for_graph): Likewise.
+    * graph.c (draw_cfg_node): Likewise.
+    * langhooks.c (lhd_print_error_function): Likewise.
+    * sched-vis.c (print_exp): Likewise.
+    (print_value): Likewise.
+    (print_pattern): Likewise.
+    (print_insn): Likewise.
+    (rtl_dump_bb_for_graph): Likewise.
+    * tree-pretty-print.c (dump_function_declaration): Likewise.
+    (dump_array_domain): Likewise.
+    (dump_omp_clause): Likewise.
+    (dump_location): Likewise.
+    (dump_generic_node): Likewise.
+    (print_struct_decl): Likewise.
+    * diagnostic.c (diagnostic_show_locus): Use pp_space.
+    * c-ada-spec.c (print_ada_macros): Use specialized pretty printer
+    functions instead of pp_character.
+    (pp_ada_tree_identifier): Likewise.
+    (dump_ada_double_name): Likewise.
+    (dump_ada_function_declaration): Likewise.
+    (dump_ada_array_domains): Likewise.
+    (dump_template_types): Likewise.
+    (dump_generic_ada_node): Likewise.
+    (print_ada_declaration): Likewise.
+    (print_ada_struct_decl): Likewise.
+    * c-pretty-print.c (pp_c_integer_constant): Likewise.
+    * error.c (dump_aggr_type): Use specialized pretty printer
+    functions instead of pp_character.
+    (dump_type_prefix): Likewise.
+    (dump_simple_decl): Likewise.
+    (type_to_string): Likewise.
+
+http://gcc.gnu.org/viewcvs/gcc?view=rev&rev=198900
+2013-05-14  Jakub Jelinek  <jakub@redhat.com>
+
+    * tree.c (warn_deprecated_use): Print file:line using locus color.
+    * diagnostic.c (diagnostic_report_current_module): Print file:line
+    and file:line:column using locus color.
+
 http://gcc.gnu.org/viewcvs/gcc?view=rev&rev=198332
 2013-04-26  Jakub Jelinek  <jakub@redhat.com>
 
@@ -25,6 +105,16 @@ http://gcc.gnu.org/viewcvs/gcc?view=rev&rev=198332
     * diagnostic.c (file_name_as_prefix): Likewise.  Colorize
     the string as locus.
     * langhooks.c (lhd_print_error_function): Adjust caller.
+
+http://gcc.gnu.org/viewcvs/gcc?view=rev&rev=198331
+2013-04-26  Jakub Jelinek  <jakub@redhat.com>
+
+    * diagnostic.h (file_name_as_prefix): Add context argument.
+    * diagnostic.c (file_name_as_prefix): Likewise.  Colorize
+    the string as locus.
+    * langhooks.c (lhd_print_error_function): Adjust caller.
+    * error.c (cp_print_error_function): Adjust file_name_as_prefix
+    caller.
 
 http://gcc.gnu.org/viewcvs/gcc?view=rev&rev=197841
 http://gcc.gnu.org/viewcvs/gcc?view=rev&rev=197842
