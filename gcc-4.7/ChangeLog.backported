@@ -1,3 +1,23 @@
+http://gcc.gnu.org/viewcvs?root=gcc&view=rev&rev=194453
+2012-12-12  Steve Ellcey  <sellcey@mips.com>
+
+	* config/mips/mips.c (mips_option_override): Set
+	mips_dbx_regno entries to IGNORED_DWARF_REGNUM by default.
+
+
+http://gcc.gnu.org/viewcvs?root=gcc&view=rev&rev=194372
+2012-12-10  Steve Ellcey  <sellcey@mips.com>
+
+	PR target/54061
+	rtl.h (IGNORED_DWARF_REGNUM): New.
+	* dwarf2out.c (reg_loc_descriptor): Check for IGNORED_DWARF_REGNUM.
+	(mem_loc_descriptor): Ditto.
+	* config/mips/mips.h (ALL_COP_REG_FIRST): New.
+	(ALL_COP_REG_LAST): New.
+	(ALL_COP_REG_NUM): Redefine using above macros.
+	* config/mips/mips.c (mips_option_override): Set mips_dbx_regno
+	coprocessor entries to IGNORED_DWARF_REGNUM.
+
 http://gcc.gnu.org/viewcvs?root=gcc&view=rev&rev=193189
 2012-11-05  Eric Botcazou  <ebotcazou@adacore.com>
 
