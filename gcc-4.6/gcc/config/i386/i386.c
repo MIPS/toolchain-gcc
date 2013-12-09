@@ -2683,6 +2683,7 @@ static const char *const cpu_names[TARGET_CPU_DEFAULT_max] =
   "core2",
   "corei7",
   "atom",
+  "intel",
   "geode",
   "k6",
   "k6-2",
@@ -3434,6 +3435,9 @@ ix86_option_override_internal (bool main_args_p)
       {"atom", PROCESSOR_ATOM, CPU_ATOM,
 	PTA_64BIT | PTA_MMX | PTA_SSE | PTA_SSE2 | PTA_SSE3
 	| PTA_SSSE3 | PTA_CX16 | PTA_MOVBE},
+      {"intel", PROCESSOR_ATOM, CPU_ATOM,
+	PTA_64BIT | PTA_MMX | PTA_SSE | PTA_SSE2 | PTA_SSE3
+	| PTA_SSSE3 | PTA_CX16 | PTA_MOVBE},
       {"geode", PROCESSOR_GEODE, CPU_GEODE,
 	PTA_MMX | PTA_3DNOW | PTA_3DNOW_A |PTA_PREFETCH_SSE},
       {"k6", PROCESSOR_K6, CPU_K6, PTA_MMX},
@@ -3765,6 +3769,9 @@ ix86_option_override_internal (bool main_args_p)
 
   if (!strcmp (ix86_arch_string, "generic"))
     error ("generic CPU can be used only for %stune=%s %s",
+	   prefix, suffix, sw);
+  else if (!strcmp (ix86_arch_string, "intel"))
+    error ("intel CPU can be used only for %stune=%s %s",
 	   prefix, suffix, sw);
   else if (!strncmp (ix86_arch_string, "generic", 7) || i == pta_size)
     error ("bad value (%s) for %sarch=%s %s",

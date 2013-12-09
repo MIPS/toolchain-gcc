@@ -592,6 +592,7 @@ enum target_cpu_default
   TARGET_CPU_DEFAULT_core2,
   TARGET_CPU_DEFAULT_corei7,
   TARGET_CPU_DEFAULT_atom,
+  TARGET_CPU_DEFAULT_intel,
 
   TARGET_CPU_DEFAULT_geode,
   TARGET_CPU_DEFAULT_k6,

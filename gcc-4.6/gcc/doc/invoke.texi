@@ -12683,6 +12683,27 @@ indicates the instruction set the compiler can use, and there is no
 generic instruction set applicable to all processors.  In contrast,
 @option{-mtune} indicates the processor (or, in this case, collection of
 processors) for which the code is optimized.
+
+@item intel
+Produce code optimized for the most current Intel processors, which are
+Sandy Bridge and Bonnell for this version of GCC.  If you know the CPU
+on which your code will run, then you should use the corresponding
+@option{-mtune} or @option{-march} option instead of @option{-mtune=intel}.
+But, if you want your application performs better on both Sandy Bridge and
+Bonnell, then you should use this option.
+
+As new Intel processors are deployed in the marketplace, the behavior of
+this option will change.  Therefore, if you upgrade to a newer version of
+GCC, code generation controlled by this option will change to reflect
+the most current Intel processors at the time that version of GCC is
+released.
+
+There is no @option{-march=intel} option because @option{-march} indicates
+the instruction set the compiler can use, and there is no common
+instruction set applicable to all processors.  In contrast,
+@option{-mtune} indicates the processor (or, in this case, collection of
+processors) for which the code is optimized.
+
 @item native
 This selects the CPU to tune for at compilation time by determining
 the processor type of the compiling machine.  Using @option{-mtune=native}
