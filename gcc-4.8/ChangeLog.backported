@@ -1,3 +1,11 @@
+http://gcc.gnu.org/viewcvs/gcc?view=revision&revision=205720
+2013-12-05  Jason Merrill  <jason@redhat.com>
+
+	PR c++/59044
+	PR c++/59052
+	* pt.c (most_specialized_class): Use the partially instantiated
+	template for deduction.  Drop the TMPL parameter.
+
 http://gcc.gnu.org/viewcvs?rev=203874&root=gcc&view=rev
 2013-10-20  Chris Jefferson  <chris@bubblescope.net>
 	    Paolo Carlini  <paolo.carlini@oracle.com>
