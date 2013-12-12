@@ -40,6 +40,7 @@
   do						\
     {						\
 	GNU_USER_TARGET_OS_CPP_BUILTINS();	\
+	ANDROID_TARGET_OS_CPP_BUILTINS();	\
     }						\
   while (0)
 
