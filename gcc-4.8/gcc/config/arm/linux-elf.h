@@ -46,7 +46,7 @@
 
 #undef  MULTILIB_DEFAULTS
 #define MULTILIB_DEFAULTS \
-	{ "marm", "mlittle-endian", "mfloat-abi=hard", "mno-thumb-interwork" }
+	{ "marm", "mlittle-endian", "mfloat-abi=softfp", "mno-thumb-interwork" }
 
 /* Now we define the strings used to build the spec file.  */
 #undef  LIB_SPEC
