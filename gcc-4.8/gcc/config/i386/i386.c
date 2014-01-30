@@ -2674,6 +2674,7 @@ ix86_target_string (HOST_WIDE_INT isa, int flags, const char *arch,
   static struct ix86_target_opts flag_opts[] =
   {
     { "-m128bit-long-double",		MASK_128BIT_LONG_DOUBLE },
+    { "-mlong-double-128",		MASK_LONG_DOUBLE_128 },
     { "-mlong-double-64",		MASK_LONG_DOUBLE_64 },
     { "-m80387",			MASK_80387 },
     { "-maccumulate-outgoing-args",	MASK_ACCUMULATE_OUTGOING_ARGS },
@@ -4006,10 +4007,19 @@ ix86_option_override_internal (bool main_args_p)
   else if (target_flags_explicit & MASK_RECIP)
     recip_mask &= ~(RECIP_MASK_ALL & ~recip_mask_explicit);
 
-  /* Default long double to 64-bit for Bionic.  */
+  /* Default long double to 64-bit for 32-bit Bionic and to __float128
+     for 64-bit Bionic.  */
   if (TARGET_HAS_BIONIC
-      && !(target_flags_explicit & MASK_LONG_DOUBLE_64))
-    target_flags |= MASK_LONG_DOUBLE_64;
+      && !(target_flags_explicit
+	   & (MASK_LONG_DOUBLE_64 | MASK_LONG_DOUBLE_128)))
+    target_flags |= (TARGET_64BIT
+			     ? MASK_LONG_DOUBLE_128
+			     : MASK_LONG_DOUBLE_64);
+
+  if ((target_flags & MASK_LONG_DOUBLE_128))
+    target_flags &= ~MASK_LONG_DOUBLE_64;
+  else if ((target_flags & MASK_LONG_DOUBLE_64))
+    target_flags &= ~MASK_LONG_DOUBLE_128;
 
   /* Save the initial options in case the user does function specific
      options.  */
