@@ -22,6 +22,7 @@
 #define GCC_AARCH64_LINUX_H
 
 #define GLIBC_DYNAMIC_LINKER "/lib/ld-linux-aarch64.so.1"
+#define BIONIC_DYNAMIC_LINKER "/system/bin/linker64"
 
 #define CPP_SPEC "%{pthread:-D_REENTRANT}"
 
