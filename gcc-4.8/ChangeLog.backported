@@ -1,3 +1,14 @@
+http://gcc.gnu.org/viewcvs/gcc?view=revision&revision=206703
+2014-01-17  Kugan Vivekanandarajah  <kuganv@linaro.org>
+
+	Backport from mainline
+	2014-01-15  Matthew Gretton-Dann  <matthew.gretton-dann@linaro.org>
+	    Kugan Vivekanandarajah  <kuganv@linaro.org>
+
+	PR target/59695
+	* config/aarch64/aarch64.c (aarch64_build_constant): Fix incorrect
+	truncation.
+
 http://gcc.gnu.org/viewcvs/gcc?view=revision&revision=208519
 2014-03-12  Roland McGrath  <mcgrathr@google.com>
 	    Mark Seaborn  <mseaborn@google.com>
