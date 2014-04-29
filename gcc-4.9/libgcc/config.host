@@ -320,8 +320,7 @@ aarch64*-*-elf)
 	tmake_file="${tmake_file} ${cpu_type}/t-softfp t-softfp"
 	;;
 aarch64*-*-linux*)
-    # ANDROID - uncomment when sysroot contains sys/ucontext.h
-	# md_unwind_header=aarch64/linux-unwind.h
+	md_unwind_header=aarch64/linux-unwind.h
 	tmake_file="${tmake_file} ${cpu_type}/t-aarch64"
 	tmake_file="${tmake_file} ${cpu_type}/t-softfp t-softfp"
 	;;
