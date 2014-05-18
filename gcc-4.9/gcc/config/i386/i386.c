@@ -3128,7 +3128,7 @@ ix86_option_override_internal (bool main_args_p,
   (PTA_SANDYBRIDGE | PTA_FSGSBASE | PTA_RDRND | PTA_F16C)
 #define PTA_HASWELL \
   (PTA_IVYBRIDGE | PTA_AVX2 | PTA_BMI | PTA_BMI2 | PTA_LZCNT \
-   | PTA_FMA | PTA_MOVBE | PTA_RTM | PTA_HLE)
+   | PTA_FMA | PTA_MOVBE | PTA_HLE)
 #define PTA_BROADWELL \
   (PTA_HASWELL | PTA_ADX | PTA_PRFCHW | PTA_RDSEED)
 #define PTA_BONNELL \
@@ -24151,8 +24151,13 @@ ix86_expand_set_or_movmem (rtx dst, rtx src, rtx count_exp, rtx val_exp,
     align = MEM_ALIGN (dst) / BITS_PER_UNIT;
 
   if (CONST_INT_P (count_exp))
-    min_size = max_size = probable_max_size = count = expected_size
-      = INTVAL (count_exp);
+    {
+      min_size = max_size = probable_max_size = count = expected_size
+	= INTVAL (count_exp);
+      /* When COUNT is 0, there is nothing to do.  */
+      if (!count)
+	return true;
+    }
   else
     {
       if (min_size_exp)
@@ -24161,7 +24166,7 @@ ix86_expand_set_or_movmem (rtx dst, rtx src, rtx count_exp, rtx val_exp,
 	max_size = INTVAL (max_size_exp);
       if (probable_max_size_exp)
 	probable_max_size = INTVAL (probable_max_size_exp);
-      if (CONST_INT_P (expected_size_exp) && count == 0)
+      if (CONST_INT_P (expected_size_exp))
 	expected_size = INTVAL (expected_size_exp);
      }
 
@@ -24390,7 +24395,8 @@ ix86_expand_set_or_movmem (rtx dst, rtx src, rtx count_exp, rtx val_exp,
 	  if (jump_around_label == NULL_RTX)
 	    jump_around_label = gen_label_rtx ();
 	  emit_cmp_and_jump_insns (count_exp, GEN_INT (dynamic_check - 1),
-				   LEU, 0, GET_MODE (count_exp), 1, hot_label);
+				   LEU, 0, counter_mode (count_exp),
+				   1, hot_label);
 	  predict_jump (REG_BR_PROB_BASE * 90 / 100);
 	  if (issetmem)
 	    set_storage_via_libcall (dst, count_exp, val_exp, false);
@@ -35406,7 +35412,8 @@ rdrand_step:
       else
 	op2 = gen_rtx_SUBREG (SImode, op0, 0);
 
-      if (target == 0)
+      if (target == 0
+	  || !register_operand (target, SImode))
 	target = gen_reg_rtx (SImode);
 
       pat = gen_rtx_GEU (VOIDmode, gen_rtx_REG (CCCmode, FLAGS_REG),
@@ -35448,7 +35455,8 @@ rdseed_step:
                          const0_rtx);
       emit_insn (gen_rtx_SET (VOIDmode, op2, pat));
 
-      if (target == 0)
+      if (target == 0
+	  || !register_operand (target, SImode))
         target = gen_reg_rtx (SImode);
 
       emit_insn (gen_zero_extendqisi2 (target, op2));

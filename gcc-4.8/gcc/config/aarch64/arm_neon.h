@@ -24819,17 +24819,17 @@ vst4_s32 (int32_t * __a, int32x2x4_t val)
 __extension__ static __inline void __attribute__ ((__always_inline__))
 vst4_u8 (uint8_t * __a, uint8x8x4_t val)
 {
-  __builtin_aarch64_simd_xi __o;
-  uint8x16x4_t temp;
-  temp.val[0] = vcombine_u8 (val.val[0], vcreate_u8 (UINT64_C (0)));
-  temp.val[1] = vcombine_u8 (val.val[1], vcreate_u8 (UINT64_C (0)));
-  temp.val[2] = vcombine_u8 (val.val[2], vcreate_u8 (UINT64_C (0)));
-  temp.val[3] = vcombine_u8 (val.val[3], vcreate_u8 (UINT64_C (0)));
-  __o = __builtin_aarch64_set_qregxiv16qi (__o, (int8x16_t) temp.val[0], 0);
-  __o = __builtin_aarch64_set_qregxiv16qi (__o, (int8x16_t) temp.val[1], 1);
-  __o = __builtin_aarch64_set_qregxiv16qi (__o, (int8x16_t) temp.val[2], 2);
-  __o = __builtin_aarch64_set_qregxiv16qi (__o, (int8x16_t) temp.val[3], 3);
-  __builtin_aarch64_st4v8qi ((__builtin_aarch64_simd_qi *) __a, __o);
+  __builtin_aarch64_simd_xi __o1;
+  uint8x16x4_t temp1;
+  temp1.val[0] = vcombine_u8 (val.val[0], vcreate_u8 (UINT64_C (0)));
+  temp1.val[1] = vcombine_u8 (val.val[1], vcreate_u8 (UINT64_C (0)));
+  temp1.val[2] = vcombine_u8 (val.val[2], vcreate_u8 (UINT64_C (0)));
+  temp1.val[3] = vcombine_u8 (val.val[3], vcreate_u8 (UINT64_C (0)));
+  __o1 = __builtin_aarch64_set_qregxiv16qi (__o1, (int8x16_t) temp1.val[0], 0);
+  __o1 = __builtin_aarch64_set_qregxiv16qi (__o1, (int8x16_t) temp1.val[1], 1);
+  __o1 = __builtin_aarch64_set_qregxiv16qi (__o1, (int8x16_t) temp1.val[2], 2);
+  __o1 = __builtin_aarch64_set_qregxiv16qi (__o1, (int8x16_t) temp1.val[3], 3);
+  __builtin_aarch64_st4v8qi ((__builtin_aarch64_simd_qi *) __a, __o1);
 }
 
 __extension__ static __inline void __attribute__ ((__always_inline__))
