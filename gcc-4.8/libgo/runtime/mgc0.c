@@ -174,7 +174,7 @@ static struct {
 	Obj	*roots;
 	uint32	nroot;
 	uint32	rootcap;
-} work;
+} work __attribute__((aligned(8)));
 
 enum {
 	GC_DEFAULT_PTR = GC_NUM_INSTR,
@@ -239,7 +239,6 @@ markonly(void *obj)
 	// (Manually inlined copy of MHeap_LookupMaybe.)
 	k = (uintptr)obj>>PageShift;
 	x = k;
-	if(sizeof(void*) == 8)
 		x -= (uintptr)runtime_mheap->arena_start>>PageShift;
 	s = runtime_mheap->map[x];
 	if(s == nil || k < s->start || k - s->start >= s->npages || s->state != MSpanInUse)
@@ -418,7 +417,6 @@ flushptrbuf(PtrTarget *ptrbuf, PtrTarget **ptrbufpos, Obj **_wp, Workbuf **_wbuf
 			// (Manually inlined copy of MHeap_LookupMaybe.)
 			k = (uintptr)obj>>PageShift;
 			x = k;
-			if(sizeof(void*) == 8)
 				x -= (uintptr)arena_start>>PageShift;
 			s = runtime_mheap->map[x];
 			if(s == nil || k < s->start || k - s->start >= s->npages || s->state != MSpanInUse)
@@ -466,7 +464,6 @@ flushptrbuf(PtrTarget *ptrbuf, PtrTarget **ptrbufpos, Obj **_wp, Workbuf **_wbuf
 			// Ask span about size class.
 			// (Manually inlined copy of MHeap_Lookup.)
 			x = (uintptr)obj >> PageShift;
-			if(sizeof(void*) == 8)
 				x -= (uintptr)arena_start>>PageShift;
 			s = runtime_mheap->map[x];
 
@@ -585,7 +582,6 @@ checkptr(void *obj, uintptr objti)
 	if(t == nil)
 		return;
 	x = (uintptr)obj >> PageShift;
-	if(sizeof(void*) == 8)
 		x -= (uintptr)(runtime_mheap->arena_start)>>PageShift;
 	s = runtime_mheap->map[x];
 	objstart = (byte*)((uintptr)s->start<<PageShift);

@@ -110,6 +110,7 @@ show_typespec (gfc_typespec *ts)
       break;
 
     case BT_CHARACTER:
+      if (ts->u.cl)
       show_expr (ts->u.cl->length);
       fprintf(dumpfile, " %d", ts->kind);
       break;

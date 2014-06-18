@@ -3,7 +3,7 @@
 <title>Installing GCC: Building</title>
 <meta http-equiv="Content-Type" content="text/html">
 <meta name="description" content="Installing GCC: Building">
-<meta name="generator" content="makeinfo 4.13">
+<meta name="generator" content="makeinfo 4.12">
 <link title="Top" rel="top" href="#Top">
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
@@ -142,7 +142,7 @@ bootstrap4</span></samp>&rsquo; to increase the number of stages of bootstrap.
    <p><code>BOOT_CFLAGS</code> does not apply to bootstrapped target libraries. 
 Since these are always compiled with the compiler currently being
 bootstrapped, you can use <code>CFLAGS_FOR_TARGET</code> to modify their
-compilation flags, as for non-bootstrapped target libraries. 
+compilation flags, as for non-bootstrapped target libraries.
 Again, if the native compiler miscompiles the stage1 compiler, you may
 need to work around this by avoiding non-working parts of the stage1
 compiler.  Use <code>STAGE1_TFLAGS</code> to this end.
@@ -170,7 +170,7 @@ the one you are building on: for example, you could build a
 <samp><span class="option">--enable-bootstrap</span></samp> to the configure script.
 
    <p><code>BUILD_CONFIG</code> can be used to bring in additional customization
-to the build.  It can be set to a whitespace-separated list of names. 
+to the build.  It can be set to a whitespace-separated list of names.
 For each such <code>NAME</code>, top-level <samp><span class="file">config/</span><code>NAME</code><span class="file">.mk</span></samp> will
 be included by the top-level <samp><span class="file">Makefile</span></samp>, bringing in any settings
 it contains.  The default <code>BUILD_CONFIG</code> can be set using the
@@ -325,7 +325,7 @@ and network filesystems.
 <h3 class="section"><a name="TOC3"></a>Building the Ada compiler</h3>
 
 <p>In order to build GNAT, the Ada compiler, you need a working GNAT
-compiler (GCC version 4.0 or later). 
+compiler (GCC version 4.0 or later).
 This includes GNAT tools such as <samp><span class="command">gnatmake</span></samp> and
 <samp><span class="command">gnatlink</span></samp>, since the Ada front end is written in Ada and
 uses some GNAT-specific extensions.
@@ -355,11 +355,11 @@ bootstrap the compiler with profile feedback, use <code>make profiledbootstrap</
    <p>When &lsquo;<samp><span class="samp">make profiledbootstrap</span></samp>&rsquo; is run, it will first build a <code>stage1</code>
 compiler.  This compiler is used to build a <code>stageprofile</code> compiler
 instrumented to collect execution counts of instruction and branch
-probabilities.  Then runtime libraries are compiled with profile collected. 
+probabilities.  Then runtime libraries are compiled with profile collected.
 Finally a <code>stagefeedback</code> compiler is built using the information collected.
 
    <p>Unlike standard bootstrap, several additional restrictions apply.  The
-compiler used to build <code>stage1</code> needs to support a 64-bit integral type. 
+compiler used to build <code>stage1</code> needs to support a 64-bit integral type.
 It is recommended to only use GCC for this.  Also parallel make is currently
 not supported since collisions in profile collecting may occur.
 

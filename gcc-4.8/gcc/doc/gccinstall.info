@@ -1,5 +1,5 @@
-This is doc/gccinstall.info, produced by makeinfo version 4.13 from
-/d/gcc-4.8.1/gcc-4.8.1/gcc/doc/install.texi.
+This is doc/gccinstall.info, produced by makeinfo version 4.12 from
+/space/rguenther/gcc-4.8.3/gcc-4.8.3/gcc/doc/install.texi.
 
 Copyright (C) 1988-2013 Free Software Foundation, Inc.
 
@@ -207,7 +207,7 @@ simplest way to install the libraries.
 GNU Multiple Precision Library (GMP) version 4.3.2 (or later)
      Necessary to build GCC.  If a GMP source distribution is found in a
      subdirectory of your GCC sources named `gmp', it will be built
-     together with GCC.  Alternatively, if GMP is already installed but
+     together with GCC. Alternatively, if GMP is already installed but
      it is not in your library search path, you will have to configure
      with the `--with-gmp' configure option.  See also `--with-gmp-lib'
      and `--with-gmp-include'.
@@ -561,7 +561,7 @@ option.
           between cross and native configurations.
 
     `--with-specs=SPECS'
-          Specify additional command line driver SPECS.  This can be
+          Specify additional command line driver SPECS. This can be
           useful if you need to turn on a non-standard feature by
           default without modifying the compiler's source code, for
           instance
@@ -1435,13 +1435,13 @@ option.
 
 `--with-boot-ldflags=FLAGS'
      This option may be used to set linker flags to be used when linking
-     stage 2 and later when bootstrapping GCC.  If neither
+     stage 2 and later when bootstrapping GCC. If neither
      -with-boot-libs nor -with-host-libstdcxx is set to a value, then
      the default is `-static-libstdc++ -static-libgcc'.
 
 `--with-boot-libs=LIBS'
      This option may be used to set libraries to be used when linking
-     stage 2 and later when bootstrapping GCC.  The default is the
+     stage 2 and later when bootstrapping GCC. The default is the
      argument to `--with-host-libstdcxx', if specified.
 
 `--with-debug-prefix-map=MAP'
@@ -1730,19 +1730,19 @@ General Options
 
 `--with-arch-directory=ARCH'
      Specifies the name to use for the `jre/lib/ARCH' directory in the
-     SDK environment created when -enable-java-home is passed. Typical
+     SDK environment created when -enable-java-home is passed.  Typical
      names for this directory include i386, amd64, ia64, etc.
 
 `--with-os-directory=DIR'
-     Specifies the OS directory for the SDK include directory. This is
+     Specifies the OS directory for the SDK include directory.  This is
      set to auto detect, and is typically 'linux'.
 
 `--with-origin-name=NAME'
-     Specifies the JPackage origin name. This defaults to the 'gcj' in
+     Specifies the JPackage origin name.  This defaults to the 'gcj' in
      java-1.5.0-gcj.
 
 `--with-arch-suffix=SUFFIX'
-     Specifies the suffix for the sdk directory. Defaults to the empty
+     Specifies the suffix for the sdk directory.  Defaults to the empty
      string.  Examples include '.x86_64' in
      'java-1.5.0-gcj-1.5.0.0.x86_64'.
 
@@ -1750,7 +1750,7 @@ General Options
      Specifies where to install the SDK. Default is $(prefix)/lib/jvm.
 
 `--with-jvm-jar-dir=DIR'
-     Specifies where to install jars. Default is
+     Specifies where to install jars.  Default is
      $(prefix)/lib/jvm-exports.
 
 `--with-python-dir=DIR'
@@ -1758,7 +1758,7 @@ General Options
      aot-compile. DIR should not include the prefix used in
      installation. For example, if the Python modules are to be
      installed in /usr/lib/python2.5/site-packages, then
-     -with-python-dir=/lib/python2.5/site-packages should be passed. If
+     -with-python-dir=/lib/python2.5/site-packages should be passed.  If
      this is not specified, then the Python modules are installed in
      $(prefix)/share/python.
 
@@ -1769,7 +1769,7 @@ General Options
      Build the gcjwebplugin web browser plugin.
 
 `--enable-static-libjava'
-     Build static libraries in libjava. The default is to only build
+     Build static libraries in libjava.  The default is to only build
      shared libraries.
 
     `ansi'
@@ -2161,7 +2161,7 @@ disable building the Ada front end.
 
    `ADA_INCLUDE_PATH' and `ADA_OBJECT_PATH' environment variables must
 not be set when building the Ada compiler, the Ada tools, or the Ada
-runtime libraries. You can check that your build environment is clean
+runtime libraries.  You can check that your build environment is clean
 by verifying that `gnatls -v' lists only one explicit path in each
 section.
 
@@ -2628,7 +2628,7 @@ tools can also be obtained from:
 Blackfin
 ========
 
-The Blackfin processor, an Analog Devices DSP.  *Note Blackfin Options:
+The Blackfin processor, an Analog Devices DSP. *Note Blackfin Options:
 (gcc)Blackfin Options,
 
    More information, and a version of binutils with support for this
@@ -2637,7 +2637,7 @@ processor, is available at `http://blackfin.uclinux.org'
 CR16
 ====
 
-The CR16 CompactRISC architecture is a 16-bit architecture. This
+The CR16 CompactRISC architecture is a 16-bit architecture.  This
 architecture is used in embedded applications.
 
    *Note CR16 Options: (gcc)CR16 Options,
@@ -3056,7 +3056,7 @@ assembler change that sometimes produces corrupt assembly files causing
 AIX linker errors.  The bug breaks GCC bootstrap on AIX and can cause
 compilation failures with existing GCC installations.  An AIX iFix for
 AIX 5.3 is available (APAR IZ98385 for AIX 5.3 TL10, APAR IZ98477 for
-AIX 5.3 TL11 and IZ98134 for AIX 5.3 TL12). AIX 5.3 TL11 SP8, AIX 5.3
+AIX 5.3 TL11 and IZ98134 for AIX 5.3 TL12).  AIX 5.3 TL11 SP8, AIX 5.3
 TL12 SP5, AIX 6.1 TL04 SP11, AIX 6.1 TL05 SP7, AIX 6.1 TL06 SP6, AIX
 6.1 TL07 and AIX 7.1 TL01 should include the fix.
 
@@ -3246,7 +3246,7 @@ use the `--with-divide=breaks' `configure' option when configuring GCC.
 The default is to use traps on systems that support them.
 
    The assembler from GNU binutils 2.17 and earlier has a bug in the way
-it sorts relocations for REL targets (o32, o64, EABI).  This can cause
+it sorts relocations for REL targets (o32, o64, EABI). This can cause
 bad code to be generated for simple C++ programs.  Also the linker from
 GNU binutils versions prior to 2.17 has a bug which causes the runtime
 linker stubs in very large programs, like `libgcj.so', to be
@@ -3373,7 +3373,7 @@ been removed in GCC 4.6.
 though you can download the Sun Studio compilers for free.  In Solaris
 10 and 11, GCC 3.4.3 is available as `/usr/sfw/bin/gcc'.  Solaris 11
 also provides GCC 4.5.2 as `/usr/gcc/4.5/bin/gcc'.  Alternatively, you
-can install a pre-built GCC to bootstrap and install GCC.  See the
+can install a pre-built GCC to bootstrap and install GCC. See the
 binaries page for details.
 
    The Solaris 2 `/bin/sh' will often fail to configure `libstdc++-v3',
@@ -3522,7 +3522,7 @@ library or the MPC library on a Solaris 7 or later system, the canonical
 target triplet must be specified as the `build' parameter on the
 configure line.  This target triplet can be obtained by invoking
 `./config.guess' in the toplevel source directory of GCC (and not that
-of GMP or MPFR or MPC).  For example on a Solaris 9 system:
+of GMP or MPFR or MPC). For example on a Solaris 9 system:
 
      % ./configure --build=sparc-sun-solaris2.9 --prefix=xxx
 
@@ -3530,7 +3530,7 @@ sparc-sun-solaris2.10
 =====================
 
 There is a bug in older versions of the Sun assembler which breaks
-thread-local storage (TLS).  A typical error message is
+thread-local storage (TLS). A typical error message is
 
      ld: fatal: relocation error: R_SPARC_TLS_LE_HIX22: file /var/tmp//ccamPA1v.o:
        symbol <unknown>: bad symbol type SECT: symbol type must be TLS
@@ -3689,7 +3689,7 @@ and which C libraries are used.
    * MinGW *-*-mingw32: MinGW is a native GCC port for the Win32
      subsystem that provides a subset of POSIX.
 
-   * MKS i386-pc-mks: NuTCracker from MKS.  See
+   * MKS i386-pc-mks: NuTCracker from MKS. See
      `http://www.mkssoftware.com/' for more information.
 
 Intel 64-bit versions
@@ -3742,7 +3742,7 @@ version 2.20 or above if building your own.
 ===========
 
 The Interix target is used by OpenNT, Interix, Services For UNIX (SFU),
-and Subsystem for UNIX-based Applications (SUA).  Applications compiled
+and Subsystem for UNIX-based Applications (SUA). Applications compiled
 with this target run in the Interix subsystem, which is separate from
 the Win32 subsystem.  This target was last known to work in GCC 3.3.
 
@@ -4354,7 +4354,7 @@ GNU Free Documentation License
      not permanently reinstated, receipt of a copy of some or all of
      the same material does not give you any rights to use it.
 
- 10. FUTURE REVISIONS OF THIS LICENSE
+  10. FUTURE REVISIONS OF THIS LICENSE
 
      The Free Software Foundation may publish new, revised versions of
      the GNU Free Documentation License from time to time.  Such new
@@ -4375,7 +4375,7 @@ GNU Free Documentation License
      proxy's public statement of acceptance of a version permanently
      authorizes you to choose that version for the Document.
 
- 11. RELICENSING
+  11. RELICENSING
 
      "Massive Multiauthor Collaboration Site" (or "MMC Site") means any
      World Wide Web server that publishes copyrightable works and also
@@ -4422,7 +4422,7 @@ notices just after the title page:
        Free Documentation License''.
 
    If you have Invariant Sections, Front-Cover Texts and Back-Cover
-Texts, replace the "with...Texts." line with this:
+Texts, replace the "with...Texts."  line with this:
 
          with the Invariant Sections being LIST THEIR TITLES, with
          the Front-Cover Texts being LIST, and with the Back-Cover Texts
@@ -4474,93 +4474,93 @@ Concept Index
 
 
 Tag Table:
-Node: Top1733
-Node: Installing GCC2291
-Node: Prerequisites3928
-Node: Downloading the source14255
-Node: Configuration15809
-Ref: with-gnu-as30815
-Ref: with-as31713
-Ref: with-gnu-ld33126
-Node: Building80044
-Node: Testing95529
-Node: Final install103401
-Node: Binaries108715
-Node: Specific110227
-Ref: alpha-x-x110737
-Ref: alpha-dec-osf51111226
-Ref: amd64-x-solaris210111751
-Ref: arm-x-eabi111854
-Ref: avr112065
-Ref: bfin112705
-Ref: cr16112947
-Ref: cris113362
-Ref: dos114178
-Ref: epiphany-x-elf114501
-Ref: x-x-freebsd114606
-Ref: h8300-hms116443
-Ref: hppa-hp-hpux116795
-Ref: hppa-hp-hpux10119166
-Ref: hppa-hp-hpux11119579
-Ref: x-x-linux-gnu125238
-Ref: ix86-x-linux125431
-Ref: ix86-x-solaris29125744
-Ref: ix86-x-solaris210126523
-Ref: ia64-x-linux127714
-Ref: ia64-x-hpux128484
-Ref: x-ibm-aix129039
-Ref: iq2000-x-elf135902
-Ref: lm32-x-elf136042
-Ref: lm32-x-uclinux136146
-Ref: m32c-x-elf136274
-Ref: m32r-x-elf136376
-Ref: m68k-x-x136478
-Ref: m68k-x-uclinux137516
-Ref: mep-x-elf137762
-Ref: microblaze-x-elf137872
-Ref: mips-x-x137991
-Ref: mips-sgi-irix5140387
-Ref: mips-sgi-irix6140467
-Ref: moxie-x-elf140654
-Ref: powerpc-x-x140701
-Ref: powerpc-x-darwin140906
-Ref: powerpc-x-elf141400
-Ref: powerpc-x-linux-gnu141485
-Ref: powerpc-x-netbsd141580
-Ref: powerpc-x-eabisim141668
-Ref: powerpc-x-eabi141794
-Ref: powerpcle-x-elf141870
-Ref: powerpcle-x-eabisim141962
-Ref: powerpcle-x-eabi142095
-Ref: rl78-x-elf142178
-Ref: rx-x-elf142284
-Ref: s390-x-linux142483
-Ref: s390x-x-linux142555
-Ref: s390x-ibm-tpf142642
-Ref: x-x-solaris2142773
-Ref: sparc-x-x147536
-Ref: sparc-sun-solaris2148038
-Ref: sparc-sun-solaris210150792
-Ref: sparc-x-linux151168
-Ref: sparc64-x-solaris2151393
-Ref: sparcv9-x-solaris2152046
-Ref: c6x-x-x152133
-Ref: tilegx-*-linux152224
-Ref: tilepro-*-linux152343
-Ref: x-x-vxworks152464
-Ref: x86-64-x-x153986
-Ref: x86-64-x-solaris210154314
-Ref: xtensa-x-elf154976
-Ref: xtensa-x-linux155647
-Ref: windows155988
-Ref: x-x-cygwin157925
-Ref: x-x-interix158478
-Ref: x-x-mingw32158787
-Ref: older159013
-Ref: elf161130
-Node: Old161388
-Node: Configurations164525
-Node: GNU Free Documentation License168066
-Node: Concept Index193213
+Node: Top1747
+Node: Installing GCC2305
+Node: Prerequisites3942
+Node: Downloading the source14269
+Node: Configuration15823
+Ref: with-gnu-as30829
+Ref: with-as31727
+Ref: with-gnu-ld33140
+Node: Building80058
+Node: Testing95543
+Node: Final install103415
+Node: Binaries108729
+Node: Specific110241
+Ref: alpha-x-x110751
+Ref: alpha-dec-osf51111240
+Ref: amd64-x-solaris210111765
+Ref: arm-x-eabi111868
+Ref: avr112079
+Ref: bfin112719
+Ref: cr16112961
+Ref: cris113376
+Ref: dos114192
+Ref: epiphany-x-elf114515
+Ref: x-x-freebsd114620
+Ref: h8300-hms116457
+Ref: hppa-hp-hpux116809
+Ref: hppa-hp-hpux10119180
+Ref: hppa-hp-hpux11119593
+Ref: x-x-linux-gnu125252
+Ref: ix86-x-linux125445
+Ref: ix86-x-solaris29125758
+Ref: ix86-x-solaris210126537
+Ref: ia64-x-linux127728
+Ref: ia64-x-hpux128498
+Ref: x-ibm-aix129053
+Ref: iq2000-x-elf135916
+Ref: lm32-x-elf136056
+Ref: lm32-x-uclinux136160
+Ref: m32c-x-elf136288
+Ref: m32r-x-elf136390
+Ref: m68k-x-x136492
+Ref: m68k-x-uclinux137530
+Ref: mep-x-elf137776
+Ref: microblaze-x-elf137886
+Ref: mips-x-x138005
+Ref: mips-sgi-irix5140401
+Ref: mips-sgi-irix6140481
+Ref: moxie-x-elf140668
+Ref: powerpc-x-x140715
+Ref: powerpc-x-darwin140920
+Ref: powerpc-x-elf141414
+Ref: powerpc-x-linux-gnu141499
+Ref: powerpc-x-netbsd141594
+Ref: powerpc-x-eabisim141682
+Ref: powerpc-x-eabi141808
+Ref: powerpcle-x-elf141884
+Ref: powerpcle-x-eabisim141976
+Ref: powerpcle-x-eabi142109
+Ref: rl78-x-elf142192
+Ref: rx-x-elf142298
+Ref: s390-x-linux142497
+Ref: s390x-x-linux142569
+Ref: s390x-ibm-tpf142656
+Ref: x-x-solaris2142787
+Ref: sparc-x-x147550
+Ref: sparc-sun-solaris2148052
+Ref: sparc-sun-solaris210150806
+Ref: sparc-x-linux151182
+Ref: sparc64-x-solaris2151407
+Ref: sparcv9-x-solaris2152060
+Ref: c6x-x-x152147
+Ref: tilegx-*-linux152238
+Ref: tilepro-*-linux152357
+Ref: x-x-vxworks152478
+Ref: x86-64-x-x154000
+Ref: x86-64-x-solaris210154328
+Ref: xtensa-x-elf154990
+Ref: xtensa-x-linux155661
+Ref: windows156002
+Ref: x-x-cygwin157939
+Ref: x-x-interix158492
+Ref: x-x-mingw32158801
+Ref: older159027
+Ref: elf161144
+Node: Old161402
+Node: Configurations164539
+Node: GNU Free Documentation License168080
+Node: Concept Index193227
 
 End Tag Table

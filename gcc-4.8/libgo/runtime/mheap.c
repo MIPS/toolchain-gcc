@@ -150,7 +150,6 @@ HaveSpan:
 		runtime_MSpan_Init(t, s->start + npage, s->npages - npage);
 		s->npages = npage;
 		p = t->start;
-		if(sizeof(void*) == 8)
 			p -= ((uintptr)h->arena_start>>PageShift);
 		if(p > 0)
 			h->map[p-1] = s;
@@ -169,7 +168,6 @@ HaveSpan:
 	s->elemsize = (sizeclass==0 ? s->npages<<PageShift : (uintptr)runtime_class_to_size[sizeclass]);
 	s->types.compression = MTypes_Empty;
 	p = s->start;
-	if(sizeof(void*) == 8)
 		p -= ((uintptr)h->arena_start>>PageShift);
 	for(n=0; n<npage; n++)
 		h->map[p+n] = s;
@@ -241,7 +239,6 @@ MHeap_Grow(MHeap *h, uintptr npage)
 	mstats.mspan_sys = h->spanalloc.sys;
 	runtime_MSpan_Init(s, (uintptr)v>>PageShift, ask>>PageShift);
 	p = s->start;
-	if(sizeof(void*) == 8)
 		p -= ((uintptr)h->arena_start>>PageShift);
 	h->map[p] = s;
 	h->map[p + s->npages - 1] = s;
@@ -259,7 +256,6 @@ runtime_MHeap_Lookup(MHeap *h, void *v)
 	uintptr p;
 	
 	p = (uintptr)v;
-	if(sizeof(void*) == 8)
 		p -= (uintptr)h->arena_start;
 	return h->map[p >> PageShift];
 }
@@ -281,7 +277,6 @@ runtime_MHeap_LookupMaybe(MHeap *h, void *v)
 		return nil;
 	p = (uintptr)v>>PageShift;
 	q = p;
-	if(sizeof(void*) == 8)
 		q -= (uintptr)h->arena_start >> PageShift;
 	s = h->map[q];
 	if(s == nil || p < s->start || p - s->start >= s->npages)
@@ -332,7 +327,6 @@ MHeap_FreeLocked(MHeap *h, MSpan *s)
 
 	// Coalesce with earlier, later spans.
 	p = s->start;
-	if(sizeof(void*) == 8)
 		p -= (uintptr)h->arena_start >> PageShift;
 	if(p > 0 && (t = h->map[p-1]) != nil && t->state != MSpanInUse) {
 		tp = (uintptr*)(t->start<<PageShift);

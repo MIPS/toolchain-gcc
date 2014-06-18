@@ -1,5 +1,5 @@
-This is doc/cpp.info, produced by makeinfo version 4.13 from
-/d/gcc-4.8.1/gcc-4.8.1/gcc/doc/cpp.texi.
+This is doc/cpp.info, produced by makeinfo version 4.12 from
+/space/rguenther/gcc-4.8.3/gcc-4.8.3/gcc/doc/cpp.texi.
 
 Copyright (C) 1987-2013 Free Software Foundation, Inc.
 
@@ -1734,11 +1734,10 @@ with `__FILE__' and `__LINE__', though.
      This macro is defined when the C++ compiler is in use.  You can use
      `__cplusplus' to test whether a header is compiled by a C compiler
      or a C++ compiler.  This macro is similar to `__STDC_VERSION__', in
-     that it expands to a version number.  A fully conforming
-     implementation of the 1998 C++ standard will define this macro to
-     `199711L'.  The GNU C++ compiler is not yet fully conforming, so
-     it uses `1' instead.  It is hoped to complete the implementation
-     of standard C++ in the near future.
+     that it expands to a version number.  Depending on the language
+     standard selected, the value of the macro is `199711L', as
+     mandated by the 1998 C++ standard, or `201103L', per the 2011 C++
+     standard.
 
 `__OBJC__'
      This macro is defined, with value 1, when the Objective-C compiler
@@ -2112,7 +2111,7 @@ double underscores.
 `__GXX_EXPERIMENTAL_CXX0X__'
      This macro is defined when compiling a C++ source file with the
      option `-std=c++0x' or `-std=gnu++0x'. It indicates that some
-     features likely to be included in C++0x are available. Note that
+     features likely to be included in C++0x are available.  Note that
      these features are experimental, and may change or be removed in
      future versions of GCC.
 
@@ -4510,9 +4509,9 @@ single-letter options may _not_ be grouped: `-dM' is very different from
      When used without `-E', this option has no effect.
 
 `-ftrack-macro-expansion[=LEVEL]'
-     Track locations of tokens across macro expansions. This allows the
+     Track locations of tokens across macro expansions.  This allows the
      compiler to emit diagnostic about the current macro expansion stack
-     when a compilation error occurs in a macro expansion. Using this
+     when a compilation error occurs in a macro expansion.  Using this
      option makes the preprocessor and the compiler consume more
      memory. The LEVEL parameter can be used to choose the level of
      precision of token location tracking thus decreasing the memory
@@ -5156,7 +5155,7 @@ GNU Free Documentation License
      not permanently reinstated, receipt of a copy of some or all of
      the same material does not give you any rights to use it.
 
- 10. FUTURE REVISIONS OF THIS LICENSE
+  10. FUTURE REVISIONS OF THIS LICENSE
 
      The Free Software Foundation may publish new, revised versions of
      the GNU Free Documentation License from time to time.  Such new
@@ -5177,7 +5176,7 @@ GNU Free Documentation License
      proxy's public statement of acceptance of a version permanently
      authorizes you to choose that version for the Document.
 
- 11. RELICENSING
+  11. RELICENSING
 
      "Massive Multiauthor Collaboration Site" (or "MMC Site") means any
      World Wide Web server that publishes copyrightable works and also
@@ -5224,7 +5223,7 @@ notices just after the title page:
        Free Documentation License''.
 
    If you have Invariant Sections, Front-Cover Texts and Back-Cover
-Texts, replace the "with...Texts." line with this:
+Texts, replace the "with...Texts."  line with this:
 
          with the Invariant Sections being LIST THEIR TITLES, with
          the Front-Cover Texts being LIST, and with the Back-Cover Texts
@@ -5519,79 +5518,79 @@ Concept Index
 
 
 Tag Table:
-Node: Top982
-Node: Overview3587
-Node: Character sets6420
-Ref: Character sets-Footnote-18603
-Node: Initial processing8784
-Ref: trigraphs10343
-Node: Tokenization14545
-Ref: Tokenization-Footnote-121681
-Node: The preprocessing language21792
-Node: Header Files24670
-Node: Include Syntax26586
-Node: Include Operation28223
-Node: Search Path30071
-Node: Once-Only Headers33272
-Node: Alternatives to Wrapper #ifndef34931
-Node: Computed Includes36674
-Node: Wrapper Headers39832
-Node: System Headers42258
-Node: Macros44308
-Node: Object-like Macros45449
-Node: Function-like Macros49039
-Node: Macro Arguments50655
-Node: Stringification54800
-Node: Concatenation58006
-Node: Variadic Macros61114
-Node: Predefined Macros65901
-Node: Standard Predefined Macros66489
-Node: Common Predefined Macros72426
-Node: System-specific Predefined Macros90049
-Node: C++ Named Operators92072
-Node: Undefining and Redefining Macros93036
-Node: Directives Within Macro Arguments95140
-Node: Macro Pitfalls96688
-Node: Misnesting97221
-Node: Operator Precedence Problems98333
-Node: Swallowing the Semicolon100199
-Node: Duplication of Side Effects102222
-Node: Self-Referential Macros104405
-Node: Argument Prescan106814
-Node: Newlines in Arguments110568
-Node: Conditionals111519
-Node: Conditional Uses113349
-Node: Conditional Syntax114707
-Node: Ifdef115027
-Node: If118188
-Node: Defined120492
-Node: Else121775
-Node: Elif122345
-Node: Deleted Code123634
-Node: Diagnostics124881
-Node: Line Control126428
-Node: Pragmas130232
-Node: Other Directives134988
-Node: Preprocessor Output136038
-Node: Traditional Mode139239
-Node: Traditional lexical analysis140297
-Node: Traditional macros142800
-Node: Traditional miscellany146602
-Node: Traditional warnings147599
-Node: Implementation Details149796
-Node: Implementation-defined behavior150417
-Ref: Identifier characters151169
-Node: Implementation limits154247
-Node: Obsolete Features156921
-Node: Differences from previous versions159809
-Node: Invocation164017
-Ref: Wtrigraphs168469
-Ref: dashMF173244
-Ref: fdollars-in-identifiers182975
-Node: Environment Variables192844
-Node: GNU Free Documentation License195810
-Node: Index of Directives220974
-Node: Option Index223054
-Node: Concept Index229457
+Node: Top996
+Node: Overview3601
+Node: Character sets6434
+Ref: Character sets-Footnote-18617
+Node: Initial processing8798
+Ref: trigraphs10357
+Node: Tokenization14559
+Ref: Tokenization-Footnote-121695
+Node: The preprocessing language21806
+Node: Header Files24684
+Node: Include Syntax26600
+Node: Include Operation28237
+Node: Search Path30085
+Node: Once-Only Headers33286
+Node: Alternatives to Wrapper #ifndef34945
+Node: Computed Includes36688
+Node: Wrapper Headers39846
+Node: System Headers42272
+Node: Macros44322
+Node: Object-like Macros45463
+Node: Function-like Macros49053
+Node: Macro Arguments50669
+Node: Stringification54814
+Node: Concatenation58020
+Node: Variadic Macros61128
+Node: Predefined Macros65915
+Node: Standard Predefined Macros66503
+Node: Common Predefined Macros72345
+Node: System-specific Predefined Macros89968
+Node: C++ Named Operators91991
+Node: Undefining and Redefining Macros92955
+Node: Directives Within Macro Arguments95059
+Node: Macro Pitfalls96607
+Node: Misnesting97140
+Node: Operator Precedence Problems98252
+Node: Swallowing the Semicolon100118
+Node: Duplication of Side Effects102141
+Node: Self-Referential Macros104324
+Node: Argument Prescan106733
+Node: Newlines in Arguments110487
+Node: Conditionals111438
+Node: Conditional Uses113268
+Node: Conditional Syntax114626
+Node: Ifdef114946
+Node: If118107
+Node: Defined120411
+Node: Else121694
+Node: Elif122264
+Node: Deleted Code123553
+Node: Diagnostics124800
+Node: Line Control126347
+Node: Pragmas130151
+Node: Other Directives134907
+Node: Preprocessor Output135957
+Node: Traditional Mode139158
+Node: Traditional lexical analysis140216
+Node: Traditional macros142719
+Node: Traditional miscellany146521
+Node: Traditional warnings147518
+Node: Implementation Details149715
+Node: Implementation-defined behavior150336
+Ref: Identifier characters151088
+Node: Implementation limits154166
+Node: Obsolete Features156840
+Node: Differences from previous versions159728
+Node: Invocation163936
+Ref: Wtrigraphs168388
+Ref: dashMF173163
+Ref: fdollars-in-identifiers182894
+Node: Environment Variables192763
+Node: GNU Free Documentation License195729
+Node: Index of Directives220893
+Node: Option Index222973
+Node: Concept Index229376
 
 End Tag Table

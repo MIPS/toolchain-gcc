@@ -2252,7 +2252,7 @@ gfc_expr_attr (gfc_expr *e)
     case EXPR_FUNCTION:
       gfc_clear_attr (&attr);
 
-      if (e->value.function.esym != NULL)
+      if (e->value.function.esym && e->value.function.esym->result)
 	{
 	  gfc_symbol *sym = e->value.function.esym->result;
 	  attr = sym->attr;
@@ -2540,6 +2540,7 @@ gfc_convert_to_structure_constructor (gfc_expr *e, gfc_symbol *sym, gfc_expr **c
       if (parent && !comp)
 	break;
 
+      if (actual)
       actual = actual->next;
     }
 

@@ -2158,6 +2158,12 @@ transfer_expr (gfc_se * se, gfc_typespec * ts, tree addr_expr, gfc_code * code)
       expr = build_fold_indirect_ref_loc (input_location,
 				      expr);
 
+      /* Make sure that the derived type has been built.  An external
+	 function, if only referenced in an io statement requires this
+	 check (see PR58771).  */
+      if (ts->u.derived->backend_decl == NULL_TREE)
+	tmp = gfc_typenode_for_spec (ts);
+
       for (c = ts->u.derived->components; c; c = c->next)
 	{
 	  field = c->backend_decl;

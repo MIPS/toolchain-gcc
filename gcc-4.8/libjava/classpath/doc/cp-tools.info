@@ -1,5 +1,5 @@
-This is cp-tools.info, produced by makeinfo version 4.13 from
-/d/gcc-4.8.1/gcc-4.8.1/libjava/classpath/doc/cp-tools.texinfo.
+This is cp-tools.info, produced by makeinfo version 4.12 from
+/space/rguenther/gcc-4.8.3/gcc-4.8.3/libjava/classpath/doc/cp-tools.texinfo.
 
 This file documents the Tools included in a standard distribution of
 the GNU Classpath project deliverables.
@@ -343,7 +343,7 @@ signed JAR file.
 form is used, or to verify if the second syntax form is used instead.
 
    ALIAS must be a known Alias of a Key Entry in the designated Key
-Store. The private key material associated with this Alias is then used
+Store.  The private key material associated with this Alias is then used
 for signing the designated .JAR file.
 
 * Menu:
@@ -379,7 +379,7 @@ signing, or verifying, a .JAR file.
 `-provider PROVIDER_CLASS_NAME'
      A fully qualified class name of a Security Provider to add to the
      current list of Security Providers already installed in the JVM
-     in-use. If a provider class is specified with this option, and was
+     in-use.  If a provider class is specified with this option, and was
      successfully added to the runtime -i.e. it was not already
      installed- then the tool will attempt to remove this Security
      Provider before exiting.
@@ -410,7 +410,7 @@ purposes.
      key store -as if the protocol was `file:'.
 
 `-storetype STORE_TYPE'
-     Use this option to specify the type of the key store to use. The
+     Use this option to specify the type of the key store to use.  The
      default value, if this option is omitted, is that of the property
      `keystore.type' in the security properties file, which is obtained
      by invoking the static method call `getDefaultType()' in
@@ -418,7 +418,7 @@ purposes.
 
 `-storepass PASSWORD'
      Use this option to specify the password which will be used to
-     unlock the key store. If this option is missing, the User will be
+     unlock the key store.  If this option is missing, the User will be
      prompted to provide a password.
 
 `-keypass PASSWORD'
@@ -426,7 +426,7 @@ purposes.
      unlock the Key Entry associated with the designated Alias.
 
      If this option is omitted, the tool will first attempt to unlock
-     the Key Entry using the same password protecting the key store. If
+     the Key Entry using the same password protecting the key store.  If
      this fails, you will then be prompted to provide a password.
 
 `-sigfile NAME'
@@ -438,12 +438,12 @@ purposes.
      characters will be converted to upper-case ones.
 
      If this option is missing, the first eight characters of the ALIAS
-     argument will be used. When this is the case, any character in
+     argument will be used.  When this is the case, any character in
      ALIAS that is outside the permissible range of characters will be
      replaced by an underscore.
 
 `-signedjar FILE'
-     Use this option to specify the file name of the signed JAR. If
+     Use this option to specify the file name of the signed JAR.  If
      this option is omitted, then the signed JAR will be named the same
      as FILE; i.e., the input JAR file will be replaced with the signed
      copy.
@@ -476,7 +476,7 @@ File: cp-tools.info,  Node: keytool Tool,  Prev: jarsigner Tool,  Up: Security T
 ======================
 
 Cryptographic credentials, in a Java environment, are usually stored in
-a Key Store. The Java SDK specifies a Key Store as a persistent
+a Key Store.  The Java SDK specifies a Key Store as a persistent
 container of two types of objects: Key Entries and Trusted
 Certificates. The security tool `keytool' is a Java-based application
 for managing those types of objects.
@@ -484,11 +484,11 @@ for managing those types of objects.
    A Key Entry represents the private key part of a key-pair used in
 Public-Key Cryptography, and a signed X.509 certificate which
 authenticates the public key part for a known entity; i.e. the owner of
-the key-pair. The X.509 certificate itself contains the public key part
+the key-pair.  The X.509 certificate itself contains the public key part
 of the key-pair.
 
    A Trusted Certificate is a signed X.509 certificate issued by a
-trusted entity. The Trust in this context is relative to the User of
+trusted entity.  The Trust in this context is relative to the User of
 the `keytool'. In other words, the existence of a Trusted Certificate
 in the Key Store processed by a `keytool' command implies that the User
 trusts the Issuer of that Trusted Certificate to also sign, and hence
@@ -497,7 +497,7 @@ authenticates, other Subjects the tool may process.
    Trusted Certificates are important because they allow the tool to
 mechanically construct Chains of Trust starting from one of the Trusted
 Certificates in a Key Store and ending with a certificate whose Issuer
-is potentially unknown. A valid chain is an ordered list, starting with
+is potentially unknown.  A valid chain is an ordered list, starting with
 a Trusted Certificate (also called the anchor), ending with the target
 certificate, and satisfying the condition that the Subject of
 certificate `#i' is the Issuer of certificate `#i + 1'.
@@ -598,7 +598,7 @@ the `-help' option for that command; e.g.
 exit the running JVM.
 
    It is worth noting here that the help messages printed by the tool
-are I18N-ready. This means that if/when the contents of the tool's
+are I18N-ready.  This means that if/when the contents of the tool's
 Message Bundle properties file are available in languages other than
 English, you may see those messages in that language.
 
@@ -613,9 +613,9 @@ described here to reduce redundancy.
 
 `-alias ALIAS'
      Every entry, be it a Key Entry or a Trusted Certificate, in a key
-     store is uniquely identified by a user-defined ALIAS string. Use
+     store is uniquely identified by a user-defined ALIAS string.  Use
      this option to specify the ALIAS to use when referring to an entry
-     in the key store. Unless specified otherwise, a default value of
+     in the key store.  Unless specified otherwise, a default value of
      `mykey' shall be used when this option is omitted from the command
      line.
 
@@ -636,7 +636,7 @@ described here to reduce redundancy.
      this option is omitted from the command line.
 
 `-storetype STORE_TYPE'
-     Use this option to specify the type of the key store to use. The
+     Use this option to specify the type of the key store to use.  The
      default value, if this option is omitted, is that of the property
      `keystore.type' in the security properties file, which is obtained
      by invoking the static method call `getDefaultType()' in
@@ -662,16 +662,16 @@ described here to reduce redundancy.
 `-provider PROVIDER_CLASS_NAME'
      A fully qualified class name of a Security Provider to add to the
      current list of Security Providers already installed in the JVM
-     in-use. If a provider class is specified with this option, and was
+     in-use.  If a provider class is specified with this option, and was
      successfully added to the runtime -i.e. it was not already
      installed- then the tool will attempt to removed this Security
      Provider before exiting.
 
 `-file FILE'
-     Use this option to designate a file to use with a command. When
+     Use this option to designate a file to use with a command.  When
      specified with this option, the value is expected to be the fully
-     qualified path of a file accessible by the File System. Depending
-     on the command, the file may be used as input or as output. When
+     qualified path of a file accessible by the File System.  Depending
+     on the command, the file may be used as input or as output.  When
      this option is omitted from the command line, `STDIN' will be used
      instead, as the source of input, and `STDOUT' will be used instead
      as the output destination.
@@ -689,8 +689,8 @@ File: cp-tools.info,  Node: Distinguished Names,  Next: Add/Update Commands,  Pr
 
 A Distinguished Name (or DN) MUST be supplied with some of the
 `COMMAND's using a `-dname' option. The syntax of a valid value for
-this option MUST follow RFC-2253 specifications. Namely the following
-components (with their accepted meaning) will be recognized. Note that
+this option MUST follow RFC-2253 specifications.  Namely the following
+components (with their accepted meaning) will be recognized.  Note that
 the component name is case-insensitive:
 
 CN
@@ -712,8 +712,8 @@ C
      The 2-letter Country identifier; e.g. `AU'
 
    When specified with a `-dname' option, each pair of component/value
-will be separated from the other with a comma. Each component and value
-pair MUST be separated by an equal sign. For example, the following is
+will be separated from the other with a comma.  Each component and value
+pair MUST be separated by an equal sign.  For example, the following is
 a valid DN value:
 CN=host.domain.com, O=The Sample Company, L=Sydney, ST=NSW, C=AU
 
@@ -762,16 +762,16 @@ chain and will be saved in the key store.
 
 `-sigalg ALGORITHM'
      The canonical name of the digital signature algorithm to use for
-     signing certificates. If this option is omitted, a default value
+     signing certificates.  If this option is omitted, a default value
      will be chosen based on the type of the key-pair; i.e., the
-     algorithm that ends up being used by the -keyalg option. If the
+     algorithm that ends up being used by the -keyalg option.  If the
      key-pair generation algorithm is `DSA', the value for the
      signature algorithm will be `SHA1withDSA'. If on the other hand
      the key-pair generation algorithm is `RSA', then the tool will use
      `MD5withRSA' as the signature algorithm.
 
 `-dname NAME'
-     This a mandatory value for the command. If no value is specified
+     This a mandatory value for the command.  If no value is specified
      -i.e. the `-dname' option is omitted- the tool will prompt you to
      enter a Distinguished Name to use as both the Owner and Issuer of
      the generated self-signed certificate.
@@ -830,7 +830,7 @@ confirmation.
    If Alias exists in the key store, the tool will treat the
 certificate(s) read from the input source as a Certificate Reply, which
 can be a chain of certificates, that eventually would replace the chain
-of certificates associated with the Key Entry of that Alias. The
+of certificates associated with the Key Entry of that Alias.  The
 substitution of the certificates only occurs if a chain-of-trust can be
 established between the bottom certificate of the chain read from the
 input file and the Trusted Certificates already present in the key
@@ -899,9 +899,9 @@ option was omitted).
 
 `-sigalg ALGORITHM'
      The canonical name of the digital signature algorithm to use for
-     signing the certificate. If this option is omitted, a default
+     signing the certificate.  If this option is omitted, a default
      value will be chosen based on the type of the private key
-     associated with the designated Alias. If the private key is a
+     associated with the designated Alias.  If the private key is a
      `DSA' one, the value for the signature algorithm will be
      `SHA1withDSA'. If on the other hand the private key is an `RSA'
      one, then the tool will use `MD5withRSA' as the signature
@@ -909,7 +909,7 @@ option was omitted).
 
 `-dname NAME'
      Use this option to specify the Distinguished Name of the newly
-     generated self-signed certificate. If this option is omitted, the
+     generated self-signed certificate.  If this option is omitted, the
      existing Distinguished Name of the base certificate in the chain
      associated with the designated Alias will be used instead.
 
@@ -923,7 +923,7 @@ option was omitted).
      unlock the Key Entry associated with the designated Alias.
 
      If this option is omitted, the tool will first attempt to unlock
-     the Key Entry using the same password protecting the key store. If
+     the Key Entry using the same password protecting the key store.  If
      this fails, you will then be prompted to provide a password.
 
 `-storetype STORE_TYPE'
@@ -1036,7 +1036,7 @@ the destination should look something like the following:
 
    IMPORTANT: Some documentation (e.g. RSA examples) claims that the
 `Attributes' field, in the CSR is `OPTIONAL' while RFC-2986 implies the
-opposite. This implementation considers this field, by default, as
+opposite.  This implementation considers this field, by default, as
 `OPTIONAL', unless the option `-attributes' is specified on the command
 line.
 
@@ -1045,9 +1045,9 @@ line.
 
 `-sigalg ALGORITHM'
      The canonical name of the digital signature algorithm to use for
-     signing the certificate. If this option is omitted, a default
+     signing the certificate.  If this option is omitted, a default
      value will be chosen based on the type of the private key
-     associated with the designated Alias. If the private key is a
+     associated with the designated Alias.  If the private key is a
      `DSA' one, the value for the signature algorithm will be
      `SHA1withDSA'. If on the other hand the private key is an `RSA'
      one, then the tool will use `MD5withRSA' as the signature
@@ -1061,7 +1061,7 @@ line.
      unlock the Key Entry associated with the designated Alias.
 
      If this option is omitted, the tool will first attempt to unlock
-     the Key Entry using the same password protecting the key store. If
+     the Key Entry using the same password protecting the key store.  If
      this fails, you will then be prompted to provide a password.
 
 `-storetype STORE_TYPE'
@@ -1117,9 +1117,9 @@ option is specified instead).
      Use RFC-1421 specifications when encoding the output.
 
 `-v'
-     Output the certificate in binary DER encoding. This is the default
+     Output the certificate in binary DER encoding.  This is the default
      output format of the command if neither `-rfc' nor `-v' options
-     were detected on the command line. If both this option and the
+     were detected on the command line.  If both this option and the
      `-rfc' option are detected on the command line, the tool will opt
      for the RFC-1421 style encoding.
 
@@ -1167,7 +1167,7 @@ certificate, unless either the `-rfc' or the `-v' option is specified.
      Use RFC-1421 specifications when encoding the output.
 
 `-v'
-     Output the certificate in human-readable format. If both this
+     Output the certificate in human-readable format.  If both this
      option and the `-rfc' option are detected on the command line, the
      tool will opt for the human-readable form and will not abort the
      command.
@@ -1224,7 +1224,7 @@ possibly a new password.
      unlock the Key Entry associated with the designated Alias.
 
      If this option is omitted, the tool will first attempt to unlock
-     the Key Entry using the same password protecting the key store. If
+     the Key Entry using the same password protecting the key store.  If
      this fails, you will then be prompted to provide a password.
 
 `-new PASSWORD'
@@ -1291,7 +1291,7 @@ material of a designated Key Entry.
      unlock the Key Entry associated with the designated Alias.
 
      If this option is omitted, the tool will first attempt to unlock
-     the Key Entry using the same password protecting the key store. If
+     the Key Entry using the same password protecting the key store.  If
      this fails, you will then be prompted to provide a password.
 
 `-new PASSWORD'
@@ -1745,7 +1745,7 @@ File: cp-tools.info,  Node: gjdoc Tool,  Prev: tnameserv Tool,  Up: Other Tools
 *******************************
 
 Gjdoc can be used in two ways: as a stand-alone documentation tool, or
-as a driver for a user-specified Doclet. *Note Other Doclets::.
+as a driver for a user-specified Doclet.  *Note Other Doclets::.
 
    In the default mode, Gjdoc will use the Standard Doclet `HtmlDoclet'
 to generate a set of HTML pages.  The canonical usage is:
@@ -1966,7 +1966,7 @@ File: cp-tools.info,  Node: Source Format Options,  Next: Interlinking Options, 
 
      This option should be specified when applying `gjdoc' to source
      code commented in a non-latin language for which the default first
-     sentence detector does not work. For all other cases, the default
+     sentence detector does not work.  For all other cases, the default
      (do not use BreakIterator) produces better results at the time of
      this writing.
 
@@ -1983,7 +1983,7 @@ File: cp-tools.info,  Node: Interlinking Options,  Next: Output Control Options,
      source set.  Use this option to additionally create hyperlinks to
      classes covered by the specified documentation set.
 
-     URL should be the root URL of the other documentation set. For
+     URL should be the root URL of the other documentation set.  For
      example, to add hyperlinks to GNU Classpath, specify the following:
 
           -link http://developer.classpath.org/doc/
@@ -2141,7 +2141,7 @@ File: cp-tools.info,  Node: Generation Options,  Next: Decoration Options,  Prev
      of a class documentation page.
 
 `-use'
-     Generate a page with cross-reference information. By default, this
+     Generate a page with cross-reference information.  By default, this
      page is not generated.
 
      The cross-reference information can be accessed by clicking on the
@@ -2468,7 +2468,7 @@ File: cp-tools.info,  Node: Output Control Options,  Next: Generation Options,  
      identifiers.
 
 `-charset CHARSET'
-     _Deprecated._ Override the specified encoding in output XHTML
+     _Deprecated._  Override the specified encoding in output XHTML
      files with the one given by `charset'.
 
      If this option is not given, the encoding specification in output
@@ -2805,7 +2805,7 @@ following benefits:
    If you derive from `AbstractDoclet', there are a number of things
 you need to take care of:
 
-   *
+   * 
    you should not implement the `start(RootDoc)' method as it is
 already defined by `AbstractDoclet' so that it can care about parsing
 the options.
@@ -2999,16 +2999,16 @@ templates they use at runtime to generate the message text itself,
 depending on the locale in use at the time.
 
    The Resource Bundles these tools use are essentially Java Properties
-files consisting of a set of Name/Value pairs. The Name is the Property
+files consisting of a set of Name/Value pairs.  The Name is the Property
 Name and the Value is a substitution string that is used when the code
-references the associated Name. For example the following is a line in
+references the associated Name.  For example the following is a line in
 a Resource Bundle used by the `keytool' Tool:
 
      Command.23=A correct key password MUST be provided
 
    When the tool needs to signal a mandatory but missing key password,
 it would reference the property named `Command.23' and the message "`A
-correct key password MUST be provided'" will be used instead. This
+correct key password MUST be provided'" will be used instead.  This
 indirect referencing of "resources" permits replacing, as late as
 possible, the English strings with strings in other languages, provided
 of course Resource Bundles in those languages are provided.
@@ -3027,12 +3027,12 @@ VV
 
    The complete list of language codes can be found at Code for the
 representation of names of languages
-(http://ftp.ics.uci.edu/pub/ietf/http/related/iso639.txt). A similar
+(http://ftp.ics.uci.edu/pub/ietf/http/related/iso639.txt).  A similar
 list for the region codes can be found at ISO 3166 Codes (Countries)
 (http://userpage.chemie.fu-berlin.de/diverse/doc/ISO_3166.html).
 
    The location of the Resource Bundles for the GNU Classpath Tools is
-specific to each tool. The next table shows where these files are found
+specific to each tool.  The next table shows where these files are found
 in a standard GNU Classpath distribution:
 
 `jarsigner'
@@ -3042,7 +3042,7 @@ in a standard GNU Classpath distribution:
      `gnu/classpath/tools/keytool'
 
    The collection of Resource Bundles in a location act as an inverted
-tree with a parent-child relationship. For example suppose in the
+tree with a parent-child relationship.  For example suppose in the
 `gnu/classpath/tools/keytool' there are 3 message bundles named:
 
   1. `messages.properties'
@@ -3052,7 +3052,7 @@ tree with a parent-child relationship. For example suppose in the
   3. `messages_fr_FR.properties'
 
    In the above example, bundle #1 will act as the parent of bundle #2,
-which in turn will act as the parent for bundle #3. This ordering is
+which in turn will act as the parent for bundle #3.  This ordering is
 used by the Java runtime to choose which file to load based on the set
 Locale. For example if the Locale is `fr_CH', `messages_fr.properties'
 will be used because (a) `messages_fr_CH.properties' does not exist,
@@ -3067,7 +3067,7 @@ the hierarchy.
    You can see from the examples above that `messages.properties' is
 the safety net that the Java runtime falls back to when failing to find
 a specific bundle and its parent(s). This file is always provided with
-the Tool. In time, more localized versions will be included to cater
+the Tool.  In time, more localized versions will be included to cater
 for other languages.
 
    In the meantime, if you are willing to contribute localized versions
@@ -3099,93 +3099,93 @@ alter text between curly braces.
 
 
 Tag Table:
-Node: Top1150
-Node: Applet Tools6870
-Node: appletviewer Tool7443
-Node: gcjwebplugin10558
-Node: Security Tools10870
-Node: jarsigner Tool11523
-Node: Common jarsigner Options12571
-Node: Signing Options13886
-Node: Verification Options16469
-Node: keytool Tool17057
-Node: Getting Help21485
-Node: Common keytool Options22229
-Ref: alias22502
-Ref: keyalg22884
-Ref: keysize23114
-Ref: validity23379
-Ref: storetype23594
-Ref: storepass23925
-Ref: keystore24122
-Ref: provider24665
-Ref: file25072
-Ref: verbose25543
-Node: Distinguished Names25635
-Ref: dn25829
-Node: Add/Update Commands26892
-Node: Command -genkey27420
-Node: Command -import29829
-Node: Command -selfcert32973
-Node: Command -cacert35152
-Node: Command -identitydb36205
-Node: Export Commands36863
-Node: Command -certreq37179
-Node: Command -export39585
-Node: Display Commands40782
-Node: Command -list41114
-Node: Command -printcert42247
-Node: Management Commands42631
-Node: Command -keyclone43063
-Node: Command -storepasswd44466
-Node: Command -keypasswd45195
-Node: Command -delete46389
-Node: Other Tools47012
-Node: jar Tool47854
-Node: javah Tool49246
-Node: gcjh Tool50465
-Node: native2ascii Tool51578
-Node: orbd Tool52039
-Node: serialver Tool52769
-Node: rmid Tool53238
-Node: rmiregistry Tool54179
-Node: tnameserv Tool55019
-Node: gjdoc Tool55643
-Node: Invoking the Standard Doclet57631
-Node: Option Summary by Type58786
-Node: Source Set Options61216
-Node: Source Format Options63080
-Node: Interlinking Options64594
-Node: Generation Options67371
-Node: Taglet Options73468
-Node: Doclet Options75695
-Node: Decoration Options77271
-Node: Output Control Options81362
-Node: Verbosity Options84894
-Node: Virtual Machine Options85240
-Node: Invoking a Custom Doclet86636
-Node: Gjdoc Option Summary87311
-Node: Other Doclets87491
-Node: Built-in Doclets87719
-Node: Using TexiDoclet87974
-Node: Using XmlDoclet88196
-Node: Using IspellDoclet88421
-Node: Using DebugDoclet88649
-Node: Third-party Doclets88849
-Node: DocBook Doclet89065
-Node: PDFDoclet89208
-Node: JUnitDoclet89361
-Node: Gjdoc Concepts89495
-Node: Taglets89739
-Node: Writing Doclets89922
-Node: Doclet Invocation Interface90262
-Node: Using AbstractDoclet91054
-Node: GNU Doclet SPI94048
-Node: XHTML Fragments95520
-Node: First Sentence Detector96953
-Node: Adding Custom Resources98715
-Node: I18N Issues100411
-Node: Language Resources100913
-Node: Message Formats104577
+Node: Top1164
+Node: Applet Tools6884
+Node: appletviewer Tool7457
+Node: gcjwebplugin10572
+Node: Security Tools10884
+Node: jarsigner Tool11537
+Node: Common jarsigner Options12585
+Node: Signing Options13900
+Node: Verification Options16483
+Node: keytool Tool17071
+Node: Getting Help21499
+Node: Common keytool Options22243
+Ref: alias22516
+Ref: keyalg22898
+Ref: keysize23128
+Ref: validity23393
+Ref: storetype23608
+Ref: storepass23939
+Ref: keystore24136
+Ref: provider24679
+Ref: file25086
+Ref: verbose25557
+Node: Distinguished Names25649
+Ref: dn25843
+Node: Add/Update Commands26906
+Node: Command -genkey27434
+Node: Command -import29843
+Node: Command -selfcert32987
+Node: Command -cacert35166
+Node: Command -identitydb36219
+Node: Export Commands36877
+Node: Command -certreq37193
+Node: Command -export39599
+Node: Display Commands40796
+Node: Command -list41128
+Node: Command -printcert42261
+Node: Management Commands42645
+Node: Command -keyclone43077
+Node: Command -storepasswd44480
+Node: Command -keypasswd45209
+Node: Command -delete46403
+Node: Other Tools47026
+Node: jar Tool47868
+Node: javah Tool49260
+Node: gcjh Tool50479
+Node: native2ascii Tool51592
+Node: orbd Tool52053
+Node: serialver Tool52783
+Node: rmid Tool53252
+Node: rmiregistry Tool54193
+Node: tnameserv Tool55033
+Node: gjdoc Tool55657
+Node: Invoking the Standard Doclet57645
+Node: Option Summary by Type58800
+Node: Source Set Options61230
+Node: Source Format Options63094
+Node: Interlinking Options64608
+Node: Generation Options67385
+Node: Taglet Options73482
+Node: Doclet Options75709
+Node: Decoration Options77285
+Node: Output Control Options81376
+Node: Verbosity Options84908
+Node: Virtual Machine Options85254
+Node: Invoking a Custom Doclet86650
+Node: Gjdoc Option Summary87325
+Node: Other Doclets87505
+Node: Built-in Doclets87733
+Node: Using TexiDoclet87988
+Node: Using XmlDoclet88210
+Node: Using IspellDoclet88435
+Node: Using DebugDoclet88663
+Node: Third-party Doclets88863
+Node: DocBook Doclet89079
+Node: PDFDoclet89222
+Node: JUnitDoclet89375
+Node: Gjdoc Concepts89509
+Node: Taglets89753
+Node: Writing Doclets89936
+Node: Doclet Invocation Interface90276
+Node: Using AbstractDoclet91068
+Node: GNU Doclet SPI94062
+Node: XHTML Fragments95534
+Node: First Sentence Detector96967
+Node: Adding Custom Resources98729
+Node: I18N Issues100425
+Node: Language Resources100927
+Node: Message Formats104591
 
 End Tag Table

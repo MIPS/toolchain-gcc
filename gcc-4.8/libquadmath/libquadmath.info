@@ -1,5 +1,5 @@
-This is libquadmath.info, produced by makeinfo version 4.13 from
-/d/gcc-4.8.1/gcc-4.8.1/libquadmath/libquadmath.texi.
+This is libquadmath.info, produced by makeinfo version 4.12 from
+/space/rguenther/gcc-4.8.3/gcc-4.8.3/libquadmath/libquadmath.texi.
 
 Copyright (C) 2010-2013 Free Software Foundation, Inc.
 
@@ -330,8 +330,8 @@ Syntax
      `__float128 strtoflt128 (const char *s, char **sp)'
 
 _Arguments_:
-     S          input string
-     SP         the address of the next character in the string
+     S           input string
+     SP          the address of the next character in the string
 
      The argument SP contains, if not `NULL', the address of the next
      character following the parts of the string, which have been read.
@@ -367,9 +367,9 @@ Syntax
      ...)'
 
 _Arguments_:
-     S          output string
-     SIZE       byte size of the string, including tailing NUL
-     FORMAT     conversion specifier string
+     S           output string
+     SIZE        byte size of the string, including tailing NUL
+     FORMAT      conversion specifier string
 
 Note
      On some targets when supported by the C library hooks are installed
@@ -817,7 +817,7 @@ GNU Free Documentation License
      not permanently reinstated, receipt of a copy of some or all of
      the same material does not give you any rights to use it.
 
- 10. FUTURE REVISIONS OF THIS LICENSE
+  10. FUTURE REVISIONS OF THIS LICENSE
 
      The Free Software Foundation may publish new, revised versions of
      the GNU Free Documentation License from time to time.  Such new
@@ -838,7 +838,7 @@ GNU Free Documentation License
      proxy's public statement of acceptance of a version permanently
      authorizes you to choose that version for the Document.
 
- 11. RELICENSING
+  11. RELICENSING
 
      "Massive Multiauthor Collaboration Site" (or "MMC Site") means any
      World Wide Web server that publishes copyrightable works and also
@@ -885,7 +885,7 @@ notices just after the title page:
        Free Documentation License''.
 
    If you have Invariant Sections, Front-Cover Texts and Back-Cover
-Texts, replace the "with...Texts." line with this:
+Texts, replace the "with...Texts."  line with this:
 
          with the Invariant Sections being LIST THEIR TITLES, with
          the Front-Cover Texts being LIST, and with the Back-Cover Texts
@@ -912,13 +912,13 @@ reported via `http://gcc.gnu.org/bugs.html'.
 
 
 Tag Table:
-Node: Top1670
-Node: Typedef and constants2404
-Node: Math Library Routines3844
-Node: I/O Library Routines7649
-Node: strtoflt1287974
-Node: quadmath_snprintf8732
-Node: GNU Free Documentation License10940
-Node: Reporting Bugs36106
+Node: Top1684
+Node: Typedef and constants2418
+Node: Math Library Routines3858
+Node: I/O Library Routines7663
+Node: strtoflt1287988
+Node: quadmath_snprintf8746
+Node: GNU Free Documentation License10954
+Node: Reporting Bugs36120
 
 End Tag Table

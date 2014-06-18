@@ -1,5 +1,5 @@
-This is libitm.info, produced by makeinfo version 4.13 from
-/d/gcc-4.8.1/gcc-4.8.1/libitm/libitm.texi.
+This is libitm.info, produced by makeinfo version 4.12 from
+/space/rguenther/gcc-4.8.3/gcc-4.8.3/libitm/libitm.texi.
 
 Copyright (C) 2011-2013 Free Software Foundation, Inc.
 
@@ -33,7 +33,7 @@ Introduction
 ************
 
 This manual documents the usage and internals of libitm, the GNU
-Transactional Memory Library. It provides transaction support for
+Transactional Memory Library.  It provides transaction support for
 accesses to a process' memory, enabling easy-to-use synchronization of
 accesses to shared memory by several threads.
 
@@ -56,7 +56,7 @@ File: libitm.info,  Node: Enabling libitm,  Next: C/C++ Language Constructs for 
 *****************
 
 To activate support for TM in C/C++, the compile-time flag `-fgnu-tm'
-must be specified. This enables TM language-level constructs such as
+must be specified.  This enables TM language-level constructs such as
 transaction statements (e.g., `__transaction_atomic', *note C/C++
 Language Constructs for TM:: for details).
 
@@ -67,7 +67,7 @@ File: libitm.info,  Node: C/C++ Language Constructs for TM,  Next: The libitm AB
 **********************************
 
 Transactions are supported in C++ and C in the form of transaction
-statements, transaction expressions, and function transactions. In the
+statements, transaction expressions, and function transactions.  In the
 following example, both `a' and `b' will be read and the difference
 will be written to `c', all atomically and isolated from other
 transactions:
@@ -87,10 +87,10 @@ Constructs for C++ (v1.1)
 of transactions.
 
    The precise semantics of transactions are defined in terms of the
-C++11/C11 memory model (see the specification). Roughly, transactions
+C++11/C11 memory model (see the specification).  Roughly, transactions
 provide synchronization guarantees that are similar to what would be
 guaranteed when using a single global lock as a guard for all
-transactions. Note that like other synchronization constructs in C/C++,
+transactions.  Note that like other synchronization constructs in C/C++,
 transactions rely on a data-race-free program (e.g., a nontransactional
 write that is concurrent with a transactional read to the same memory
 location is a data race).
@@ -133,14 +133,14 @@ the structure of this specification.
 ----------------------------
 
 The memory locations accessed with transactional loads and stores and
-the memory locations whose values are logged must not overlap. This
+the memory locations whose values are logged must not overlap.  This
 required separation only extends to the scope of the execution of one
 transaction including all the executions of all nested transactions.
 
    The compiler must be consistent (within the scope of a single
 transaction) about which memory locations are shared and which are not
 shared with other threads (i.e., data must be accessed either
-transactionally or nontransactionally). Otherwise, non-write-through TM
+transactionally or nontransactionally).  Otherwise, non-write-through TM
 algorithms would not work.
 
    For memory locations on the stack, this requirement extends to only
@@ -220,7 +220,7 @@ machine.
 point register save/restore is not necessary for any target machine.
 
    `undoLogCode' is not supported and a fatal runtime error will be
-raised if this bit is set. It is not properly defined in the ABI why
+raised if this bit is set.  It is not properly defined in the ABI why
 barriers other than undo logging are not present; Are they not
 necessary (e.g., a transaction operating purely on thread-local data)
 or have they been omitted by the compiler because it thinks that some
@@ -258,7 +258,7 @@ used.
 `_ITM_rollbackTransaction' is not supported. `_ITM_abortTransaction' is
 supported but the abort reasons `exceptionBlockAbort', `TMConflict',
 and `userRetry' are not supported. There are no exception blocks in
-general, so the related cases also do not have to be considered. To
+general, so the related cases also do not have to be considered.  To
 encode `__transaction_cancel [[outer]]', compilers must set the new
 `outerAbort' bit (`0x10') additionally to the `userAbort' bit in the
 abort reason.
@@ -266,12 +266,12 @@ abort reason.
 3.5.9 Committing a transaction
 ------------------------------
 
-The exception handling (EH) scheme is different. The Intel ABI requires
+The exception handling (EH) scheme is different.  The Intel ABI requires
 the `_ITM_tryCommitTransaction' function that will return even when the
 commit failed and will have to be matched with calls to either
 `_ITM_abortTransaction' or `_ITM_commitTransaction'. In contrast, gcc
 relies on transactional wrappers for the functions of the Exception
-Handling ABI and on one additional commit function (shown below). This
+Handling ABI and on one additional commit function (shown below).  This
 allows the TM to keep track of EH internally and thus it does not have
 to embed the cleanup of EH state into the existing EH code in the
 program.  `_ITM_tryCommitTransaction' is not supported.
@@ -364,11 +364,11 @@ tuning output, but this output is not part of the ABI nor further
 defined by it.
 
    `_ITM_dropReferences' is not supported currently because its
-semantics and the intention behind it is not entirely clear. The
+semantics and the intention behind it is not entirely clear.  The
 specification suggests that this function is necessary because of
 certain orderings of data transfer undos and the releasing of memory
-regions (i.e., privatization). However, this ordering is never defined,
-nor is the ordering of dropping references w.r.t. other events.
+regions (i.e., privatization).  However, this ordering is never defined,
+nor is the ordering of dropping references w.r.t.  other events.
 
 3.5.18 [New] Transactional indirect calls
 -----------------------------------------
@@ -404,7 +404,7 @@ indirect calls in transactions:
      void *_ITM_getTMCloneSafe (void *function) ITM_REGPARM;
 
    If there is a registered clone for supplied function, both will
-return a pointer to the clone. If not, the first runtime function will
+return a pointer to the clone.  If not, the first runtime function will
 attempt to switch to serial-irrevocable mode and return the original
 pointer, whereas the second will raise a fatal runtime error.
 
@@ -427,7 +427,7 @@ calls to the original functions with calls to the wrapper functions.
 3.7 Sample code
 ===============
 
-The code examples might not be correct w.r.t. the current version of
+The code examples might not be correct w.r.t.  the current version of
 the ABI, especially everything related to exception handling.
 
 3.8 [New] Memory model
@@ -441,8 +441,8 @@ the programming language (e.g., by the C++ TM specification).
 
    For example, if a transactional load is ordered before another
 load/store, then the TM runtime must also ensure this ordering when
-accessing shared state. If not, this might break the kind of
-publication safety used in the C++ TM specification. Likewise, the TM
+accessing shared state.  If not, this might break the kind of
+publication safety used in the C++ TM specification.  Likewise, the TM
 runtime must ensure privatization safety.
 
 
@@ -471,7 +471,7 @@ serial mode.
 --------------------------
 
 The state of TM methods does not change after construction, but they do
-alter the state of transactions that use this method. However, because
+alter the state of transactions that use this method.  However, because
 per-transaction data gets used by several methods, `gtm_thread' is
 responsible for setting an initial state that is useful for all methods.
 After that, methods are responsible for resetting/clearing this state
@@ -498,9 +498,9 @@ might not be supported in the future.
 4.2 Nesting: flat vs. closed
 ============================
 
-We support two different kinds of nesting of transactions. In the case
+We support two different kinds of nesting of transactions.  In the case
 of _flat nesting_, the nesting structure is flattened and all nested
-transactions are subsumed by the enclosing transaction. In contrast,
+transactions are subsumed by the enclosing transaction.  In contrast,
 with _closed nesting_, nested transactions that have not yet committed
 can be rolled back separately from the enclosing transactions; when they
 commit, they are subsumed by the enclosing transaction, and their
@@ -523,11 +523,11 @@ transaction encounters data conflicts during optimistic execution).
 =======================
 
 This section documents the locking scheme and rules for all uses of
-locking in libitm. We have to support serial(-irrevocable) mode, which
+locking in libitm.  We have to support serial(-irrevocable) mode, which
 is implemented using a global lock as explained next (called the
 _serial lock_). To simplify the overall design, we use the same lock as
 catch-all locking mechanism for other infrequent tasks such as
-(de)registering clone tables or threads. Besides the serial lock, there
+(de)registering clone tables or threads.  Besides the serial lock, there
 are _per-method-group locks_ that are managed by specific method groups
 (i.e., groups of similar TM concurrency control algorithms), and
 lock-like constructs for quiescence-based operations such as ensuring
@@ -538,13 +538,13 @@ are either _active transactions_ that do not run in serial mode, _serial
 transactions_ (which (are about to) run in serial mode), and management
 tasks that do not execute within a transaction but have acquired the
 serial mode like a serial transaction would do (e.g., to be able to
-register threads with libitm). Transactions become active as soon as
+register threads with libitm).  Transactions become active as soon as
 they have successfully used the serial lock to announce this globally
-(*note Serial lock implementation: serial-lock-impl.). Likewise,
+(*note Serial lock implementation: serial-lock-impl.).  Likewise,
 transactions become serial transactions as soon as they have acquired
 the exclusive rights provided by the serial lock (i.e., serial mode,
 which also means that there are no other concurrent active or serial
-transactions). Note that active transactions can become serial
+transactions).  Note that active transactions can become serial
 transactions when they enter serial mode during the runtime of the
 transaction.
 
@@ -555,13 +555,13 @@ Application data is protected by the serial lock if there is a serial
 transaction and no concurrently running active transaction (i.e.,
 non-serial).  Otherwise, application data is protected by the currently
 selected method group, which might use per-method-group locks or other
-mechanisms. Also note that application data that is about to be
+mechanisms.  Also note that application data that is about to be
 privatized might not be allowed to be accessed by nontransactional code
 until privatization safety has been ensured; the details of this are
 handled by the current method group.
 
    libitm-internal state is either protected by the serial lock or
-accessed through custom concurrent code. The latter applies to the
+accessed through custom concurrent code.  The latter applies to the
 public/shared part of a transaction object and most typical
 method-group-specific state.
 
@@ -572,12 +572,12 @@ method-group-specific state.
 
    * The current selection of which method group to use.
 
-   * Some method-group-specific data, or invariants of this data. For
+   * Some method-group-specific data, or invariants of this data.  For
      example, resetting a method group to its initial state is handled
      by switching to the same method group, so the serial lock protects
      such resetting as well.
    In general, such state is immutable whenever there exists an active
-(non-serial) transaction. If there is no active transaction, a serial
+(non-serial) transaction.  If there is no active transaction, a serial
 transaction (or a thread that is not currently executing a transaction
 but has acquired the serial lock) is allowed to modify this state (but
 must of course be careful to not surprise the current method group's
@@ -587,9 +587,9 @@ implementation with such modifications).
 ----------------------------
 
 To prevent deadlocks, locks acquisition must happen in a globally
-agreed-upon order. Note that this applies to other forms of blocking
+agreed-upon order.  Note that this applies to other forms of blocking
 too, but does not necessarily apply to lock acquisitions that do not
-block (e.g., trylock() calls that do not get retried forever). Note
+block (e.g., trylock() calls that do not get retried forever).  Note
 that serial transactions are never return back to active transactions
 until the transaction has committed.  Likewise, active transactions
 stay active until they have committed.  Per-method-group locks are
@@ -608,7 +608,7 @@ typically also not released before commit.
      transaction that is trying that (the latter is ensured by the
      serial lock implementation.
 
-   * Method groups must prevent deadlocks on their locks. In
+   * Method groups must prevent deadlocks on their locks.  In
      particular, they must also be prepared for another active
      transaction that has acquired method-group-specific locks but is
      blocked during an attempt to upgrade to being a serial
@@ -619,7 +619,7 @@ typically also not released before commit.
 
 
    There is no single rule for per-method-group blocking because this
-depends on when a TM method might acquire locks. If no active
+depends on when a TM method might acquire locks.  If no active
 transaction can upgrade to being a serial transaction after it has
 acquired per-method-group locks (e.g., when those locks are only
 acquired during an attempt to commit), then the TM method does not need
@@ -641,25 +641,25 @@ per-method-group locks, then TM methods need to avoid those deadlocks:
      per-method-group lock before doing the wake-up, and only blocking
      on this lock using a futex if this bit is not group).
 
-   *TODO*: Can reuse serial lock for gl-*? And if we can, does it make
-sense to introduce further complexity in the serial lock? For gl-*, we
+   *TODO*: Can reuse serial lock for gl-*?  And if we can, does it make
+sense to introduce further complexity in the serial lock?  For gl-*, we
 can really only avoid an abort if we do -wb and -vbv.
 
 4.3.3 Serial lock implementation
 --------------------------------
 
 The serial lock implementation is optimized towards assuming that serial
-transactions are infrequent and not the common case. However, the
+transactions are infrequent and not the common case.  However, the
 performance of entering serial mode can matter because when only few
 transactions are run concurrently or if there are few threads, then it
 can be efficient to run transactions serially.
 
    The serial lock is similar to a multi-reader-single-writer lock in
 that there can be several active transactions but only one serial
-transaction. However, we do want to avoid contention (in the lock
+transaction.  However, we do want to avoid contention (in the lock
 implementation) between active transactions, so we split up the reader
 side of the lock into per-transaction flags that are true iff the
-transaction is active. The exclusive writer side remains a shared
+transaction is active.  The exclusive writer side remains a shared
 single flag, which is acquired using a CAS, for example.  On the
 fast-path, the serial lock then works similar to Dekker's algorithm but
 with several reader flags that a serial transaction would have to check.
@@ -670,7 +670,7 @@ lock can modify this list).
 
    We want starvation-freedom for the serial lock to allow for using it
 to ensure progress for potentially starved transactions (*note Progress
-Guarantees: progress-guarantees. for details). However, this is
+Guarantees: progress-guarantees. for details).  However, this is
 currently not enforced by the implementation of the serial lock.
 
    Here is pseudo-code for the read/write fast paths of acquiring the
@@ -714,12 +714,12 @@ libitm has to consider the following cases of reentrancy:
 
    * Transaction calls either a transactional wrapper or safe code,
      which in turn starts a new transaction: It is not yet defined in
-     the specification whether this is allowed. Thus, it is undefined
+     the specification whether this is allowed.  Thus, it is undefined
      whether libitm supports this.
 
    * Code that starts new transactions might be called from within any
      part of libitm: This kind of reentrancy would likely be rather
-     complex and can probably be avoided. Therefore, it is not
+     complex and can probably be avoided.  Therefore, it is not
      supported.
 
 
@@ -736,15 +736,15 @@ quiescence does not contribute to deadlocks.
 
    In method groups that need to ensure publication safety explicitly,
 active transactions maintain a flag or timestamp in the public/shared
-part of the transaction descriptor. Before blocking, privatizers need
+part of the transaction descriptor.  Before blocking, privatizers need
 to let the other transactions know that they should wake up the
 privatizer.
 
-   *TODO* Ho to implement the waiters? Should those flags be
-per-transaction or at a central place? We want to avoid one wake/wait
+   *TODO* Ho to implement the waiters?  Should those flags be
+per-transaction or at a central place?  We want to avoid one wake/wait
 call per active transactions, so we might want to use either a tree or
 combining to reduce the syscall overhead, or rather spin for a long
-amount of time instead of doing blocking. Also, it would be good if
+amount of time instead of doing blocking.  Also, it would be good if
 only the last transaction that the privatizer waits for would do the
 wake-up.
 
@@ -752,7 +752,7 @@ wake-up.
 -------------------------
 
 Transactions that do not make progress when using the current TM method
-will eventually try to execute in serial mode. Thus, the serial lock's
+will eventually try to execute in serial mode.  Thus, the serial lock's
 progress guarantees determine the progress guarantees of the whole TM.
 Obviously, we at least need deadlock-freedom for the serial lock, but
 it would also be good to provide starvation-freedom (informally, all
@@ -762,7 +762,7 @@ enough cycles).
    However, the scheduling of transactions (e.g., thread scheduling by
 the OS) also affects the handling of progress guarantees by the TM.
 First, the TM can only guarantee deadlock-freedom if threads do not get
-stopped. Likewise, low-priority threads can starve if they do not get
+stopped.  Likewise, low-priority threads can starve if they do not get
 scheduled when other high-priority threads get those cycles instead.
 
    If all threads get scheduled eventually, correct lock
@@ -779,7 +779,7 @@ efficient).
 higher runtime overhead, we focus on deadlock-freedom right now and
 assume that the threads will get scheduled eventually by the OS (but
 don't consider threads with different priorities). We should support
-starvation-freedom for serial transactions in the future. Everything
+starvation-freedom for serial transactions in the future.  Everything
 beyond that is highly related to proper contention management across
 all of the TM (including with TM method to choose), and is future work.
 
@@ -1194,7 +1194,7 @@ GNU Free Documentation License
      not permanently reinstated, receipt of a copy of some or all of
      the same material does not give you any rights to use it.
 
- 10. FUTURE REVISIONS OF THIS LICENSE
+  10. FUTURE REVISIONS OF THIS LICENSE
 
      The Free Software Foundation may publish new, revised versions of
      the GNU Free Documentation License from time to time.  Such new
@@ -1215,7 +1215,7 @@ GNU Free Documentation License
      proxy's public statement of acceptance of a version permanently
      authorizes you to choose that version for the Document.
 
- 11. RELICENSING
+  11. RELICENSING
 
      "Massive Multiauthor Collaboration Site" (or "MMC Site") means any
      World Wide Web server that publishes copyrightable works and also
@@ -1262,7 +1262,7 @@ notices just after the title page:
        Free Documentation License''.
 
    If you have Invariant Sections, Front-Cover Texts and Back-Cover
-Texts, replace the "with...Texts." line with this:
+Texts, replace the "with...Texts."  line with this:
 
          with the Invariant Sections being LIST THEIR TITLES, with
          the Front-Cover Texts being LIST, and with the Back-Cover Texts
@@ -1293,15 +1293,15 @@ Index
 
 
 Tag Table:
-Node: Top1173
-Node: Enabling libitm2076
-Node: C/C++ Language Constructs for TM2470
-Node: The libitm ABI3950
-Ref: txn-code-properties7743
-Node: Internals18018
-Ref: serial-lock-impl28043
-Ref: progress-guarantees32793
-Node: GNU Free Documentation License35067
-Node: Index60208
+Node: Top1187
+Node: Enabling libitm2090
+Node: C/C++ Language Constructs for TM2484
+Node: The libitm ABI3964
+Ref: txn-code-properties7757
+Node: Internals18032
+Ref: serial-lock-impl28057
+Ref: progress-guarantees32807
+Node: GNU Free Documentation License35081
+Node: Index60222
 
 End Tag Table
