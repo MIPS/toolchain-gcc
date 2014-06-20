@@ -683,14 +683,8 @@ const char *host_detect_local_cpu (int argc, const char **argv)
 		/* Assume Sandy Bridge.  */
 		cpu = "corei7-avx";
 	      else if (has_sse4_2)
-		{
-		  if (has_movbe)
-		    /* Assume SLM.  */
-		    cpu = "slm";
-		  else
-		    /* Assume Core i7.  */
-		    cpu = "corei7";
-		}
+		/* Assume Core i7.  */
+		cpu = "corei7";
 	      else if (has_ssse3)
 		{
 		  if (has_movbe)
