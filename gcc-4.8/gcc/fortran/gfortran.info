@@ -1,5 +1,5 @@
-This is doc/gfortran.info, produced by makeinfo version 4.13 from
-/d/gcc-4.8.1/gcc-4.8.1/gcc/fortran/gfortran.texi.
+This is doc/gfortran.info, produced by makeinfo version 4.12 from
+/space/rguenther/gcc-4.8.3/gcc-4.8.3/gcc/fortran/gfortran.texi.
 
 Copyright (C) 1999-2013 Free Software Foundation, Inc.
 
@@ -364,7 +364,7 @@ for them, which work with GNU Fortran.  They can be found at
 
    Deferred-length character strings of Fortran 2003 supports part of
 the features of `ISO_VARYING_STRING' and should be considered as
-replacement. (Namely, allocatable or pointers of the type
+replacement.  (Namely, allocatable or pointers of the type
 `character(len=:)'.)
 
 
@@ -544,14 +544,14 @@ accepted by the compiler:
 
 `-fbackslash'
      Change the interpretation of backslashes in string literals from a
-     single backslash character to "C-style" escape characters. The
+     single backslash character to "C-style" escape characters.  The
      following combinations are expanded `\a', `\b', `\f', `\n', `\r',
      `\t', `\v', `\\', and `\0' to the ASCII characters alert,
      backspace, form feed, newline, carriage return, horizontal tab,
      vertical tab, backslash, and NUL, respectively.  Additionally,
      `\x'NN, `\u'NNNN and `\U'NNNNNNNN (where each N is a hexadecimal
      digit) are translated into the Unicode characters corresponding to
-     the specified code points. All other combinations of a character
+     the specified code points.  All other combinations of a character
      preceded by \ are unexpanded.
 
 `-fmodule-private'
@@ -574,13 +574,13 @@ accepted by the compiler:
 
 `-ffree-line-length-N'
      Set column after which characters are ignored in typical free-form
-     lines in the source file. The default value is 132.  N may be
+     lines in the source file.  The default value is 132.  N may be
      `none', meaning that the entire line is meaningful.
      `-ffree-line-length-0' means the same thing as
      `-ffree-line-length-none'.
 
 `-fmax-identifier-length=N'
-     Specify the maximum allowed identifier length. Typical values are
+     Specify the maximum allowed identifier length.  Typical values are
      31 (Fortran 95) and 63 (Fortran 2003 and Fortran 2008).
 
 `-fimplicit-none'
@@ -663,13 +663,13 @@ File: gfortran.info,  Node: Preprocessing Options,  Next: Error and Warning Opti
 2.3 Enable and customize preprocessing
 ======================================
 
-Preprocessor related options. See section *note Preprocessing and
+Preprocessor related options.  See section *note Preprocessing and
 conditional compilation:: for more detailed information on
 preprocessing in `gfortran'.
 
 `-cpp'
 `-nocpp'
-     Enable preprocessing. The preprocessor is automatically invoked if
+     Enable preprocessing.  The preprocessor is automatically invoked if
      the file extension is `.fpp', `.FPP',  `.F', `.FOR', `.FTN',
      `.F90', `.F95', `.F03' or `.F08'. Use this option to manually
      enable preprocessing of any kind of Fortran file.
@@ -677,7 +677,7 @@ preprocessing in `gfortran'.
      To disable preprocessing of files with any of the above listed
      extensions, use the negative form: `-nocpp'.
 
-     The preprocessor is run in traditional mode. Any restrictions of
+     The preprocessor is run in traditional mode.  Any restrictions of
      the file-format, especially the limits on line length, apply for
      preprocessed output as well, so it might be advisable to use the
      `-ffree-line-length-none' or `-ffixed-line-length-none' options.
@@ -685,7 +685,7 @@ preprocessing in `gfortran'.
 `-dM'
      Instead of the normal output, generate a list of `'#define''
      directives for all the macros defined during the execution of the
-     preprocessor, including predefined macros. This gives you a way of
+     preprocessor, including predefined macros.  This gives you a way of
      finding out what is predefined in your version of the preprocessor.
      Assuming you have no file `foo.f90', the command
             touch foo.f90; gfortran -cpp -E -dM foo.f90
@@ -714,10 +714,10 @@ preprocessing in `gfortran'.
 `-fworking-directory'
      Enable generation of linemarkers in the preprocessor output that
      will let the compiler know the current working directory at the
-     time of preprocessing. When this option is enabled, the
+     time of preprocessing.  When this option is enabled, the
      preprocessor will emit, after the initial linemarker, a second
      linemarker with the current working directory followed by two
-     slashes. GCC will use this directory, when it is present in the
+     slashes.  GCC will use this directory, when it is present in the
      preprocessed input, as the directory emitted as the current
      working directory in some debugging information formats.  This
      option is implicitly enabled if debugging information is enabled,
@@ -729,7 +729,7 @@ preprocessing in `gfortran'.
 `-idirafter DIR'
      Search DIR for include files, but do it after all directories
      specified with `-I' and the standard system directories have been
-     exhausted. DIR is treated as a system include directory.  If dir
+     exhausted.  DIR is treated as a system include directory.  If dir
      begins with `=', then the `=' will be replaced by the sysroot
      prefix; see `--sysroot' and `-isysroot'.
 
@@ -757,7 +757,7 @@ preprocessing in `gfortran'.
      Search DIR for header files, after all directories specified by
      `-I' but before the standard system directories. Mark it as a
      system directory, so that it gets the same special treatment as is
-     applied to the standard system directories. If DIR begins with
+     applied to the standard system directories.  If DIR begins with
      `=', then the `=' will be replaced by the sysroot prefix; see
      `--sysroot' and `-isysroot'.
 
@@ -780,7 +780,7 @@ preprocessing in `gfortran'.
      Cancel an assertion with the predicate PREDICATE and answer ANSWER.
 
 `-C'
-     Do not discard comments. All comments are passed through to the
+     Do not discard comments.  All comments are passed through to the
      output file, except for comments in processed directives, which
      are deleted along with the directive.
 
@@ -791,11 +791,11 @@ preprocessing in `gfortran'.
      ordinary source line, since the first token on the line is no
      longer a `'#''.
 
-     Warning: this currently handles C-Style comments only. The
+     Warning: this currently handles C-Style comments only.  The
      preprocessor does not yet recognize Fortran-style comments.
 
 `-CC'
-     Do not discard comments, including during macro expansion. This is
+     Do not discard comments, including during macro expansion.  This is
      like `-C', except that comments contained within macros are also
      passed through to the output file where the macro is expanded.
 
@@ -824,17 +824,17 @@ preprocessing in `gfortran'.
 
      If you wish to define a function-like macro on the command line,
      write its argument list with surrounding parentheses before the
-     equals sign (if any). Parentheses are meaningful to most shells,
-     so you will need to quote the option. With sh and csh,
+     equals sign (if any).  Parentheses are meaningful to most shells,
+     so you will need to quote the option.  With sh and csh,
      `-D'name(args...)=definition'' works.
 
      `-D' and `-U' options are processed in the order they are given on
-     the command line. All -imacros file and -include file options are
+     the command line.  All -imacros file and -include file options are
      processed after all -D and -U options.
 
 `-H'
      Print the name of each header file used, in addition to other
-     normal activities. Each name is indented to show how deep in the
+     normal activities.  Each name is indented to show how deep in the
      `'#include'' stack it is.
 
 `-P'
@@ -916,7 +916,7 @@ produced by GNU Fortran:
      `-Wtarget-lifetime', `-Wreal-q-constant' and `-Wunused'.
 
 `-Waliasing'
-     Warn about possible aliasing of dummy arguments. Specifically, it
+     Warn about possible aliasing of dummy arguments.  Specifically, it
      warns if the same actual argument is associated with a dummy
      argument with `INTENT(IN)' and a dummy argument with `INTENT(OUT)'
      in a call with an explicit interface.
@@ -933,7 +933,7 @@ produced by GNU Fortran:
             call bar(a,a)
 
 `-Wampersand'
-     Warn about missing ampersand in continued character constants. The
+     Warn about missing ampersand in continued character constants.  The
      warning is given with `-Wampersand', `-pedantic', `-std=f95',
      `-std=f2003' and `-std=f2008'. Note: With no ampersand given in a
      continued character constant, GNU Fortran assumes continuation at
@@ -1018,7 +1018,7 @@ produced by GNU Fortran:
      By default, tabs are accepted as whitespace, but tabs are not
      members of the Fortran Character Set.  For continuation lines, a
      tab followed by a digit between 1 and 9 is supported.  `-Wno-tabs'
-     will cause a warning to be issued if a tab is encountered. Note,
+     will cause a warning to be issued if a tab is encountered.  Note,
      `-Wno-tabs' is active for `-pedantic', `-std=f95', `-std=f2003',
      `-std=f2008' and `-Wall'.
 
@@ -1034,7 +1034,7 @@ produced by GNU Fortran:
      implied by `-Wall'.
 
 `-Wunused-dummy-argument'
-     Warn about unused dummy arguments. This option is implied by
+     Warn about unused dummy arguments.  This option is implied by
      `-Wall'.
 
 `-Wunused-parameter'
@@ -1104,10 +1104,11 @@ either your program or the GNU Fortran compiler.
      into internal representation.  Only really useful for debugging the
      GNU Fortran compiler itself.
 
-`-fdump-optimized-tree'
+`-fdump-fortran-optimized'
      Output the parse tree after front-end optimization.  Only really
      useful for debugging the GNU Fortran compiler itself.
 
+`-fdump-parse-tree'
      Output the internal parse tree after translating the source program
      into internal representation.  Only really useful for debugging the
      GNU Fortran compiler itself.  This option is deprecated; use
@@ -1146,7 +1147,7 @@ either your program or the GNU Fortran compiler.
      floating-point exception, and the other POSIX signals that have the
      action `core'), the Fortran runtime library tries to output a
      backtrace of the error. `-fno-backtrace' disables the backtrace
-     generation. This option only has influence for compilation of the
+     generation.  This option only has influence for compilation of the
      Fortran main program.
 
 
@@ -1200,12 +1201,12 @@ File: gfortran.info,  Node: Link Options,  Next: Runtime Options,  Prev: Directo
 ================================
 
 These options come into play when the compiler links object files into
-an executable output file. They are meaningless if the compiler is not
+an executable output file.  They are meaningless if the compiler is not
 doing a link step.
 
 `-static-libgfortran'
      On systems that provide `libgfortran' as a shared and a static
-     library, this option forces the use of the static version. If no
+     library, this option forces the use of the static version.  If no
      shared version of `libgfortran' was built when the compiler was
      configured, this option has no effect.
 
@@ -1248,7 +1249,7 @@ Fortran.
      treated as negative in the `SIGN' intrinsic.  `-fno-sign-zero'
      does not print the negative sign of zero values (or values rounded
      to zero for I/O) and regards zero as positive number in the `SIGN'
-     intrinsic for compatibility with Fortran 77. The default is
+     intrinsic for compatibility with Fortran 77.  The default is
      `-fsign-zero'.
 
 
@@ -1268,7 +1269,7 @@ the other form by either removing `no-' or adding it.
 `-fno-automatic'
      Treat each program unit (except those marked as RECURSIVE) as if
      the `SAVE' statement were specified for every local variable and
-     array referenced in it. Does not affect common blocks. (Some
+     array referenced in it.  Does not affect common blocks.  (Some
      Fortran compilers provide this option under the name `-static' or
      `-save'.)  The default, which is `-fautomatic', uses the stack for
      local variables smaller than the value given by
@@ -1420,7 +1421,7 @@ the other form by either removing `no-' or adding it.
 
     `array-temps'
           Warns at run time when for passing an actual argument a
-          temporary array had to be generated. The information
+          temporary array had to be generated.  The information
           generated by this warning is sometimes useful in
           optimization, in order to avoid such temporaries.
 
@@ -1479,7 +1480,7 @@ the other form by either removing `no-' or adding it.
           print '(10(I0,1X))', i
           end program test
 
-     _Caution:  This option can lead to long compile times and
+     _Caution: This option can lead to long compile times and
      excessively large object files._
 
      The default value for N is 65535.
@@ -1503,7 +1504,7 @@ the other form by either removing `no-' or adding it.
      arrays, even those of unknown size onto stack memory.  If your
      program uses very large local arrays it is possible that you will
      have to extend your runtime limits for stack memory on some
-     operating systems. This flag is enabled by default at optimization
+     operating systems.  This flag is enabled by default at optimization
      level `-Ofast'.
 
 `-fpack-derived'
@@ -1549,7 +1550,7 @@ the other form by either removing `no-' or adding it.
 
 `-frecursive'
      Allow indirect recursion by forcing all local arrays to be
-     allocated on the stack. This flag cannot be used together with
+     allocated on the stack.  This flag cannot be used together with
      `-fmax-stack-var-size=' or `-fno-automatic'.
 
 `-finit-local-zero'
@@ -1608,7 +1609,7 @@ the other form by either removing `no-' or adding it.
 `-frealloc-lhs'
      An allocatable left-hand side of an intrinsic assignment is
      automatically (re)allocated if it is either unallocated or has a
-     different shape. The option is enabled by default except when
+     different shape.  The option is enabled by default except when
      `-std=f95' is given. See also `-Wrealloc-lhs'.
 
 `-faggressive-function-elimination'
@@ -1651,7 +1652,7 @@ behavior of programs compiled with GNU Fortran.
 
 File: gfortran.info,  Node: Runtime,  Next: Fortran 2003 and 2008 status,  Prev: Invoking GNU Fortran,  Up: Top
 
-3 Runtime:  Influencing runtime behavior with environment variables
+3 Runtime: Influencing runtime behavior with environment variables
 *******************************************************************
 
 The behavior of the `gfortran' can be influenced by environment
@@ -1906,7 +1907,7 @@ can be found below.  See also the wiki page
      and arrays, including unlimited polymorphism.
 
    * Generic interface names, which have the same name as derived types,
-     are now supported. This allows one to write constructor functions.
+     are now supported.  This allows one to write constructor functions.
      Note that Fortran does not support static constructor functions.
      For static variables, only default initialization or
      structure-constructor initialization are available.
@@ -1927,7 +1928,7 @@ can be found below.  See also the wiki page
    * Reallocation on assignment: If an intrinsic assignment is used, an
      allocatable variable on the left-hand side is automatically
      allocated (if unallocated) or reallocated (if the shape is
-     different). Currently, scalar deferred character length left-hand
+     different).  Currently, scalar deferred character length left-hand
      sides are correctly handled but arrays are not yet fully
      implemented.
 
@@ -2025,7 +2026,7 @@ downloaded free of charge from
 `http://www.nag.co.uk/sc22wg5/links.html'.  Fortran is developed by the
 Working Group 5 of Sub-Committee 22 of the Joint Technical Committee 1
 of the International Organization for Standardization and the
-International Electrotechnical Commission (IEC).  This group is known as
+International Electrotechnical Commission (IEC). This group is known as
 WG5 (http://www.nag.co.uk/sc22wg5/).
 
    The GNU Fortran compiler supports several of the new features of
@@ -2272,9 +2273,9 @@ This section contains a brief overview of data and metadata consistency
 and durability issues when doing I/O.
 
    With respect to durability, GNU Fortran makes no effort to ensure
-that data is committed to stable storage. If this is required, the GNU
+that data is committed to stable storage.  If this is required, the GNU
 Fortran programmer can use the intrinsic `FNUM' to retrieve the low
-level file descriptor corresponding to an open Fortran unit. Then,
+level file descriptor corresponding to an open Fortran unit.  Then,
 using e.g. the `ISO_C_BINDING' feature, one can call the underlying
 system call to flush dirty data to stable storage, such as `fsync' on
 POSIX, `_commit' on MingW, or `fcntl(fd, F_FULLSYNC, 0)' on Mac OS X.
@@ -2307,8 +2308,8 @@ The following example shows how to call fsync:
        if (ret /= 0) stop "Error calling FSYNC"
 
    With respect to consistency, for regular files GNU Fortran uses
-buffered I/O in order to improve performance. This buffer is flushed
-automatically when full and in some other situations, e.g. when closing
+buffered I/O in order to improve performance.  This buffer is flushed
+automatically when full and in some other situations, e.g.  when closing
 a unit. It can also be explicitly flushed with the `FLUSH' statement.
 Also, the buffering can be turned off with the
 `GFORTRAN_UNBUFFERED_ALL' and `GFORTRAN_UNBUFFERED_PRECONNECTED'
@@ -2318,7 +2319,7 @@ done in order to allow other processes to see data that GNU Fortran has
 written, as follows.
 
    The Windows platform supports a relaxed metadata consistency model,
-where file metadata is written to the directory lazily. This means
+where file metadata is written to the directory lazily.  This means
 that, for instance, the `dir' command can show a stale size for a file.
 One can force a directory metadata update by closing the unit, or by
 calling `_commit' on the file descriptor. Note, though, that `_commit'
@@ -2326,7 +2327,7 @@ will force all dirty data to stable storage, which is often a very slow
 operation.
 
    The Network File System (NFS) implements a relaxed consistency model
-called open-to-close consistency. Closing a file forces dirty data and
+called open-to-close consistency.  Closing a file forces dirty data and
 metadata to be flushed to the server, and opening a file forces the
 client to contact the server in order to revalidate cached data.
 `fsync' will also force a flush of dirty data and metadata to the
@@ -3185,7 +3186,7 @@ In order to ensure that exactly the same variable type and kind is used
 in C and Fortran, the named constants shall be used which are defined
 in the `ISO_C_BINDING' intrinsic module.  That module contains named
 constants for kind parameters and character named constants for the
-escape sequences in C.  For a list of the constants, see *note
+escape sequences in C. For a list of the constants, see *note
 ISO_C_BINDING::.
 
 
@@ -3263,13 +3264,13 @@ File: gfortran.info,  Node: Interoperable Subroutines and Functions,  Next: Work
 ---------------------------------------------
 
 Subroutines and functions have to have the `BIND(C)' attribute to be
-compatible with C.  The dummy argument declaration is relatively
+compatible with C. The dummy argument declaration is relatively
 straightforward.  However, one needs to be careful because C uses
 call-by-value by default while Fortran behaves usually similar to
 call-by-reference.  Furthermore, strings and pointers are handled
 differently.  Note that in Fortran 2003 and 2008 only explicit size and
 assumed-size arrays are supported but not assumed-shape or
-deferred-shape (i.e. allocatable or pointer) arrays.  However, those
+deferred-shape (i.e.  allocatable or pointer) arrays.  However, those
 are allowed since the Technical Specification 29113, see *note Further
 Interoperability of Fortran with C::
 
@@ -3504,7 +3505,7 @@ File: gfortran.info,  Node: Further Interoperability of Fortran with C,  Prev: W
 
 The Technical Specification ISO/IEC TS 29113:2012 on further
 interoperability of Fortran with C extends the interoperability support
-of Fortran 2003 and Fortran 2008. Besides removing some restrictions
+of Fortran 2003 and Fortran 2008.  Besides removing some restrictions
 and constraints, it adds assumed-type (`TYPE(*)') and assumed-rank
 (`dimension') variables and allows for interoperability of
 assumed-shape, assumed-rank and deferred-shape arrays, including
@@ -3512,7 +3513,7 @@ allocatables and pointers.
 
    Note: Currently, GNU Fortran does not support the array descriptor
 (dope vector) as specified in the Technical Specification, but uses an
-array descriptor with different fields. The Chasm Language
+array descriptor with different fields.  The Chasm Language
 Interoperability Tools, `http://chasm-interop.sourceforge.net/',
 provide an interface to GNU Fortran's array descriptor.
 
@@ -3556,7 +3557,7 @@ are supported by GNU Fortran:
    Currently unimplemented:
 
    * GNU Fortran always uses an array descriptor, which does not match
-     the one of the Technical Specification. The
+     the one of the Technical Specification.  The
      `ISO_Fortran_binding.h' header file and the C functions it
      specifies are not available.
 
@@ -3577,7 +3578,7 @@ allow the user to choose specific implementation details, compiler
 directives can be used to set attributes of variables and procedures
 which are not part of the standard.  Whether a given attribute is
 supported and its exact effects depend on both the operating system and
-on the processor; see *note C Extensions: (gcc)Top.  for details.
+on the processor; see *note C Extensions: (gcc)Top. for details.
 
    For procedures and procedure pointers, the following attributes can
 be used to change the calling convention:
@@ -3676,9 +3677,9 @@ _Syntax_:
      `void _gfortran_set_args (int argc, char *argv[])'
 
 _Arguments_:
-     ARGC       number of command line argument strings
-     ARGV       the command-line argument strings; argv[0] is
-                the pathname of the executable itself.
+     ARGC        number of command line argument strings
+     ARGV        the command-line argument strings; argv[0] is
+                 the pathname of the executable itself.
 
 _Example_:
           int main (int argc, char *argv[])
@@ -3707,11 +3708,11 @@ _Syntax_:
      `void _gfortran_set_options (int num, int options[])'
 
 _Arguments_:
-     NUM        number of options passed
-     ARGV       The list of flag values
+     NUM         number of options passed
+     ARGV        The list of flag values
 
 _option flag list_:
-     OPTION[0]  Allowed standard; can give run-time errors if
+     OPTION[0]   Allowed standard; can give run-time errors if
                 e.g. an input-output edit descriptor is
                 invalid in a given standard.  Possible values
                 are (bitwise or-ed) `GFC_STD_F77' (1),
@@ -3722,23 +3723,23 @@ _option flag list_:
                 (256) and GFC_STD_F2008_TS (512). Default:
                 `GFC_STD_F95_OBS | GFC_STD_F95_DEL |
                 GFC_STD_F95 | GFC_STD_F2003 | GFC_STD_F2008 |
-                GFC_STD_F2008_TS | GFC_STD_F2008_OBS |
-                GFC_STD_F77 | GFC_STD_GNU | GFC_STD_LEGACY'.
-     OPTION[1]  Standard-warning flag; prints a warning to
+                 GFC_STD_F2008_TS | GFC_STD_F2008_OBS |
+                 GFC_STD_F77 | GFC_STD_GNU | GFC_STD_LEGACY'.
+     OPTION[1]   Standard-warning flag; prints a warning to
                 standard error.  Default: `GFC_STD_F95_DEL |
-                GFC_STD_LEGACY'.
+                 GFC_STD_LEGACY'.
      OPTION[2]  If non zero, enable pedantic checking.
                 Default: off.
-     OPTION[3]  Unused.
-     OPTION[4]  If non zero, enable backtracing on run-time
+     OPTION[3]   Unused.
+     OPTION[4]   If non zero, enable backtracing on run-time
                 errors.  Default: off.  Note: Installs a
                 signal handler and requires command-line
                 initialization using `_gfortran_set_args'.
-     OPTION[5]  If non zero, supports signed zeros.  Default:
-                enabled.
+     OPTION[5]   If non zero, supports signed zeros.  Default:
+                 enabled.
      OPTION[6]  Enables run-time checking.  Possible values
                 are (bitwise or-ed): GFC_RTCHECK_BOUNDS (1),
-                GFC_RTCHECK_ARRAY_TEMPS (2),
+                 GFC_RTCHECK_ARRAY_TEMPS (2),
                 GFC_RTCHECK_RECURSION (4), GFC_RTCHECK_DO
                 (16), GFC_RTCHECK_POINTER (32).  Default:
                 disabled.
@@ -3762,10 +3763,10 @@ _Syntax_:
      `void _gfortran_set_convert (int conv)'
 
 _Arguments_:
-     CONV       Endian conversion, possible values:
-                GFC_CONVERT_NATIVE (0, default),
-                GFC_CONVERT_SWAP (1), GFC_CONVERT_BIG (2),
-                GFC_CONVERT_LITTLE (3).
+     CONV        Endian conversion, possible values:
+                 GFC_CONVERT_NATIVE (0, default),
+                 GFC_CONVERT_SWAP (1), GFC_CONVERT_BIG (2),
+                 GFC_CONVERT_LITTLE (3).
 
 _Example_:
           int main (int argc, char *argv[])
@@ -3817,8 +3818,8 @@ _Syntax_:
      `void _gfortran_set_fpe (int val)'
 
 _Arguments_:
-     OPTION[0]  IEEE exceptions.  Possible values are (bitwise
-                or-ed) zero (0, default) no trapping,
+     OPTION[0]   IEEE exceptions.  Possible values are (bitwise
+                 or-ed) zero (0, default) no trapping,
                 `GFC_FPE_INVALID' (1), `GFC_FPE_DENORMAL' (2),
                 `GFC_FPE_ZERO' (4), `GFC_FPE_OVERFLOW' (8),
                 `GFC_FPE_UNDERFLOW' (16), and
@@ -4241,19 +4242,19 @@ _Example_:
           end program test_abs
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `ABS(A)'      `REAL(4) A'   `REAL(4)'     Fortran 77 and
-                                               later
+                                                  later
      `CABS(A)'     `COMPLEX(4)   `REAL(4)'     Fortran 77 and
-                   A'                          later
+                    A'                            later
      `DABS(A)'     `REAL(8) A'   `REAL(8)'     Fortran 77 and
-                                               later
+                                                  later
      `IABS(A)'     `INTEGER(4)   `INTEGER(4)'  Fortran 77 and
-                   A'                          later
+                    A'                            later
      `ZABS(A)'     `COMPLEX(8)   `COMPLEX(8)'  GNU extension
-                   A'                          
+                    A'
      `CDABS(A)'    `COMPLEX(8)   `COMPLEX(8)'  GNU extension
-                   A'                          
+                    A'
 
 
 File: gfortran.info,  Node: ACCESS,  Next: ACHAR,  Prev: ABS,  Up: Intrinsic Procedures
@@ -4263,7 +4264,7 @@ File: gfortran.info,  Node: ACCESS,  Next: ACHAR,  Prev: ABS,  Up: Intrinsic Pro
 
 _Description_:
      `ACCESS(NAME, MODE)' checks whether the file NAME exists, is
-     readable, writable or executable. Except for the executable check,
+     readable, writable or executable.  Except for the executable check,
      `ACCESS' can be replaced by Fortran 95's `INQUIRE'.
 
 _Standard_:
@@ -4280,7 +4281,7 @@ _Arguments_:
                 file name. Tailing blank are ignored unless
                 the character `achar(0)' is present, then all
                 characters up to and excluding `achar(0)' are
-                used as file name.
+                 used as file name.
      MODE       Scalar `CHARACTER' of default kind with the
                 file access mode, may be any concatenation of
                 `"r"' (readable), `"w"' (writable) and `"x"'
@@ -4387,11 +4388,11 @@ _Example_:
           end program test_acos
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `ACOS(X)'     `REAL(4) X'   `REAL(4)'     Fortran 77 and
-                                               later
+                                                  later
      `DACOS(X)'    `REAL(8) X'   `REAL(8)'     Fortran 77 and
-                                               later
+                                                  later
 
 _See also_:
      Inverse function: *note COS::
@@ -4419,8 +4420,8 @@ _Arguments_:
      X          The type shall be `REAL' or `COMPLEX'.
 
 _Return value_:
-     The return value has the same type and kind as X. If X is complex,
-     the imaginary part of the result is in radians and lies between  0
+     The return value has the same type and kind as X.  If X is complex,
+     the imaginary part of the result is in radians and lies between 0
      \leq \Im \acosh(x) \leq \pi.
 
 _Example_:
@@ -4430,7 +4431,7 @@ _Example_:
           END PROGRAM
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `DACOSH(X)'   `REAL(8) X'   `REAL(8)'     GNU extension
 
 _See also_:
@@ -4548,10 +4549,10 @@ _Example_:
           end program test_aimag
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `AIMAG(Z)'    `COMPLEX Z'   `REAL'        GNU extension
      `DIMAG(Z)'    `COMPLEX(8)   `REAL(8)'     GNU extension
-                   Z'                          
+                    Z'
      `IMAG(Z)'     `COMPLEX Z'   `REAL'        GNU extension
      `IMAGPART(Z)' `COMPLEX Z'   `REAL'        GNU extension
 
@@ -4599,11 +4600,11 @@ _Example_:
           end program test_aint
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `AINT(A)'     `REAL(4) A'   `REAL(4)'     Fortran 77 and
-                                               later
+                                                  later
      `DINT(A)'     `REAL(8) A'   `REAL(8)'     Fortran 77 and
-                                               later
+                                                  later
 
 
 File: gfortran.info,  Node: ALARM,  Next: ALL,  Prev: AINT,  Up: Intrinsic Procedures
@@ -4629,7 +4630,7 @@ _Syntax_:
      `CALL ALARM(SECONDS, HANDLER [, STATUS])'
 
 _Arguments_:
-     SECONDS    The type of the argument shall be a scalar
+     SECONDS     The type of the argument shall be a scalar
                 `INTEGER'. It is `INTENT(IN)'.
      HANDLER    Signal handler (`INTEGER FUNCTION' or
                 `SUBROUTINE') or dummy/global `INTEGER'
@@ -4673,10 +4674,10 @@ _Syntax_:
 
 _Arguments_:
      MASK       The type of the argument shall be `LOGICAL' and
-                it shall not be scalar.
+                 it shall not be scalar.
      DIM        (Optional) DIM shall be a scalar integer with
                 a value that lies between one and the rank of
-                MASK.
+                 MASK.
 
 _Return value_:
      `ALL(MASK)' returns a scalar value of type `LOGICAL' where the
@@ -4685,11 +4686,11 @@ _Return value_:
      with the rank of MASK minus 1.  The shape is determined from the
      shape of MASK where the DIM dimension is elided.
 
-    (A)
+     (A)
           `ALL(MASK)' is true if all elements of MASK are true.  It
           also is true if MASK has zero size; otherwise, it is false.
 
-    (B)
+     (B)
           If the rank of MASK is one, then `ALL(MASK,DIM)' is equivalent
           to `ALL(MASK)'.  If the rank is greater than one, then
           `ALL(MASK,DIM)' is determined by applying `ALL' to the array
@@ -4775,7 +4776,7 @@ _Syntax_:
 _Arguments_:
      I          The type shall be either a scalar `INTEGER'
                 type or a scalar `LOGICAL' type.
-     J          The type shall be the same as the type of I.
+     J           The type shall be the same as the type of I.
 
 _Return value_:
      The return type is either a scalar `INTEGER' or a scalar
@@ -4839,11 +4840,11 @@ _Example_:
           end program test_anint
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `AINT(A)'     `REAL(4) A'   `REAL(4)'     Fortran 77 and
-                                               later
+                                                  later
      `DNINT(A)'    `REAL(8) A'   `REAL(8)'     Fortran 77 and
-                                               later
+                                                  later
 
 
 File: gfortran.info,  Node: ANY,  Next: ASIN,  Prev: ANINT,  Up: Intrinsic Procedures
@@ -4866,10 +4867,10 @@ _Syntax_:
 
 _Arguments_:
      MASK       The type of the argument shall be `LOGICAL' and
-                it shall not be scalar.
+                 it shall not be scalar.
      DIM        (Optional) DIM shall be a scalar integer with
                 a value that lies between one and the rank of
-                MASK.
+                 MASK.
 
 _Return value_:
      `ANY(MASK)' returns a scalar value of type `LOGICAL' where the
@@ -4878,12 +4879,12 @@ _Return value_:
      with the rank of MASK minus 1.  The shape is determined from the
      shape of MASK where the DIM dimension is elided.
 
-    (A)
+     (A)
           `ANY(MASK)' is true if any element of MASK is true;
           otherwise, it is false.  It also is false if MASK has zero
           size.
 
-    (B)
+     (B)
           If the rank of MASK is one, then `ANY(MASK,DIM)' is equivalent
           to `ANY(MASK)'.  If the rank is greater than one, then
           `ANY(MASK,DIM)' is determined by applying `ANY' to the array
@@ -4941,11 +4942,11 @@ _Example_:
           end program test_asin
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `ASIN(X)'     `REAL(4) X'   `REAL(4)'     Fortran 77 and
-                                               later
+                                                  later
      `DASIN(X)'    `REAL(8) X'   `REAL(8)'     Fortran 77 and
-                                               later
+                                                  later
 
 _See also_:
      Inverse function: *note SIN::
@@ -4973,7 +4974,7 @@ _Arguments_:
      X          The type shall be `REAL' or `COMPLEX'.
 
 _Return value_:
-     The return value is of the same type and kind as  X. If X is
+     The return value is of the same type and kind as X.  If X is
      complex, the imaginary part of the result is in radians and lies
      between -\pi/2 \leq \Im \asinh(x) \leq \pi/2.
 
@@ -4984,7 +4985,7 @@ _Example_:
           END PROGRAM
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `DASINH(X)'   `REAL(8) X'   `REAL(8)'     GNU extension.
 
 _See also_:
@@ -5011,39 +5012,39 @@ _Syntax_:
 
 _Arguments_:
      POINTER    POINTER shall have the `POINTER' attribute and
-                it can be of any type.
-     TARGET     (Optional) TARGET shall be a pointer or a
-                target.  It must have the same type, kind type
-                parameter, and array rank as POINTER.
+                 it can be of any type.
+     TARGET      (Optional) TARGET shall be a pointer or a
+                 target.  It must have the same type, kind type
+                 parameter, and array rank as POINTER.
      The association status of neither POINTER nor TARGET shall be
      undefined.
 
 _Return value_:
      `ASSOCIATED(POINTER)' returns a scalar value of type `LOGICAL(4)'.
      There are several cases:
-    (A) When the optional TARGET is not present then
+     (A) When the optional TARGET is not present then
           `ASSOCIATED(POINTER)' is true if POINTER is associated with a
           target; otherwise, it returns false.
 
-    (B) If TARGET is present and a scalar target, the result is true if
+     (B) If TARGET is present and a scalar target, the result is true if
           TARGET is not a zero-sized storage sequence and the target
           associated with POINTER occupies the same storage units.  If
           POINTER is disassociated, the result is false.
 
-    (C) If TARGET is present and an array target, the result is true if
+     (C) If TARGET is present and an array target, the result is true if
           TARGET and POINTER have the same shape, are not zero-sized
           arrays, are arrays whose elements are not zero-sized storage
           sequences, and TARGET and POINTER occupy the same storage
           units in array element order.  As in case(B), the result is
           false, if POINTER is disassociated.
 
-    (D) If TARGET is present and an scalar pointer, the result is true
+     (D) If TARGET is present and an scalar pointer, the result is true
           if TARGET is associated with POINTER, the target associated
           with TARGET are not zero-sized storage sequences and occupy
           the same storage units.  The result is false, if either
           TARGET or POINTER is disassociated.
 
-    (E) If TARGET is present and an array pointer, the result is true if
+     (E) If TARGET is present and an array pointer, the result is true if
           target associated with POINTER and the target associated with
           TARGET have the same shape, are not zero-sized arrays, are
           arrays whose elements are not zero-sized storage sequences,
@@ -5086,12 +5087,12 @@ _Syntax_:
 
 _Arguments_:
      X          The type shall be `REAL' or `COMPLEX'; if Y is
-                present, X shall be REAL.
-     Y shall    
-     be of the  
-     same type  
-     and kind   
-     as X.      
+                 present, X shall be REAL.
+     Y shall
+     be of the
+     same type
+     and kind
+     as X.
 
 _Return value_:
      The return value is of the same type and kind as X.  If Y is
@@ -5106,11 +5107,11 @@ _Example_:
           end program test_atan
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `ATAN(X)'     `REAL(4) X'   `REAL(4)'     Fortran 77 and
-                                               later
+                                                  later
      `DATAN(X)'    `REAL(8) X'   `REAL(8)'     Fortran 77 and
-                                               later
+                                                  later
 
 _See also_:
      Inverse function: *note TAN::
@@ -5139,9 +5140,9 @@ _Syntax_:
 
 _Arguments_:
      Y          The type shall be `REAL'.
-     X          The type and kind type parameter shall be the
-                same as Y.  If Y is zero, then X must be
-                nonzero.
+     X           The type and kind type parameter shall be the
+                 same as Y.  If Y is zero, then X must be
+                 nonzero.
 
 _Return value_:
      The return value has the same type and kind type parameter as Y. It
@@ -5160,11 +5161,11 @@ _Example_:
           end program test_atan2
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `ATAN2(X,     `REAL(4) X,   `REAL(4)'     Fortran 77 and
-     Y)'           Y'                          later
+     Y)'            Y'                            later
      `DATAN2(X,    `REAL(8) X,   `REAL(8)'     Fortran 77 and
-     Y)'           Y'                          later
+     Y)'            Y'                            later
 
 
 File: gfortran.info,  Node: ATANH,  Next: ATOMIC_DEFINE,  Prev: ATAN2,  Up: Intrinsic Procedures
@@ -5188,7 +5189,7 @@ _Arguments_:
      X          The type shall be `REAL' or `COMPLEX'.
 
 _Return value_:
-     The return value has same type and kind as X. If X is complex, the
+     The return value has same type and kind as X.  If X is complex, the
      imaginary part of the result is in radians and lies between -\pi/2
      \leq \Im \atanh(x) \leq \pi/2.
 
@@ -5199,7 +5200,7 @@ _Example_:
           END PROGRAM
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `DATANH(X)'   `REAL(8) X'   `REAL(8)'     GNU extension
 
 _See also_:
@@ -5225,11 +5226,11 @@ _Syntax_:
      `CALL ATOMIC_DEFINE(ATOM, VALUE)'
 
 _Arguments_:
-     ATOM       Scalar coarray or coindexed variable of either
+     ATOM        Scalar coarray or coindexed variable of either
                 integer                         type with
                 `ATOMIC_INT_KIND' kind or logical type
                                with `ATOMIC_LOGICAL_KIND' kind.
-     VALURE     Scalar and of the same type as ATOM. If the
+     VALURE      Scalar and of the same type as ATOM.  If the
                 kind                         is different, the
                 value is converted to the kind of
                           ATOM.
@@ -5264,11 +5265,11 @@ _Syntax_:
      `CALL ATOMIC_REF(VALUE, ATOM)'
 
 _Arguments_:
-     VALURE     Scalar and of the same type as ATOM. If the
+     VALURE      Scalar and of the same type as ATOM.  If the
                 kind                         is different, the
                 value is converted to the kind of
                           ATOM.
-     ATOM       Scalar coarray or coindexed variable of either
+     ATOM        Scalar coarray or coindexed variable of either
                 integer                         type with
                 `ATOMIC_INT_KIND' kind or logical type
                                with `ATOMIC_LOGICAL_KIND' kind.
@@ -5297,7 +5298,7 @@ File: gfortran.info,  Node: BACKTRACE,  Next: BESSEL_J0,  Prev: ATOMIC_REF,  Up:
 
 _Description_:
      `BACKTRACE' shows a backtrace at an arbitrary place in user code.
-     Program execution continues normally afterwards. The backtrace
+     Program execution continues normally afterwards.  The backtrace
      information is printed to the unit corresponding to `ERROR_UNIT'
      in `ISO_FORTRAN_ENV'.
 
@@ -5338,11 +5339,11 @@ _Syntax_:
 
 _Arguments_:
      X          The type shall be `REAL', and it shall be
-                scalar.
+                 scalar.
 
 _Return value_:
      The return value is of type `REAL' and lies in the range  -
-     0.4027... \leq Bessel (0,x) \leq 1. It has the same kind as X.
+     0.4027... \leq Bessel (0,x) \leq 1.  It has the same kind as X.
 
 _Example_:
           program test_besj0
@@ -5351,7 +5352,7 @@ _Example_:
           end program test_besj0
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `DBESJ0(X)'   `REAL(8) X'   `REAL(8)'     GNU extension
 
 
@@ -5376,11 +5377,11 @@ _Syntax_:
 
 _Arguments_:
      X          The type shall be `REAL', and it shall be
-                scalar.
+                 scalar.
 
 _Return value_:
      The return value is of type `REAL' and it lies in the range  -
-     0.5818... \leq Bessel (0,x) \leq 0.5818 . It has the same kind as
+     0.5818... \leq Bessel (0,x) \leq 0.5818 .  It has the same kind as
      X.
 
 _Example_:
@@ -5390,7 +5391,7 @@ _Example_:
           end program test_besj1
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `DBESJ1(X)'   `REAL(8) X'   `REAL(8)'     GNU extension
 
 
@@ -5422,9 +5423,9 @@ _Syntax_:
 _Arguments_:
      N          Shall be a scalar or an array of type
                 `INTEGER'.
-     N1         Shall be a non-negative scalar of type
+     N1          Shall be a non-negative scalar of type
                 `INTEGER'.
-     N2         Shall be a non-negative scalar of type
+     N2          Shall be a non-negative scalar of type
                 `INTEGER'.
      X          Shall be a scalar or an array of type  `REAL';
                 for `BESSEL_JN(N1, N2, X)' it shall be scalar.
@@ -5445,9 +5446,9 @@ _Example_:
           end program test_besjn
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `DBESJN(N,    `INTEGER N'   `REAL(8)'     GNU extension
-     X)'                                       
+     X)'
                    `REAL(8) X'                 
 
 
@@ -5472,7 +5473,7 @@ _Syntax_:
 
 _Arguments_:
      X          The type shall be `REAL', and it shall be
-                scalar.
+                 scalar.
 
 _Return value_:
      The return value is a scalar of type `REAL'. It has the same kind
@@ -5485,7 +5486,7 @@ _Example_:
           end program test_besy0
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `DBESY0(X)'   `REAL(8) X'   `REAL(8)'     GNU extension
 
 
@@ -5510,7 +5511,7 @@ _Syntax_:
 
 _Arguments_:
      X          The type shall be `REAL', and it shall be
-                scalar.
+                 scalar.
 
 _Return value_:
      The return value is a scalar of type `REAL'. It has the same kind
@@ -5523,7 +5524,7 @@ _Example_:
           end program test_besy1
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `DBESY1(X)'   `REAL(8) X'   `REAL(8)'     GNU extension
 
 
@@ -5555,9 +5556,9 @@ _Syntax_:
 _Arguments_:
      N          Shall be a scalar or an array of type
                 `INTEGER' .
-     N1         Shall be a non-negative scalar of type
+     N1          Shall be a non-negative scalar of type
                 `INTEGER'.
-     N2         Shall be a non-negative scalar of type
+     N2          Shall be a non-negative scalar of type
                 `INTEGER'.
      X          Shall be a scalar or an array of type  `REAL';
                 for `BESSEL_YN(N1, N2, X)' it shall be scalar.
@@ -5578,7 +5579,7 @@ _Example_:
           end program test_besyn
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `DBESYN(N,X)' `INTEGER N'   `REAL(8)'     GNU extension
                    `REAL(8) X'                 
 
@@ -5793,7 +5794,7 @@ _Syntax_:
 
 _Arguments_:
      C_PTR_1    Scalar of the type `C_PTR' or `C_FUNPTR'.
-     C_PTR_2    (Optional) Scalar of the same type as C_PTR_1.
+     C_PTR_2     (Optional) Scalar of the same type as C_PTR_1.
 
 _Return value_:
      The return value is of type `LOGICAL'; it is `.false.' if either
@@ -5834,7 +5835,7 @@ _Syntax_:
 
 _Arguments_:
      CPTR       scalar of the type `C_PTR'. It is `INTENT(IN)'.
-     FPTR       pointer interoperable with CPTR. It is
+     FPTR        pointer interoperable with CPTR.  It is
                 `INTENT(OUT)'.
      SHAPE      (Optional) Rank-one array of type `INTEGER'
                 with `INTENT(IN)'. It shall be present if and
@@ -5882,7 +5883,7 @@ _Syntax_:
 _Arguments_:
      CPTR       scalar of the type `C_FUNPTR'. It is
                 `INTENT(IN)'.
-     FPTR       procedure pointer interoperable with CPTR. It
+     FPTR        procedure pointer interoperable with CPTR.  It
                 is `INTENT(OUT)'.
 
 _Example_:
@@ -5930,8 +5931,8 @@ _Syntax_:
      `RESULT = C_FUNLOC(x)'
 
 _Arguments_:
-     X          Interoperable function or pointer to such
-                function.
+     X           Interoperable function or pointer to such
+                 function.
 
 _Return value_:
      The return value is of type `C_FUNPTR' and contains the C address
@@ -6028,8 +6029,8 @@ _Syntax_:
      `N = C_SIZEOF(X)'
 
 _Arguments_:
-     X          The argument shall be an interoperable data
-                entity.
+     X           The argument shall be an interoperable data
+                 entity.
 
 _Return value_:
      The return value is of type integer and of the system-dependent
@@ -6129,7 +6130,7 @@ _Example_:
           end program test_char
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `CHAR(I)'     `INTEGER I'   `CHARACTER(LEN=1)'F77 and later
 
 _Note_:
@@ -6164,11 +6165,11 @@ _Syntax_:
 
 _Arguments_:
      NAME       The type shall be `CHARACTER' of default kind
-                and shall specify a valid path within the file
-                system.
+                 and shall specify a valid path within the file
+                 system.
      STATUS     (Optional) `INTEGER' status flag of the default
-                kind.  Returns 0 on success, and a system
-                specific and nonzero error code otherwise.
+                 kind.  Returns 0 on success, and a system
+                 specific and nonzero error code otherwise.
 
 _Example_:
           PROGRAM test_chdir
@@ -6210,15 +6211,15 @@ _Arguments_:
                 file name. Trailing blanks are ignored unless
                 the character `achar(0)' is present, then all
                 characters up to and excluding `achar(0)' are
-                used as the file name.
+                 used as the file name.
      MODE       Scalar `CHARACTER' of default kind giving the
-                file permission. MODE uses the same syntax as
+                 file permission.  MODE uses the same syntax as
                 the `chmod' utility as defined by the POSIX
                 standard. The argument shall either be a
                 string of a nonnegative octal number or a
                 symbolic mode.
      STATUS     (optional) scalar `INTEGER', which is `0' on
-                success and nonzero otherwise.
+                 success and nonzero otherwise.
 
 _Return value_:
      In either syntax, STATUS is set to `0' on success and nonzero
@@ -6309,7 +6310,7 @@ _Syntax_:
      `RESULT = COMMAND_ARGUMENT_COUNT()'
 
 _Arguments_:
-     None       
+     None
 
 _Return value_:
      The return value is an `INTEGER' of default kind.
@@ -6476,10 +6477,10 @@ _Example_:
           end program test_conjg
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `CONJG(Z)'    `COMPLEX Z'   `COMPLEX'     GNU extension
      `DCONJG(Z)'   `COMPLEX(8)   `COMPLEX(8)'  GNU extension
-                   Z'                          
+                    Z'
 
 
 File: gfortran.info,  Node: COS,  Next: COSH,  Prev: CONJG,  Up: Intrinsic Procedures
@@ -6503,9 +6504,9 @@ _Arguments_:
      X          The type shall be `REAL' or `COMPLEX'.
 
 _Return value_:
-     The return value is of the same type and kind as X. The real part
+     The return value is of the same type and kind as X.  The real part
      of the result is in radians. If X is of the type `REAL', the
-     return value lies in the range  -1 \leq \cos (x) \leq 1.
+     return value lies in the range -1 \leq \cos (x) \leq 1.
 
 _Example_:
           program test_cos
@@ -6514,17 +6515,17 @@ _Example_:
           end program test_cos
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `COS(X)'      `REAL(4) X'   `REAL(4)'     Fortran 77 and
-                                               later
+                                                  later
      `DCOS(X)'     `REAL(8) X'   `REAL(8)'     Fortran 77 and
-                                               later
+                                                  later
      `CCOS(X)'     `COMPLEX(4)   `COMPLEX(4)'  Fortran 77 and
-                   X'                          later
+                    X'                            later
      `ZCOS(X)'     `COMPLEX(8)   `COMPLEX(8)'  GNU extension
-                   X'                          
+                    X'
      `CDCOS(X)'    `COMPLEX(8)   `COMPLEX(8)'  GNU extension
-                   X'                          
+                    X'
 
 _See also_:
      Inverse function: *note ACOS::
@@ -6552,7 +6553,7 @@ _Arguments_:
      X          The type shall be `REAL' or `COMPLEX'.
 
 _Return value_:
-     The return value has same type and kind as X. If X is complex, the
+     The return value has same type and kind as X.  If X is complex, the
      imaginary part of the result is in radians. If X is `REAL', the
      return value has a lower bound of one, \cosh (x) \geq 1.
 
@@ -6563,11 +6564,11 @@ _Example_:
           end program test_cosh
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `COSH(X)'     `REAL(4) X'   `REAL(4)'     Fortran 77 and
-                                               later
+                                                  later
      `DCOSH(X)'    `REAL(8) X'   `REAL(8)'     Fortran 77 and
-                                               later
+                                                  later
 
 _See also_:
      Inverse function: *note ACOSH::
@@ -6644,7 +6645,7 @@ _Description_:
      execution time.
 
      If a time source is available, time will be reported with
-     microsecond resolution. If no time source is available, TIME is
+     microsecond resolution.  If no time source is available, TIME is
      set to `-1.0'.
 
      Note that TIME may contain a, system dependent, arbitrary offset
@@ -6706,7 +6707,7 @@ _Syntax_:
      `RESULT = CSHIFT(ARRAY, SHIFT [, DIM])'
 
 _Arguments_:
-     ARRAY      Shall be an array of any type.
+     ARRAY       Shall be an array of any type.
      SHIFT      The type shall be `INTEGER'.
      DIM        The type shall be `INTEGER'.
 
@@ -6793,7 +6794,7 @@ _Description_:
      `INTENT(OUT)' and has form ccyymmdd.  TIME is `INTENT(OUT)' and
      has form hhmmss.sss.  ZONE is `INTENT(OUT)' and has form (+-)hhmm,
      representing the difference with respect to Coordinated Universal
-     Time (UTC).  Unavailable time and date parameters return blanks.
+     Time (UTC). Unavailable time and date parameters return blanks.
 
      VALUES is `INTENT(OUT)' and provides the following:
 
@@ -6806,7 +6807,7 @@ _Description_:
                 `VALUE(6)':          The minutes of the hour
                 `VALUE(7)':          The seconds of the minute
                 `VALUE(8)':          The milliseconds of the
-                                     second
+                                        second
 
 _Standard_:
      Fortran 95 and later
@@ -6819,12 +6820,12 @@ _Syntax_:
 
 _Arguments_:
      DATE       (Optional) The type shall be `CHARACTER(LEN=8)'
-                or larger, and of default kind.
+                 or larger, and of default kind.
      TIME       (Optional) The type shall be
                 `CHARACTER(LEN=10)' or larger, and of default
                 kind.
      ZONE       (Optional) The type shall be `CHARACTER(LEN=5)'
-                or larger, and of default kind.
+                 or larger, and of default kind.
      VALUES     (Optional) The type shall be `INTEGER(8)'.
 
 _Return value_:
@@ -6985,7 +6986,7 @@ _Syntax_:
 
 _Arguments_:
      X          The type shall be `INTEGER' or `REAL'
-     Y          The type shall be the same type and kind as X.
+     Y           The type shall be the same type and kind as X.
 
 _Return value_:
      The return value is of type `INTEGER' or `REAL'.
@@ -7001,13 +7002,13 @@ _Example_:
           end program test_dim
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `DIM(X,Y)'    `REAL(4) X,   `REAL(4)'     Fortran 77 and
-                   Y'                          later
+                    Y'                            later
      `IDIM(X,Y)'   `INTEGER(4)   `INTEGER(4)'  Fortran 77 and
-                   X, Y'                       later
+                    X, Y'                         later
      `DDIM(X,Y)'   `REAL(8) X,   `REAL(8)'     Fortran 77 and
-                   Y'                          later
+                    Y'                            later
 
 
 File: gfortran.info,  Node: DOT_PRODUCT,  Next: DPROD,  Prev: DIM,  Up: Intrinsic Procedures
@@ -7036,7 +7037,7 @@ _Syntax_:
 
 _Arguments_:
      VECTOR_A   The type shall be numeric or `LOGICAL', rank 1.
-     VECTOR_B   The type shall be numeric if VECTOR_A is of
+     VECTOR_B    The type shall be numeric if VECTOR_A is of
                 numeric type or `LOGICAL' if VECTOR_A is of
                 type `LOGICAL'. VECTOR_B shall be a rank-one
                 array.
@@ -7093,9 +7094,9 @@ _Example_:
           end program test_dprod
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `DPROD(X,Y)'  `REAL(4) X,   `REAL(4)'     Fortran 77 and
-                   Y'                          later
+                    Y'                            later
 
 
 
@@ -7155,12 +7156,12 @@ _Syntax_:
 _Arguments_:
      I          Shall be of type `INTEGER' or a BOZ constant.
      J          Shall be of type `INTEGER' or a BOZ constant.
-                If both I and J have integer type, then they
-                shall have the same kind type parameter. I and
-                J shall not both be BOZ constants.
+                 If both I and J have integer type, then they
+                 shall have the same kind type parameter.  I and
+                 J shall not both be BOZ constants.
      SHIFT      Shall be of type `INTEGER'. It shall be
-                nonnegative.  If I is not a BOZ constant, then
-                SHIFT shall be less than or equal to
+                 nonnegative.  If I is not a BOZ constant, then
+                 SHIFT shall be less than or equal to
                 `BIT_SIZE(I)'; otherwise, SHIFT shall be less
                 than or equal to `BIT_SIZE(J)'.
 
@@ -7195,12 +7196,12 @@ _Syntax_:
 _Arguments_:
      I          Shall be of type `INTEGER' or a BOZ constant.
      J          Shall be of type `INTEGER' or a BOZ constant.
-                If both I and J have integer type, then they
-                shall have the same kind type parameter. I and
-                J shall not both be BOZ constants.
+                 If both I and J have integer type, then they
+                 shall have the same kind type parameter.  I and
+                 J shall not both be BOZ constants.
      SHIFT      Shall be of type `INTEGER'. It shall be
-                nonnegative.  If I is not a BOZ constant, then
-                SHIFT shall be less than or equal to
+                 nonnegative.  If I is not a BOZ constant, then
+                 SHIFT shall be less than or equal to
                 `BIT_SIZE(I)'; otherwise, SHIFT shall be less
                 than or equal to `BIT_SIZE(J)'.
 
@@ -7250,7 +7251,7 @@ _Description_:
                 `VALUES(1)':         User time in seconds.
                 `VALUES(2)':         System time in seconds.
                 `TIME':              Run time since start in
-                                     seconds.
+                                        seconds.
 
 _Standard_:
      GNU extension
@@ -7312,9 +7313,9 @@ _Description_:
      not present then the following are copied in depending on the type
      of ARRAY.
 
-     _Array     _Boundary Value_
-     Type_      
-     Numeric    0 of the type and kind of ARRAY.
+     _Array      _Boundary Value_
+     Type_
+     Numeric     0 of the type and kind of ARRAY.
      Logical    `.FALSE.'.
      Character(LEN)LEN blanks.
 
@@ -7328,9 +7329,9 @@ _Syntax_:
      `RESULT = EOSHIFT(ARRAY, SHIFT [, BOUNDARY, DIM])'
 
 _Arguments_:
-     ARRAY      May be any type, not scalar.
+     ARRAY       May be any type, not scalar.
      SHIFT      The type shall be `INTEGER'.
-     BOUNDARY   Same type as ARRAY.
+     BOUNDARY    Same type as ARRAY.
      DIM        The type shall be `INTEGER'.
 
 _Return value_:
@@ -7415,7 +7416,7 @@ _Example_:
           end program test_erf
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `DERF(X)'     `REAL(8) X'   `REAL(8)'     GNU extension
 
 
@@ -7441,7 +7442,7 @@ _Arguments_:
 
 _Return value_:
      The return value is of type `REAL' and of the same kind as X.  It
-     lies in the range  0 \leq erfc (x) \leq 2 .
+     lies in the range 0 \leq erfc (x) \leq 2 .
 
 _Example_:
           program test_erfc
@@ -7450,7 +7451,7 @@ _Example_:
           end program test_erfc
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `DERFC(X)'    `REAL(8) X'   `REAL(8)'     GNU extension
 
 
@@ -7596,7 +7597,7 @@ _Arguments_:
      EXITSTAT   (Optional) Shall be an `INTEGER' of the
                 default kind.
      CMDSTAT    (Optional) Shall be an `INTEGER' of the
-                default kind.
+                 default kind.
      CMDMSG     (Optional) Shall be an `CHARACTER' scalar of
                 the default kind.
 
@@ -7615,9 +7616,9 @@ _Example_:
 _Note_:
      Because this intrinsic is implemented in terms of the `system'
      function call, its behavior with respect to signaling is processor
-     dependent. In particular, on POSIX-compliant systems, the SIGINT
+     dependent.  In particular, on POSIX-compliant systems, the SIGINT
      and SIGQUIT signals will be ignored, and the SIGCHLD will be
-     blocked. As such, if the parent process is terminated, the child
+     blocked.  As such, if the parent process is terminated, the child
      process might not be terminated alongside.
 
 _See also_:
@@ -7690,17 +7691,17 @@ _Example_:
           end program test_exp
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `EXP(X)'      `REAL(4) X'   `REAL(4)'     Fortran 77 and
-                                               later
+                                                  later
      `DEXP(X)'     `REAL(8) X'   `REAL(8)'     Fortran 77 and
-                                               later
+                                                  later
      `CEXP(X)'     `COMPLEX(4)   `COMPLEX(4)'  Fortran 77 and
-                   X'                          later
+                    X'                            later
      `ZEXP(X)'     `COMPLEX(8)   `COMPLEX(8)'  GNU extension
-                   X'                          
+                    X'
      `CDEXP(X)'    `COMPLEX(8)   `COMPLEX(8)'  GNU extension
-                   X'                          
+                    X'
 
 
 File: gfortran.info,  Node: EXPONENT,  Next: EXTENDS_TYPE_OF,  Prev: EXP,  Up: Intrinsic Procedures
@@ -7755,13 +7756,13 @@ _Syntax_:
      `RESULT = EXTENDS_TYPE_OF(A, MOLD)'
 
 _Arguments_:
-     A          Shall be an object of extensible declared type
-                or unlimited polymorphic.
-     MOLD       Shall be an object of extensible declared type
-                or unlimited polymorphic.
+     A           Shall be an object of extensible declared type
+                 or unlimited polymorphic.
+     MOLD        Shall be an object of extensible declared type
+                 or unlimited polymorphic.
 
 _Return value_:
-     The return value is a scalar of type default logical. It is true
+     The return value is a scalar of type default logical.  It is true
      if and only if the dynamic type of A is an extension type of the
      dynamic type of MOLD.
 
@@ -7826,7 +7827,7 @@ File: gfortran.info,  Node: FGET,  Next: FGETC,  Prev: FDATE,  Up: Intrinsic Pro
 
 _Description_:
      Read a single character in stream mode from stdin by bypassing
-     normal formatted output. Stream I/O should not be mixed with
+     normal formatted output.  Stream I/O should not be mixed with
      normal record-oriented (formatted or unformatted) I/O on the same
      unit; the results are unpredictable.
 
@@ -7851,10 +7852,10 @@ _Syntax_:
 
 _Arguments_:
      C          The type shall be `CHARACTER' and of default
-                kind.
+                 kind.
      STATUS     (Optional) status flag of type `INTEGER'.
-                Returns 0 on success, -1 on end-of-file, and a
-                system specific positive error code otherwise.
+                 Returns 0 on success, -1 on end-of-file, and a
+                 system specific positive error code otherwise.
 
 _Example_:
           PROGRAM test_fget
@@ -7908,10 +7909,10 @@ _Syntax_:
 _Arguments_:
      UNIT       The type shall be `INTEGER'.
      C          The type shall be `CHARACTER' and of default
-                kind.
+                 kind.
      STATUS     (Optional) status flag of type `INTEGER'.
-                Returns 0 on success, -1 on end-of-file and a
-                system specific positive error code otherwise.
+                 Returns 0 on success, -1 on end-of-file and a
+                 system specific positive error code otherwise.
 
 _Example_:
           PROGRAM test_fgetc
@@ -7977,7 +7978,7 @@ File: gfortran.info,  Node: FLUSH,  Next: FNUM,  Prev: FLOOR,  Up: Intrinsic Pro
 =================================
 
 _Description_:
-     Flushes Fortran unit(s) currently open for output. Without the
+     Flushes Fortran unit(s) currently open for output.  Without the
      optional argument, all units are flushed, otherwise just the unit
      specified.
 
@@ -7999,10 +8000,10 @@ _Note_:
 
      The `FLUSH' intrinsic and the Fortran 2003 `FLUSH' statement have
      identical effect: they flush the runtime library's I/O buffer so
-     that the data becomes visible to other processes. This does not
+     that the data becomes visible to other processes.  This does not
      guarantee that the data is committed to disk.
 
-     On POSIX systems, you can request that all data is transferred  to
+     On POSIX systems, you can request that all data is transferred to
      the storage device by calling the `fsync' function, with the POSIX
      file descriptor of the I/O unit as argument (retrieved with GNU
      intrinsic `FNUM'). The following example shows how:
@@ -8076,7 +8077,7 @@ File: gfortran.info,  Node: FPUT,  Next: FPUTC,  Prev: FNUM,  Up: Intrinsic Proc
 
 _Description_:
      Write a single character in stream mode to stdout by bypassing
-     normal formatted output. Stream I/O should not be mixed with
+     normal formatted output.  Stream I/O should not be mixed with
      normal record-oriented (formatted or unformatted) I/O on the same
      unit; the results are unpredictable.
 
@@ -8101,10 +8102,10 @@ _Syntax_:
 
 _Arguments_:
      C          The type shall be `CHARACTER' and of default
-                kind.
+                 kind.
      STATUS     (Optional) status flag of type `INTEGER'.
-                Returns 0 on success, -1 on end-of-file and a
-                system specific positive error code otherwise.
+                 Returns 0 on success, -1 on end-of-file and a
+                 system specific positive error code otherwise.
 
 _Example_:
           PROGRAM test_fput
@@ -8126,7 +8127,7 @@ File: gfortran.info,  Node: FPUTC,  Next: FRACTION,  Prev: FPUT,  Up: Intrinsic 
 
 _Description_:
      Write a single character in stream mode by bypassing normal
-     formatted output. Stream I/O should not be mixed with normal
+     formatted output.  Stream I/O should not be mixed with normal
      record-oriented (formatted or unformatted) I/O on the same unit;
      the results are unpredictable.
 
@@ -8152,10 +8153,10 @@ _Syntax_:
 _Arguments_:
      UNIT       The type shall be `INTEGER'.
      C          The type shall be `CHARACTER' and of default
-                kind.
+                 kind.
      STATUS     (Optional) status flag of type `INTEGER'.
-                Returns 0 on success, -1 on end-of-file and a
-                system specific positive error code otherwise.
+                 Returns 0 on success, -1 on end-of-file and a
+                 system specific positive error code otherwise.
 
 _Example_:
           PROGRAM test_fputc
@@ -8217,7 +8218,7 @@ _Description_:
      Frees memory previously allocated by `MALLOC'. The `FREE'
      intrinsic is an extension intended to be used with Cray pointers,
      and is provided in GNU Fortran to allow user to compile legacy
-     code. For new code using Fortran 95 pointers, the memory
+     code.  For new code using Fortran 95 pointers, the memory
      de-allocation intrinsic is `DEALLOCATE'.
 
 _Standard_:
@@ -8231,8 +8232,8 @@ _Syntax_:
 
 _Arguments_:
      PTR        The type shall be `INTEGER'. It represents the
-                location of the memory that should be
-                de-allocated.
+                 location of the memory that should be
+                 de-allocated.
 
 _Return value_:
      None
@@ -8250,16 +8251,16 @@ File: gfortran.info,  Node: FSEEK,  Next: FSTAT,  Prev: FREE,  Up: Intrinsic Pro
 =====================================================
 
 _Description_:
-     Moves UNIT to the specified OFFSET. If WHENCE is set to 0, the
+     Moves UNIT to the specified OFFSET.  If WHENCE is set to 0, the
      OFFSET is taken as an absolute value `SEEK_SET', if set to 1,
      OFFSET is taken to be relative to the current position `SEEK_CUR',
      and if set to 2 relative to the end of the file `SEEK_END'.  On
-     error, STATUS is set to a nonzero value. If STATUS the seek fails
+     error, STATUS is set to a nonzero value.  If STATUS the seek fails
      silently.
 
      This intrinsic routine is not fully backwards compatible with
      `g77'.  In `g77', the `FSEEK' takes a statement label instead of a
-     STATUS variable. If FSEEK is used in old code, change
+     STATUS variable.  If FSEEK is used in old code, change
             CALL FSEEK(UNIT, OFFSET, WHENCE, *label)
      to
             INTEGER :: status
@@ -8268,7 +8269,7 @@ _Description_:
 
      Please note that GNU Fortran provides the Fortran 2003 Stream
      facility.  Programmers should consider the use of new stream IO
-     feature in new code for future portability. See also *note Fortran
+     feature in new code for future portability.  See also *note Fortran
      2003 status::.
 
 _Standard_:
@@ -8285,7 +8286,7 @@ _Arguments_:
      OFFSET     Shall be a scalar of type `INTEGER'.
      WHENCE     Shall be a scalar of type `INTEGER'.  Its
                 value shall be either 0, 1 or 2.
-     STATUS     (Optional) shall be a scalar of type
+     STATUS      (Optional) shall be a scalar of type
                 `INTEGER(4)'.
 
 _Example_:
@@ -8414,7 +8415,7 @@ _Syntax_:
 
 _Arguments_:
      X          Shall be of type `REAL' and neither zero nor a
-                negative integer.
+                 negative integer.
 
 _Return value_:
      The return value is of type `REAL' of the same kind as X.
@@ -8426,7 +8427,7 @@ _Example_:
           end program test_gamma
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `GAMMA(X)'    `REAL(4) X'   `REAL(4)'     GNU Extension
      `DGAMMA(X)'   `REAL(8) X'   `REAL(8)'     GNU Extension
 
@@ -8492,15 +8493,15 @@ _Syntax_:
 
 _Arguments_:
      POS        Shall be of type `INTEGER' and not wider than
-                the default integer kind; POS \geq 0
+                 the default integer kind; POS \geq 0
      VALUE      Shall be of type `CHARACTER' and of default
-                kind.
+                 kind.
      VALUE      Shall be of type `CHARACTER'.
 
 _Return value_:
      After `GETARG' returns, the VALUE argument holds the POSth command
-     line argument. If VALUE can not hold the argument, it is truncated
-     to fit the length of VALUE. If there are less than POS arguments
+     line argument.  If VALUE can not hold the argument, it is truncated
+     to fit the length of VALUE.  If there are less than POS arguments
      specified at the command line, VALUE will be filled with blanks.
      If POS = 0, VALUE is set to the name of the program (on systems
      that support this feature).
@@ -8543,16 +8544,16 @@ _Syntax_:
 
 _Arguments_:
      COMMAND    (Optional) shall be of type `CHARACTER' and of
-                default kind.
+                 default kind.
      LENGTH     (Optional) Shall be of type `INTEGER' and of
-                default kind.
+                 default kind.
      STATUS     (Optional) Shall be of type `INTEGER' and of
-                default kind.
+                 default kind.
 
 _Return value_:
      If COMMAND is present, stores the entire command line that was used
-     to invoke the program in COMMAND. If LENGTH is present, it is
-     assigned the length of the command line. If STATUS is present, it
+     to invoke the program in COMMAND.  If LENGTH is present, it is
+     assigned the length of the command line.  If STATUS is present, it
      is assigned 0 upon success of the command, -1 if COMMAND is too
      short to store the command line, or a positive value in case of an
      error.
@@ -8588,23 +8589,23 @@ _Syntax_:
 
 _Arguments_:
      NUMBER     Shall be a scalar of type `INTEGER' and of
-                default kind, NUMBER \geq 0
+                 default kind, NUMBER \geq 0
      VALUE      (Optional) Shall be a scalar of type
                 `CHARACTER' and of default kind.
      LENGTH     (Optional) Shall be a scalar of type `INTEGER'
-                and of default kind.
+                 and of default kind.
      STATUS     (Optional) Shall be a scalar of type `INTEGER'
-                and of default kind.
+                 and of default kind.
 
 _Return value_:
      After `GET_COMMAND_ARGUMENT' returns, the VALUE argument holds the
-     NUMBER-th command line argument. If VALUE can not hold the
-     argument, it is truncated to fit the length of VALUE. If there are
+     NUMBER-th command line argument.  If VALUE can not hold the
+     argument, it is truncated to fit the length of VALUE.  If there are
      less than NUMBER arguments specified at the command line, VALUE
      will be filled with blanks.  If NUMBER = 0, VALUE is set to the
-     name of the program (on systems that support this feature). The
+     name of the program (on systems that support this feature).  The
      LENGTH argument contains the length of the NUMBER-th command line
-     argument. If the argument retrieval fails, STATUS is a positive
+     argument.  If the argument retrieval fails, STATUS is a positive
      number; if VALUE contains a truncated command line argument,
      STATUS is -1; and otherwise the STATUS is zero.
 
@@ -8650,10 +8651,10 @@ _Syntax_:
 
 _Arguments_:
      C          The type shall be `CHARACTER' and of default
-                kind.
+                 kind.
      STATUS     (Optional) status flag. Returns 0 on success,
                 a system specific and nonzero error code
-                otherwise.
+                 otherwise.
 
 _Example_:
           PROGRAM test_getcwd
@@ -8694,13 +8695,13 @@ _Syntax_:
 
 _Arguments_:
      NAME       Shall be of type `CHARACTER' and of default
-                kind.
+                 kind.
      VALUE      Shall be of type `CHARACTER' and of default
-                kind.
+                 kind.
 
 _Return value_:
-     Stores the value of NAME in VALUE. If VALUE is not large enough to
-     hold the data, it is truncated. If NAME is not set, VALUE will be
+     Stores the value of NAME in VALUE.  If VALUE is not large enough to
+     hold the data, it is truncated.  If NAME is not set, VALUE will be
      filled with blanks.
 
 _Example_:
@@ -8739,20 +8740,20 @@ _Syntax_:
 
 _Arguments_:
      NAME       Shall be a scalar of type `CHARACTER' and of
-                default kind.
+                 default kind.
      VALUE      (Optional) Shall be a scalar of type
                 `CHARACTER' and of default kind.
      LENGTH     (Optional) Shall be a scalar of type `INTEGER'
-                and of default kind.
+                 and of default kind.
      STATUS     (Optional) Shall be a scalar of type `INTEGER'
-                and of default kind.
+                 and of default kind.
      TRIM_NAME  (Optional) Shall be a scalar of type `LOGICAL'
-                and of default kind.
+                 and of default kind.
 
 _Return value_:
-     Stores the value of NAME in VALUE. If VALUE is not large enough to
-     hold the data, it is truncated. If NAME is not set, VALUE will be
-     filled with blanks. Argument LENGTH contains the length needed for
+     Stores the value of NAME in VALUE.  If VALUE is not large enough to
+     hold the data, it is truncated.  If NAME is not set, VALUE will be
+     filled with blanks.  Argument LENGTH contains the length needed for
      storing the environment variable NAME or zero if it is not
      present. STATUS is -1 if VALUE is present but too short for the
      environment variable; it is 1 if the environment variable does not
@@ -8816,7 +8817,7 @@ _Syntax_:
 
 _Arguments_:
      C          Shall be of type `CHARACTER' and of default
-                kind.
+                 kind.
 
 _Return value_:
      Stores the current user name in LOGIN.  (On systems where POSIX
@@ -9032,8 +9033,8 @@ _Syntax_:
 
 _Arguments_:
      X          The type shall be `REAL'.
-     Y          The type and kind type parameter shall be the
-                same as X.
+     Y           The type and kind type parameter shall be the
+                 same as X.
 
 _Return value_:
      The return value has the same type and kind type parameter as X.
@@ -9111,8 +9112,8 @@ _Syntax_:
 _Arguments_:
      ARRAY      Shall be an array of type `INTEGER'
      DIM        (Optional) shall be a scalar of type `INTEGER'
-                with a value in the range from 1 to n, where n
-                equals the rank of ARRAY.
+                 with a value in the range from 1 to n, where n
+                 equals the rank of ARRAY.
      MASK       (Optional) shall be of type `LOGICAL' and
                 either be a scalar or an array of the same
                 shape as ARRAY.
@@ -9121,7 +9122,7 @@ _Return value_:
      The result is of the same type as ARRAY.
 
      If DIM is absent, a scalar with the bitwise ALL of all elements in
-     ARRAY is returned. Otherwise, an array of rank n-1, where n equals
+     ARRAY is returned.  Otherwise, an array of rank n-1, where n equals
      the rank of ARRAY, and a shape similar to that of ARRAY with
      dimension DIM dropped is returned.
 
@@ -9203,8 +9204,8 @@ _Syntax_:
 _Arguments_:
      ARRAY      Shall be an array of type `INTEGER'
      DIM        (Optional) shall be a scalar of type `INTEGER'
-                with a value in the range from 1 to n, where n
-                equals the rank of ARRAY.
+                 with a value in the range from 1 to n, where n
+                 equals the rank of ARRAY.
      MASK       (Optional) shall be of type `LOGICAL' and
                 either be a scalar or an array of the same
                 shape as ARRAY.
@@ -9213,7 +9214,7 @@ _Return value_:
      The result is of the same type as ARRAY.
 
      If DIM is absent, a scalar with the bitwise OR of all elements in
-     ARRAY is returned. Otherwise, an array of rank n-1, where n equals
+     ARRAY is returned.  Otherwise, an array of rank n-1, where n equals
      the rank of ARRAY, and a shape similar to that of ARRAY with
      dimension DIM dropped is returned.
 
@@ -9404,15 +9405,15 @@ _Example_:
           end program test_ichar
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `ICHAR(C)'    `CHARACTER    `INTEGER(4)'  Fortran 77 and
-                   C'                          later
+                    C'                            later
 
 _Note_:
      No intrinsic exists to convert between a numeric value and a
      formatted character string representation - for instance, given the
      `CHARACTER' value `'154'', obtaining an `INTEGER' or `REAL' value
-     with the value 154, or vice versa. Instead, this functionality is
+     with the value 154, or vice versa.  Instead, this functionality is
      provided by internal-file I/O, as in the following example:
           program read_val
             integer value
@@ -9440,7 +9441,7 @@ File: gfortran.info,  Node: IDATE,  Next: IEOR,  Prev: ICHAR,  Up: Intrinsic Pro
 
 _Description_:
      `IDATE(VALUES)' Fills VALUES with the numerical values at the
-     current local time. The day (in the range 1-31), month (in the
+     current local time.  The day (in the range 1-31), month (in the
      range 1-12), and year appear in elements 1, 2, and 3 of VALUES,
      respectively.  The year has four significant digits.
 
@@ -9455,7 +9456,7 @@ _Syntax_:
 
 _Arguments_:
      VALUES     The type shall be `INTEGER, DIMENSION(3)' and
-                the kind shall be the default integer kind.
+                 the kind shall be the default integer kind.
 
 _Return value_:
      Does not return anything.
@@ -9550,13 +9551,13 @@ _Syntax_:
      `RESULT = IMAGE_INDEX(COARRAY, SUB)'
 
 _Arguments_: None.
-     COARRAY    Coarray of any type.
-     SUB        default integer rank-1 array of a size equal to
-                the corank of COARRAY.
+     COARRAY     Coarray of any type.
+     SUB         default integer rank-1 array of a size equal to
+                 the corank of COARRAY.
 
 _Return value_:
      Scalar default integer with the value of the image index which
-     corresponds to the cosubscripts. For invalid cosubscripts the
+     corresponds to the cosubscripts.  For invalid cosubscripts the
      result is zero.
 
 _Example_:
@@ -9605,9 +9606,9 @@ _Return value_:
      absent, the return value is of default integer kind.
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `INDEX(STRING,`CHARACTER'   `INTEGER(4)'  Fortran 77 and
-     SUBSTRING)'                               later
+     SUBSTRING)'                                  later
 
 _See also_:
      *note SCAN::, *note VERIFY::
@@ -9641,16 +9642,16 @@ _Return value_:
      These functions return a `INTEGER' variable or array under the
      following rules:
 
-    (A)
+     (A)
           If A is of type `INTEGER', `INT(A) = A'
 
-    (B)
+     (B)
           If A is of type `REAL' and |A| < 1, `INT(A)' equals `0'.  If
           |A| \geq 1, then `INT(A)' equals the largest integer that
           does not exceed the range of A and whose sign is the same as
           the sign of A.
 
-    (C)
+     (C)
           If A is of type `COMPLEX', rule B is applied to the real part
           of A.
 
@@ -9663,13 +9664,13 @@ _Example_:
           end program
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `INT(A)'      `REAL(4) A'   `INTEGER'     Fortran 77 and
-                                               later
+                                                  later
      `IFIX(A)'     `REAL(4) A'   `INTEGER'     Fortran 77 and
-                                               later
+                                                  later
      `IDINT(A)'    `REAL(8) A'   `INTEGER'     Fortran 77 and
-                                               later
+                                                  later
 
 
 
@@ -9790,8 +9791,8 @@ _Syntax_:
 _Arguments_:
      ARRAY      Shall be an array of type `INTEGER'
      DIM        (Optional) shall be a scalar of type `INTEGER'
-                with a value in the range from 1 to n, where n
-                equals the rank of ARRAY.
+                 with a value in the range from 1 to n, where n
+                 equals the rank of ARRAY.
      MASK       (Optional) shall be of type `LOGICAL' and
                 either be a scalar or an array of the same
                 shape as ARRAY.
@@ -9800,7 +9801,7 @@ _Return value_:
      The result is of the same type as ARRAY.
 
      If DIM is absent, a scalar with the bitwise XOR of all elements in
-     ARRAY is returned. Otherwise, an array of rank n-1, where n equals
+     ARRAY is returned.  Otherwise, an array of rank n-1, where n equals
      the rank of ARRAY, and a shape similar to that of ARRAY with
      dimension DIM dropped is returned.
 
@@ -9827,7 +9828,7 @@ File: gfortran.info,  Node: IRAND,  Next: IS_IOSTAT_END,  Prev: IPARITY,  Up: In
 _Description_:
      `IRAND(FLAG)' returns a pseudo-random number from a uniform
      distribution between 0 and a system-dependent limit (which is in
-     most cases 2147483647). If FLAG is 0, the next number in the
+     most cases 2147483647).  If FLAG is 0, the next number in the
      current sequence is returned; if FLAG is 1, the generator is
      restarted by `CALL SRAND(0)'; if FLAG has any other value, it is
      used as a new seed with `SRAND'.
@@ -9870,7 +9871,7 @@ File: gfortran.info,  Node: IS_IOSTAT_END,  Next: IS_IOSTAT_EOR,  Prev: IRAND,  
 
 _Description_:
      `IS_IOSTAT_END' tests whether an variable has the value of the I/O
-     status "end of file". The function is equivalent to comparing the
+     status "end of file".  The function is equivalent to comparing the
      variable with the `IOSTAT_END' parameter of the intrinsic module
      `ISO_FORTRAN_ENV'.
 
@@ -10089,7 +10090,7 @@ File: gfortran.info,  Node: ITIME,  Next: KILL,  Prev: ISNAN,  Up: Intrinsic Pro
 
 _Description_:
      `IDATE(VALUES)' Fills VALUES with the numerical values at the
-     current local time. The hour (in the range 1-24), minute (in the
+     current local time.  The hour (in the range 1-24), minute (in the
      range 1-60), and seconds (in the range 1-60) appear in elements 1,
      2, and 3 of VALUES, respectively.
 
@@ -10104,7 +10105,7 @@ _Syntax_:
 
 _Arguments_:
      VALUES     The type shall be `INTEGER, DIMENSION(3)' and
-                the kind shall be the default integer kind.
+                 the kind shall be the default integer kind.
 
 _Return value_:
      Does not return anything.
@@ -10145,7 +10146,7 @@ _Arguments_:
      VALUE      Shall be a scalar `INTEGER', with `INTENT(IN)'
      STATUS     (Optional) status flag of type `INTEGER(4)' or
                 `INTEGER(8)'. Returns 0 on success, or a
-                system-specific error code otherwise.
+                 system-specific error code otherwise.
 
 _See also_:
      *note ABORT::, *note EXIT::
@@ -10206,7 +10207,7 @@ _Syntax_:
      `RESULT = LBOUND(ARRAY [, DIM [, KIND]])'
 
 _Arguments_:
-     ARRAY      Shall be an array, of any type.
+     ARRAY       Shall be an array, of any type.
      DIM        (Optional) Shall be a scalar `INTEGER'.
      KIND       (Optional) An `INTEGER' initialization
                 expression indicating the kind parameter of
@@ -10245,7 +10246,7 @@ _Syntax_:
      `RESULT = LCOBOUND(COARRAY [, DIM [, KIND]])'
 
 _Arguments_:
-     ARRAY      Shall be an coarray, of any type.
+     ARRAY       Shall be an coarray, of any type.
      DIM        (Optional) Shall be a scalar `INTEGER'.
      KIND       (Optional) An `INTEGER' initialization
                 expression indicating the kind parameter of
@@ -10328,9 +10329,9 @@ _Return value_:
      absent, the return value is of default integer kind.
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `LEN(STRING)' `CHARACTER'   `INTEGER'     Fortran 77 and
-                                               later
+                                                  later
 
 _See also_:
      *note LEN_TRIM::, *note ADJUSTL::, *note ADJUSTR::
@@ -10405,9 +10406,9 @@ _Return value_:
      otherwise, based on the ASCII ordering.
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `LGE(STRING_A,`CHARACTER'   `LOGICAL'     Fortran 77 and
-     STRING_B)'                                later
+     STRING_B)'                                   later
 
 _See also_:
      *note LGT::, *note LLE::, *note LLT::
@@ -10449,9 +10450,9 @@ _Return value_:
      otherwise, based on the ASCII ordering.
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `LGT(STRING_A,`CHARACTER'   `LOGICAL'     Fortran 77 and
-     STRING_B)'                                later
+     STRING_B)'                                   later
 
 _See also_:
      *note LGE::, *note LLE::, *note LLT::
@@ -10463,7 +10464,7 @@ File: gfortran.info,  Node: LINK,  Next: LLE,  Prev: LGT,  Up: Intrinsic Procedu
 ==================================
 
 _Description_:
-     Makes a (hard) link from file PATH1 to PATH2. A null character
+     Makes a (hard) link from file PATH1 to PATH2.  A null character
      (`CHAR(0)') can be used to mark the end of the names in PATH1 and
      PATH2; otherwise, trailing blanks in the file names are ignored.
      If the STATUS argument is supplied, it contains 0 on success or a
@@ -10528,9 +10529,9 @@ _Return value_:
      otherwise, based on the ASCII ordering.
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `LLE(STRING_A,`CHARACTER'   `LOGICAL'     Fortran 77 and
-     STRING_B)'                                later
+     STRING_B)'                                   later
 
 _See also_:
      *note LGE::, *note LGT::, *note LLT::
@@ -10572,9 +10573,9 @@ _Return value_:
      otherwise, based on the ASCII ordering.
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `LLT(STRING_A,`CHARACTER'   `LOGICAL'     Fortran 77 and
-     STRING_B)'                                later
+     STRING_B)'                                   later
 
 _See also_:
      *note LGE::, *note LGT::, *note LLE::
@@ -10628,7 +10629,7 @@ _Syntax_:
      `RESULT = LOC(X)'
 
 _Arguments_:
-     X          Variable of any type.
+     X           Variable of any type.
 
 _Return value_:
      The return value is of type `INTEGER', with a `KIND' corresponding
@@ -10678,15 +10679,15 @@ _Example_:
           end program test_log
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `ALOG(X)'     `REAL(4) X'   `REAL(4)'     f95, gnu
      `DLOG(X)'     `REAL(8) X'   `REAL(8)'     f95, gnu
      `CLOG(X)'     `COMPLEX(4)   `COMPLEX(4)'  f95, gnu
-                   X'                          
+                    X'
      `ZLOG(X)'     `COMPLEX(8)   `COMPLEX(8)'  f95, gnu
-                   X'                          
+                    X'
      `CDLOG(X)'    `COMPLEX(8)   `COMPLEX(8)'  f95, gnu
-                   X'                          
+                    X'
 
 
 File: gfortran.info,  Node: LOG10,  Next: LOG_GAMMA,  Prev: LOG,  Up: Intrinsic Procedures
@@ -10720,11 +10721,11 @@ _Example_:
           end program test_log10
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `ALOG10(X)'   `REAL(4) X'   `REAL(4)'     Fortran 95 and
-                                               later
+                                                  later
      `DLOG10(X)'   `REAL(8) X'   `REAL(8)'     Fortran 95 and
-                                               later
+                                                  later
 
 
 File: gfortran.info,  Node: LOG_GAMMA,  Next: LOGICAL,  Prev: LOG10,  Up: Intrinsic Procedures
@@ -10747,7 +10748,7 @@ _Syntax_:
 
 _Arguments_:
      X          Shall be of type `REAL' and neither zero nor a
-                negative integer.
+                 negative integer.
 
 _Return value_:
      The return value is of type `REAL' of the same kind as X.
@@ -10759,7 +10760,7 @@ _Example_:
           end program test_log_gamma
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `LGAMMA(X)'   `REAL(4) X'   `REAL(4)'     GNU Extension
      `ALGAMA(X)'   `REAL(4) X'   `REAL(4)'     GNU Extension
      `DLGAMA(X)'   `REAL(8) X'   `REAL(8)'     GNU Extension
@@ -10897,7 +10898,7 @@ _Syntax_:
 
 _Arguments_:
      NAME       The type shall be `CHARACTER' of the default
-                kind, a valid path within the file system.
+                 kind, a valid path within the file system.
      VALUES     The type shall be `INTEGER(4), DIMENSION(13)'.
      STATUS     (Optional) status flag of type `INTEGER(4)'.
                 Returns 0 on success and a system specific
@@ -10972,7 +10973,7 @@ _Description_:
      `MALLOC(SIZE)' allocates SIZE bytes of dynamic memory and returns
      the address of the allocated memory. The `MALLOC' intrinsic is an
      extension intended to be used with Cray pointers, and is provided
-     in GNU Fortran to allow the user to compile legacy code. For new
+     in GNU Fortran to allow the user to compile legacy code.  For new
      code using Fortran 95 pointers, the memory allocation intrinsic is
      `ALLOCATE'.
 
@@ -11039,7 +11040,7 @@ _Syntax_:
 
 _Arguments_:
      I          Shall be of type `INTEGER'.
-     KIND       Shall be a scalar constant expression of type
+     KIND        Shall be a scalar constant expression of type
                 `INTEGER'.
 
 _Return value_:
@@ -11071,7 +11072,7 @@ _Syntax_:
 
 _Arguments_:
      I          Shall be of type `INTEGER'.
-     KIND       Shall be a scalar constant expression of type
+     KIND        Shall be a scalar constant expression of type
                 `INTEGER'.
 
 _Return value_:
@@ -11137,26 +11138,26 @@ _Syntax_:
 
 _Arguments_:
      A1         The type shall be `INTEGER' or `REAL'.
-     A2, A3,    An expression of the same type and kind as A1.
-     ...        (As a GNU extension, arguments of different
-                kinds are permitted.)
+     A2, A3,     An expression of the same type and kind as A1.
+     ...         (As a GNU extension, arguments of different
+                 kinds are permitted.)
 
 _Return value_:
      The return value corresponds to the maximum value among the
      arguments, and has the same type and kind as the first argument.
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `MAX0(A1)'    `INTEGER(4)   `INTEGER(4)'  Fortran 77 and
-                   A1'                         later
+                    A1'                           later
      `AMAX0(A1)'   `INTEGER(4)   `REAL(MAX(X))'Fortran 77 and
-                   A1'                         later
+                    A1'                           later
      `MAX1(A1)'    `REAL A1'     `INT(MAX(X))' Fortran 77 and
-                                               later
+                                                  later
      `AMAX1(A1)'   `REAL(4) A1'  `REAL(4)'     Fortran 77 and
-                                               later
+                                                  later
      `DMAX1(A1)'   `REAL(8) A1'  `REAL(8)'     Fortran 77 and
-                                               later
+                                                  later
 
 _See also_:
      *note MAXLOC:: *note MAXVAL::, *note MIN::
@@ -11233,7 +11234,7 @@ _Arguments_:
                 rank of ARRAY, inclusive.  It may not be an
                 optional dummy argument.
      MASK       Shall be an array of type `LOGICAL', and
-                conformable with ARRAY.
+                 conformable with ARRAY.
 
 _Return value_:
      If DIM is absent, the result is a rank-one array with a length
@@ -11279,7 +11280,7 @@ _Arguments_:
                 rank of ARRAY, inclusive.  It may not be an
                 optional dummy argument.
      MASK       Shall be an array of type `LOGICAL', and
-                conformable with ARRAY.
+                 conformable with ARRAY.
 
 _Return value_:
      If DIM is absent, or if ARRAY has a rank of one, the result is a
@@ -11385,7 +11386,7 @@ _Syntax_:
      `RESULT = MERGE(TSOURCE, FSOURCE, MASK)'
 
 _Arguments_:
-     TSOURCE    May be of any type.
+     TSOURCE     May be of any type.
      FSOURCE    Shall be of the same type and type parameters
                 as TSOURCE.
      MASK       Shall be of type `LOGICAL'.
@@ -11446,26 +11447,26 @@ _Syntax_:
 
 _Arguments_:
      A1         The type shall be `INTEGER' or `REAL'.
-     A2, A3,    An expression of the same type and kind as A1.
-     ...        (As a GNU extension, arguments of different
-                kinds are permitted.)
+     A2, A3,     An expression of the same type and kind as A1.
+     ...         (As a GNU extension, arguments of different
+                 kinds are permitted.)
 
 _Return value_:
      The return value corresponds to the maximum value among the
      arguments, and has the same type and kind as the first argument.
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `MIN0(A1)'    `INTEGER(4)   `INTEGER(4)'  Fortran 77 and
-                   A1'                         later
+                    A1'                           later
      `AMIN0(A1)'   `INTEGER(4)   `REAL(4)'     Fortran 77 and
-                   A1'                         later
+                    A1'                           later
      `MIN1(A1)'    `REAL A1'     `INTEGER(4)'  Fortran 77 and
-                                               later
+                                                  later
      `AMIN1(A1)'   `REAL(4) A1'  `REAL(4)'     Fortran 77 and
-                                               later
+                                                  later
      `DMIN1(A1)'   `REAL(8) A1'  `REAL(8)'     Fortran 77 and
-                                               later
+                                                  later
 
 _See also_:
      *note MAX::, *note MINLOC::, *note MINVAL::
@@ -11535,7 +11536,7 @@ _Arguments_:
                 rank of ARRAY, inclusive.  It may not be an
                 optional dummy argument.
      MASK       Shall be an array of type `LOGICAL', and
-                conformable with ARRAY.
+                 conformable with ARRAY.
 
 _Return value_:
      If DIM is absent, the result is a rank-one array with a length
@@ -11582,7 +11583,7 @@ _Arguments_:
                 rank of ARRAY, inclusive.  It may not be an
                 optional dummy argument.
      MASK       Shall be an array of type `LOGICAL', and
-                conformable with ARRAY.
+                 conformable with ARRAY.
 
 _Return value_:
      If DIM is absent, or if ARRAY has a rank of one, the result is a
@@ -11643,13 +11644,13 @@ _Example_:
           end program test_mod
 
 _Specific names_:
-     Name          Arguments     Return type   Standard
+     Name           Arguments      Return type    Standard
      `MOD(A,P)'    `INTEGER      `INTEGER'     Fortran 95 and
-                   A,P'                        later
+                    A,P'                          later
      `AMOD(A,P)'   `REAL(4)      `REAL(4)'     Fortran 95 and
-                   A,P'                        later
+                    A,P'                          later
      `DMOD(A,P)'   `REAL(8)      `REAL(8)'     Fortran 95 and
-                   A,P'                        later
+                    A,P'                          later
 
 _See also_:
      *note MODULO::
@@ -11675,8 +11676,8 @@ _Syntax_:
 
 _Arguments_:
      A          Shall be a scalar of type `INTEGER' or `REAL'.
-     P          Shall be a scalar of the same type and kind as
-                A.  It shall not be zero.
+     P           Shall be a scalar of the same type and kind as
+                 A.  It shall not be zero.
 
 _Return value_:
      The type and kind of the result are those of the arguments.
@@ -11726,9 +11727,9 @@ _Syntax_:
 
 _Arguments_:
      FROM       `ALLOCATABLE', `INTENT(INOUT)', may be of any
-                type and kind.
+                 type and kind.
      TO         `ALLOCATABLE', `INTENT(OUT)', shall be of the
-                same type, kind and rank as FROM.
+                 same type, kind and rank as FROM.
 
 _Return value_:
      None
@@ -11834,7 +11835,7 @@ _Syntax_:
      `RESULT = NEW_LINE(C)'
 
 _Arguments_:
-     C          The argument shall be a scalar or array of the
+     C           The argument shall be a scalar or array of the
                 type `CHARACTER'.
 
 _Return value_:
@@ -11886,11 +11887,11 @@ _Example_:
           end program test_nint
 
 _Specific names_:
-     Name          Argument      Return Type   Standard
+     Name           Argument       Return Type    Standard
      `NINT(A)'     `REAL(4) A'   `INTEGER'     Fortran 95 and
-                                               later
+                                                  later
      `IDNINT(A)'   `REAL(8) A'   `INTEGER'     Fortran 95 and
-                                               later
+                                                  later
 
 _See also_:
      *note CEILING::, *note FLOOR::
@@ -11918,8 +11919,8 @@ _Syntax_:
 _Arguments_:
      ARRAY      Shall be an array of type `REAL'
      DIM        (Optional) shall be a scalar of type `INTEGER'
-                with a value in the range from 1 to n, where n
-                equals the rank of ARRAY.
+                 with a value in the range from 1 to n, where n
+                 equals the rank of ARRAY.
 
 _Return value_:
      The result is of the same type as ARRAY.
@@ -11976,7 +11977,7 @@ _Description_:
      If MOLD is present, a disassociated pointer of the same type is
      returned, otherwise the type is determined by context.
 
-     In Fortran 95, MOLD is optional. Please note that Fortran 2003
+     In Fortran 95, MOLD is optional.  Please note that Fortran 2003
      includes cases where it is required.
 
 _Standard_:
@@ -12064,7 +12065,7 @@ _Syntax_:
 _Arguments_:
      I          The type shall be either a scalar `INTEGER'
                 type or a scalar `LOGICAL' type.
-     J          The type shall be the same as the type of J.
+     J           The type shall be the same as the type of J.
 
 _Return value_:
      The return type is either a scalar `INTEGER' or a scalar
@@ -12108,9 +12109,9 @@ _Syntax_:
      `RESULT = PACK(ARRAY, MASK[,VECTOR]'
 
 _Arguments_:
-     ARRAY      Shall be an array of any type.
+     ARRAY       Shall be an array of any type.
      MASK       Shall be an array of type `LOGICAL' and of the
-                same size as ARRAY. Alternatively, it may be a
+                 same size as ARRAY.  Alternatively, it may be a
                 `LOGICAL' scalar.
      VECTOR     (Optional) shall be an array of the same type
                 as ARRAY and of rank one. If present, the
@@ -12166,8 +12167,8 @@ _Syntax_:
 _Arguments_:
      LOGICAL    Shall be an array of type `LOGICAL'
      DIM        (Optional) shall be a scalar of type `INTEGER'
-                with a value in the range from 1 to n, where n
-                equals the rank of MASK.
+                 with a value in the range from 1 to n, where n
+                 equals the rank of MASK.
 
 _Return value_:
      The result is of the same type as MASK.
@@ -12386,8 +12387,8 @@ _Arguments_:
      ARRAY      Shall be an array of type `INTEGER', `REAL' or
                 `COMPLEX'.
      DIM        (Optional) shall be a scalar of type `INTEGER'
-                with a value in the range from 1 to n, where n
-                equals the rank of ARRAY.
+                 with a value in the range from 1 to n, where n
+                 equals the rank of ARRAY.
      MASK       (Optional) shall be of type `LOGICAL' and
                 either be a scalar or an array of the same
                 shape as ARRAY.
@@ -12396,7 +12397,7 @@ _Return value_:
      The result is of the same type as ARRAY.
 
      If DIM is absent, a scalar with the product of all elements in
-     ARRAY is returned. Otherwise, an array of rank n-1, where n equals
+     ARRAY is returned.  Otherwise, an array of rank n-1, where n equals
      the rank of ARRAY, and a shape similar to that of ARRAY with
      dimension DIM dropped is returned.
 
@@ -12473,7 +12474,7 @@ File: gfortran.info,  Node: RAND,  Next: RANDOM_NUMBER,  Prev: RAN,  Up: Intrins
 
 _Description_:
      `RAND(FLAG)' returns a pseudo-random number from a uniform
-     distribution between 0 and 1. If FLAG is 0, the next number in the
+     distribution between 0 and 1.  If FLAG is 0, the next number in the
      current sequence is returned; if FLAG is 1, the generator is
      restarted by `CALL SRAND(0)'; if FLAG has any other value, it is
      used as a new seed with `SRAND'.
@@ -12519,7 +12520,7 @@ File: gfortran.info,  Node: RANDOM_NUMBER,  Next: RANDOM_SEED,  Prev: RAND,  Up:
 
 _Description_:
      Returns a single pseudorandom number or an array of pseudorandom
-     numbers from the uniform distribution over the range  0 \leq x < 1.
+     numbers from the uniform distribution over the range 0 \leq x < 1.
 
      The runtime-library implements George Marsaglia's KISS (Keep It
      Simple Stupid) random number generator (RNG). This RNG combines:
@@ -12536,7 +12537,7 @@ _Description_:
      directives, i.e., its state will be consistent while called from
      multiple threads.  However, the KISS generator does not create
      random numbers in parallel from multiple sources, but in sequence
-     from a single source. If an OpenMP-enabled application heavily
+     from a single source.  If an OpenMP-enabled application heavily
      relies on random numbers, one should consider employing a
      dedicated parallel random number generator instead.
 
@@ -12573,9 +12574,9 @@ _Description_:
      used by `RANDOM_NUMBER'.
 
      If `RANDOM_SEED' is called without arguments, it is initialized to
-     a default state. The example below shows how to initialize the
+     a default state.  The example below shows how to initialize the
      random seed with a varying seed in order to ensure a different
-     random number sequence for each invocation of the program. Note
+     random number sequence for each invocation of the program.  Note
      that setting any of the seed values to zero should be avoided as
      it can result in poor quality random numbers being generated.
 
@@ -12593,23 +12594,24 @@ _Arguments_:
                 default `INTEGER', with `INTENT(OUT)'. It
                 specifies the minimum size of the arrays used
                 with the PUT and GET arguments.
-     PUT        (Optional) Shall be an array of type default
+     PUT         (Optional) Shall be an array of type default
                 `INTEGER' and rank one. It is `INTENT(IN)' and
-                the size of the array must be larger than or
-                equal to the number returned by the SIZE
-                argument.
-     GET        (Optional) Shall be an array of type default
+                 the size of the array must be larger than or
+                 equal to the number returned by the SIZE
+                 argument.
+     GET         (Optional) Shall be an array of type default
                 `INTEGER' and rank one. It is `INTENT(OUT)'
                 and the size of the array must be larger than
                 or equal to the number returned by the SIZE
-                argument.
+                 argument.
 
 _Example_:
           subroutine init_random_seed()
+            use iso_fortran_env, only: int64
             implicit none
             integer, allocatable :: seed(:)
-            integer :: i, n, un, istat, dt(8), pid, t(2), s
-            integer(8) :: count, tms
+            integer :: i, n, un, istat, dt(8), pid
+            integer(int64) :: t
 
             call random_seed(size = n)
             allocate(seed(n))
@@ -12623,34 +12625,37 @@ _Example_:
                ! Fallback to XOR:ing the current time and pid. The PID is
                ! useful in case one launches multiple instances of the same
                ! program in parallel.
-               call system_clock(count)
-               if (count /= 0) then
-                  t = transfer(count, t)
-               else
+               call system_clock(t)
+               if (t == 0) then
                   call date_and_time(values=dt)
-                  tms = (dt(1) - 1970) * 365_8 * 24 * 60 * 60 * 1000 &
-                       + dt(2) * 31_8 * 24 * 60 * 60 * 1000 &
-                       + dt(3) * 24 * 60 * 60 * 60 * 1000 &
+                  t = (dt(1) - 1970) * 365_int64 * 24 * 60 * 60 * 1000 &
+                       + dt(2) * 31_int64 * 24 * 60 * 60 * 1000 &
+                       + dt(3) * 24_int64 * 60 * 60 * 1000 &
                        + dt(5) * 60 * 60 * 1000 &
                        + dt(6) * 60 * 1000 + dt(7) * 1000 &
                        + dt(8)
-                  t = transfer(tms, t)
                end if
-               s = ieor(t(1), t(2))
-               pid = getpid() + 1099279 ! Add a prime
-               s = ieor(s, pid)
-               if (n >= 3) then
-                  seed(1) = t(1) + 36269
-                  seed(2) = t(2) + 72551
-                  seed(3) = pid
-                  if (n > 3) then
-                     seed(4:) = s + 37 * (/ (i, i = 0, n - 4) /)
+               pid = getpid()
+               t = ieor(t, int(pid, kind(t)))
+               do i = 1, n
+                  seed(i) = lcg(t)
+               end do
                   end if
-               else
-                  seed = s + 37 * (/ (i, i = 0, n - 1 ) /)
-               end if
-            end if
             call random_seed(put=seed)
+          contains
+            ! This simple PRNG might not be good enough for real work, but is
+            ! sufficient for seeding a better PRNG.
+            function lcg(s)
+              integer :: lcg
+              integer(int64) :: s
+              if (s == 0) then
+                 s = 104729
+               else
+                 s = mod(s, 4294967296_int64)
+               end if
+              s = mod(s * 279470273_int64, 4294967291_int64)
+              lcg = int(mod(s, int(huge(0), int64)), kind(0))
+            end function lcg
           end subroutine init_random_seed
 
 _See also_:
@@ -12708,11 +12713,11 @@ _Syntax_:
      `RESULT = RANGE(A)'
 
 _Arguments_:
-     A          can be of any type
+     A           can be of any type
 
 _Return value_:
      The return value is of type `INTEGER' and of the default integer
-     kind. For arrays, their rank is returned; for scalars zero is
+     kind.  For arrays, their rank is returned; for scalars zero is
      returned.
 
 _Example_:
@@ -12755,15 +12760,15 @@ _Return value_:
      These functions return a `REAL' variable or array under the
      following rules:
 
-    (A)
+     (A)
           `REAL(A)' is converted to a default real type if A is an
           integer or real variable.
 
-    (B)
+     (B)
           `REAL(A)' is converted to a real type with the kind type
           parameter of A if A is a complex variable.
 
-    (C)
+     (C)
           `REAL(A, KIND)' is converted to a real type with kind type
           parameter KIND if A is a complex, integer, or real variable.
 
@@ -12774,12 +12779,12 @@ _Example_:
           end program test_real
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `FLOAT(A)'    `INTEGER(4)'  `REAL(4)'     Fortran 77 and
-                                               later
+                                                  later
      `DFLOAT(A)'   `INTEGER(4)'  `REAL(8)'     GNU extension
      `SNGL(A)'     `INTEGER(8)'  `REAL(4)'     Fortran 77 and
-                                               later
+                                                  later
 
 _See also_:
      *note DBLE::
@@ -12792,7 +12797,7 @@ File: gfortran.info,  Node: RENAME,  Next: REPEAT,  Prev: REAL,  Up: Intrinsic P
 ===============================
 
 _Description_:
-     Renames a file from file PATH1 to PATH2. A null character
+     Renames a file from file PATH1 to PATH2.  A null character
      (`CHAR(0)') can be used to mark the end of the names in PATH1 and
      PATH2; otherwise, trailing blanks in the file names are ignored.
      If the STATUS argument is supplied, it contains 0 on success or a
@@ -12858,7 +12863,7 @@ File: gfortran.info,  Node: RESHAPE,  Next: RRSPACING,  Prev: REPEAT,  Up: Intri
 ===============================================
 
 _Description_:
-     Reshapes SOURCE to correspond to SHAPE. If necessary, the new
+     Reshapes SOURCE to correspond to SHAPE.  If necessary, the new
      array may be padded with elements from PAD or permuted as defined
      by ORDER.
 
@@ -12872,13 +12877,13 @@ _Syntax_:
      `RESULT = RESHAPE(SOURCE, SHAPE[, PAD, ORDER])'
 
 _Arguments_:
-     SOURCE     Shall be an array of any type.
+     SOURCE      Shall be an array of any type.
      SHAPE      Shall be of type `INTEGER' and an array of
                 rank one. Its values must be positive or zero.
      PAD        (Optional) shall be an array of the same type
                 as SOURCE.
      ORDER      (Optional) shall be of type `INTEGER' and an
-                array of the same shape as SHAPE. Its values
+                 array of the same shape as SHAPE.  Its values
                 shall be a permutation of the numbers from 1
                 to n, where n is the size of SHAPE. If ORDER
                 is absent, the natural ordering shall be
@@ -12937,7 +12942,7 @@ _Description_:
      `RSHIFT' returns a value corresponding to I with all of the bits
      shifted right by SHIFT places.  If the absolute value of SHIFT is
      greater than `BIT_SIZE(I)', the value is undefined.  Bits shifted
-     out from the right end are lost. The fill is arithmetic: the bits
+     out from the right end are lost.  The fill is arithmetic: the bits
      shifted in from the left end are equal to the leftmost bit, which
      in two's complement representation is the sign bit.
 
@@ -12984,13 +12989,13 @@ _Syntax_:
      `RESULT = SAME_TYPE_AS(A, B)'
 
 _Arguments_:
-     A          Shall be an object of extensible declared type
-                or unlimited polymorphic.
-     B          Shall be an object of extensible declared type
-                or unlimited polymorphic.
+     A           Shall be an object of extensible declared type
+                 or unlimited polymorphic.
+     B           Shall be an object of extensible declared type
+                 or unlimited polymorphic.
 
 _Return value_:
-     The return value is a scalar of type default logical. It is true
+     The return value is a scalar of type default logical.  It is true
      if and only if the dynamic type of A is the same as the dynamic
      type of B.
 
@@ -13085,8 +13090,8 @@ File: gfortran.info,  Node: SECNDS,  Next: SECOND,  Prev: SCAN,  Up: Intrinsic P
 
 _Description_:
      `SECNDS(X)' gets the time in seconds from the real-time system
-     clock.  X is a reference time, also in seconds. If this is zero,
-     the time in seconds from midnight is returned. This function is
+     clock.  X is a reference time, also in seconds.  If this is zero,
+     the time in seconds from midnight is returned.  This function is
      non-standard and its use is discouraged.
 
 _Standard_:
@@ -13162,7 +13167,7 @@ File: gfortran.info,  Node: SELECTED_CHAR_KIND,  Next: SELECTED_INT_KIND,  Prev:
 _Description_:
      `SELECTED_CHAR_KIND(NAME)' returns the kind value for the character
      set named NAME, if a character set with such a name is supported,
-     or -1 otherwise. Currently, supported character sets include
+     or -1 otherwise.  Currently, supported character sets include
      "ASCII" and "DEFAULT", which are equivalent, and "ISO_10646"
      (Universal Character Set, UCS-4) which is commonly known as
      Unicode.
@@ -13177,8 +13182,8 @@ _Syntax_:
      `RESULT = SELECTED_CHAR_KIND(NAME)'
 
 _Arguments_:
-     NAME       Shall be a scalar and of the default character
-                type.
+     NAME        Shall be a scalar and of the default character
+                 type.
 
 _Example_:
           program character_kind
@@ -13210,7 +13215,7 @@ File: gfortran.info,  Node: SELECTED_INT_KIND,  Next: SELECTED_REAL_KIND,  Prev:
 _Description_:
      `SELECTED_INT_KIND(R)' return the kind value of the smallest
      integer type that can represent all values ranging from -10^R
-     (exclusive) to 10^R (exclusive). If there is no integer kind that
+     (exclusive) to 10^R (exclusive).  If there is no integer kind that
      accommodates this range, `SELECTED_INT_KIND' returns -1.
 
 _Standard_:
@@ -13260,11 +13265,11 @@ _Syntax_:
      `RESULT = SELECTED_REAL_KIND([P, R, RADIX])'
 
 _Arguments_:
-     P          (Optional) shall be a scalar and of type
+     P           (Optional) shall be a scalar and of type
                 `INTEGER'.
-     R          (Optional) shall be a scalar and of type
+     R           (Optional) shall be a scalar and of type
                 `INTEGER'.
-     RADIX      (Optional) shall be a scalar and of type
+     RADIX       (Optional) shall be a scalar and of type
                 `INTEGER'.
      Before Fortran 2008, at least one of the arguments R or P shall be
      present; since Fortran 2008, they are assumed to be zero if absent.
@@ -13274,15 +13279,15 @@ _Return value_:
      of a real data type with decimal precision of at least `P' digits,
      a decimal exponent range of at least `R', and with the requested
      `RADIX'. If the `RADIX' parameter is absent, real kinds with any
-     radix can be returned. If more than one real data type meet the
+     radix can be returned.  If more than one real data type meet the
      criteria, the kind of the data type with the smallest decimal
-     precision is returned. If no real data type matches the criteria,
+     precision is returned.  If no real data type matches the criteria,
      the result is
-    -1 if the processor does not support a real data type with a
+     -1 if the processor does not support a real data type with a
           precision greater than or equal to `P', but the `R' and
           `RADIX' requirements can be fulfilled
 
-    -2 if the processor does not support a real type with an exponent
+     -2 if the processor does not support a real type with an exponent
           range greater than or equal to `R', but `P' and `RADIX' are
           fulfillable
 
@@ -13366,18 +13371,18 @@ _Syntax_:
      `RESULT = SHAPE(SOURCE [, KIND])'
 
 _Arguments_:
-     SOURCE     Shall be an array or scalar of any type.  If
-                SOURCE is a pointer it must be associated and
-                allocatable arrays must be allocated.
+     SOURCE      Shall be an array or scalar of any type.  If
+                 SOURCE is a pointer it must be associated and
+                 allocatable arrays must be allocated.
      KIND       (Optional) An `INTEGER' initialization
                 expression indicating the kind parameter of
                 the result.
 
 _Return value_:
      An `INTEGER' array of rank one with as many elements as SOURCE has
-     dimensions. The elements of the resulting array correspond to the
-     extend of SOURCE along the respective dimensions. If SOURCE is a
-     scalar, the result is the rank one array of size zero. If KIND is
+     dimensions.  The elements of the resulting array correspond to the
+     extend of SOURCE along the respective dimensions.  If SOURCE is a
+     scalar, the result is the rank one array of size zero.  If KIND is
      absent, the return value has the default integer kind otherwise
      the specified kind.
 
@@ -13401,7 +13406,7 @@ _Description_:
      `SHIFTA' returns a value corresponding to I with all of the bits
      shifted right by SHIFT places.  If the absolute value of SHIFT is
      greater than `BIT_SIZE(I)', the value is undefined.  Bits shifted
-     out from the right end are lost. The fill is arithmetic: the bits
+     out from the right end are lost.  The fill is arithmetic: the bits
      shifted in from the left end are equal to the leftmost bit, which
      in two's complement representation is the sign bit.
 
@@ -13508,7 +13513,7 @@ _Syntax_:
 
 _Arguments_:
      A          Shall be of type `INTEGER' or `REAL'
-     B          Shall be of the same type and kind as A
+     B           Shall be of the same type and kind as A
 
 _Return value_:
      The kind of the return value is that of A and B.  If B\ge 0 then
@@ -13526,13 +13531,13 @@ _Example_:
           end program test_sign
 
 _Specific names_:
-     Name          Arguments     Return type   Standard
+     Name           Arguments      Return type    Standard
      `SIGN(A,B)'   `REAL(4) A,   `REAL(4)'     f77, gnu
-                   B'                          
+                    B'
      `ISIGN(A,B)'  `INTEGER(4)   `INTEGER(4)'  f77, gnu
-                   A, B'                       
+                    A, B'
      `DSIGN(A,B)'  `REAL(8) A,   `REAL(8)'     f77, gnu
-                   B'                          
+                    B'
 
 
 File: gfortran.info,  Node: SIGNAL,  Next: SIN,  Prev: SIGN,  Up: Intrinsic Procedures
@@ -13613,15 +13618,15 @@ _Example_:
           end program test_sin
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `SIN(X)'      `REAL(4) X'   `REAL(4)'     f77, gnu
      `DSIN(X)'     `REAL(8) X'   `REAL(8)'     f95, gnu
      `CSIN(X)'     `COMPLEX(4)   `COMPLEX(4)'  f95, gnu
-                   X'                          
+                    X'
      `ZSIN(X)'     `COMPLEX(8)   `COMPLEX(8)'  f95, gnu
-                   X'                          
+                    X'
      `CDSIN(X)'    `COMPLEX(8)   `COMPLEX(8)'  f95, gnu
-                   X'                          
+                    X'
 
 _See also_:
      *note ASIN::
@@ -13657,11 +13662,11 @@ _Example_:
           end program test_sinh
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `SINH(X)'     `REAL(4) X'   `REAL(4)'     Fortran 95 and
-                                               later
+                                                  later
      `DSINH(X)'    `REAL(8) X'   `REAL(8)'     Fortran 95 and
-                                               later
+                                                  later
 
 _See also_:
      *note ASINH::
@@ -13686,9 +13691,9 @@ _Syntax_:
      `RESULT = SIZE(ARRAY[, DIM [, KIND]])'
 
 _Arguments_:
-     ARRAY      Shall be an array of any type. If ARRAY is a
-                pointer it must be associated and allocatable
-                arrays must be allocated.
+     ARRAY       Shall be an array of any type.  If ARRAY is a
+                 pointer it must be associated and allocatable
+                 arrays must be allocated.
      DIM        (Optional) shall be a scalar of type `INTEGER'
                 and its value shall be in the range from 1 to
                 n, where n equals the rank of ARRAY.
@@ -13728,19 +13733,19 @@ _Syntax_:
      `N = SIZEOF(X)'
 
 _Arguments_:
-     X          The argument shall be of any type, rank or
-                shape.
+     X           The argument shall be of any type, rank or
+                 shape.
 
 _Return value_:
      The return value is of type integer and of the system-dependent
-     kind C_SIZE_T (from the ISO_C_BINDING module). Its value is the
+     kind C_SIZE_T (from the ISO_C_BINDING module).  Its value is the
      number of bytes occupied by the argument.  If the argument has the
      `POINTER' attribute, the number of bytes of the storage area
      pointed to is returned.  If the argument is of a derived type with
      `POINTER' or `ALLOCATABLE' components, the return value does not
      account for the sizes of the data pointed to by these components.
      If the argument is polymorphic, the size according to the declared
-     type is returned. The argument may not be a procedure or procedure
+     type is returned.  The argument may not be a procedure or procedure
      pointer.
 
 _Example_:
@@ -13893,17 +13898,17 @@ _Example_:
           end program test_sqrt
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `SQRT(X)'     `REAL(4) X'   `REAL(4)'     Fortran 95 and
-                                               later
+                                                  later
      `DSQRT(X)'    `REAL(8) X'   `REAL(8)'     Fortran 95 and
-                                               later
+                                                  later
      `CSQRT(X)'    `COMPLEX(4)   `COMPLEX(4)'  Fortran 95 and
-                   X'                          later
+                    X'                            later
      `ZSQRT(X)'    `COMPLEX(8)   `COMPLEX(8)'  GNU extension
-                   X'                          
+                    X'
      `CDSQRT(X)'   `COMPLEX(8)   `COMPLEX(8)'  GNU extension
-                   X'                          
+                    X'
 
 
 File: gfortran.info,  Node: SRAND,  Next: STAT,  Prev: SQRT,  Up: Intrinsic Procedures
@@ -13937,7 +13942,7 @@ _Example_:
 _Notes_:
      The Fortran 2003 standard specifies the intrinsic `RANDOM_SEED' to
      initialize the pseudo-random numbers generator and `RANDOM_NUMBER'
-     to generate pseudo-random numbers. Please note that in GNU
+     to generate pseudo-random numbers.  Please note that in GNU
      Fortran, these two sets of intrinsics (`RAND', `IRAND' and `SRAND'
      on the one hand, `RANDOM_NUMBER' and `RANDOM_SEED' on the other
      hand) access two independent pseudo-random number generators.
@@ -13953,7 +13958,7 @@ File: gfortran.info,  Node: STAT,  Next: STORAGE_SIZE,  Prev: SRAND,  Up: Intrin
 ===============================
 
 _Description_:
-     This function returns information about a file. No permissions are
+     This function returns information about a file.  No permissions are
      required on the file itself, but execute (search) permission is
      required on all of the directories in path that lead to the file.
 
@@ -13992,7 +13997,7 @@ _Syntax_:
 
 _Arguments_:
      NAME       The type shall be `CHARACTER', of the default
-                kind and a valid path within the file system.
+                 kind and a valid path within the file system.
      VALUES     The type shall be `INTEGER(4), DIMENSION(13)'.
      STATUS     (Optional) status flag of type `INTEGER(4)'.
                 Returns 0 on success and a system specific
@@ -14044,9 +14049,9 @@ _Syntax_:
      `RESULT = STORAGE_SIZE(A [, KIND])'
 
 _Arguments_:
-     A          Shall be a scalar or array of any type.
-     KIND       (Optional) shall be a scalar integer constant
-                expression.
+     A           Shall be a scalar or array of any type.
+     KIND        (Optional) shall be a scalar integer constant
+                 expression.
 
 _Return Value_:
      The result is a scalar integer with the kind type parameter
@@ -14081,8 +14086,8 @@ _Arguments_:
      ARRAY      Shall be an array of type `INTEGER', `REAL' or
                 `COMPLEX'.
      DIM        (Optional) shall be a scalar of type `INTEGER'
-                with a value in the range from 1 to n, where n
-                equals the rank of ARRAY.
+                 with a value in the range from 1 to n, where n
+                 equals the rank of ARRAY.
      MASK       (Optional) shall be of type `LOGICAL' and
                 either be a scalar or an array of the same
                 shape as ARRAY.
@@ -14112,7 +14117,7 @@ File: gfortran.info,  Node: SYMLNK,  Next: SYSTEM,  Prev: SUM,  Up: Intrinsic Pr
 ========================================
 
 _Description_:
-     Makes a symbolic link from file PATH1 to PATH2. A null character
+     Makes a symbolic link from file PATH1 to PATH2.  A null character
      (`CHAR(0)') can be used to mark the end of the names in PATH1 and
      PATH2; otherwise, trailing blanks in the file names are ignored.
      If the STATUS argument is supplied, it contains 0 on success or a
@@ -14195,9 +14200,9 @@ _Description_:
      resolution realtime clock.
 
      COUNT_RATE is system dependent and can vary depending on the kind
-     of the arguments. For KIND=4 arguments, COUNT usually represents
+     of the arguments.  For KIND=4 arguments, COUNT usually represents
      milliseconds, while for KIND=8 arguments, COUNT typically
-     represents micro- or nanoseconds. COUNT_MAX usually equals
+     represents micro- or nanoseconds.  COUNT_MAX usually equals
      `HUGE(COUNT_MAX)'.
 
      If there is no clock, COUNT is set to `-HUGE(COUNT)', and
@@ -14267,11 +14272,11 @@ _Example_:
           end program test_tan
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `TAN(X)'      `REAL(4) X'   `REAL(4)'     Fortran 95 and
-                                               later
+                                                  later
      `DTAN(X)'     `REAL(8) X'   `REAL(8)'     Fortran 95 and
-                                               later
+                                                  later
 
 _See also_:
      *note ATAN::
@@ -14298,9 +14303,9 @@ _Arguments_:
      X          The type shall be `REAL' or `COMPLEX'.
 
 _Return value_:
-     The return value has same type and kind as X. If X is complex, the
+     The return value has same type and kind as X.  If X is complex, the
      imaginary part of the result is in radians. If X is `REAL', the
-     return value lies in the range  - 1 \leq tanh(x) \leq 1 .
+     return value lies in the range - 1 \leq tanh(x) \leq 1 .
 
 _Example_:
           program test_tanh
@@ -14309,11 +14314,11 @@ _Example_:
           end program test_tanh
 
 _Specific names_:
-     Name          Argument      Return type   Standard
+     Name           Argument       Return type    Standard
      `TANH(X)'     `REAL(4) X'   `REAL(4)'     Fortran 95 and
-                                               later
+                                                  later
      `DTANH(X)'    `REAL(8) X'   `REAL(8)'     Fortran 95 and
-                                               later
+                                                  later
 
 _See also_:
      *note ATANH::
@@ -14340,16 +14345,16 @@ _Syntax_:
 _Arguments_:
      COARRAY    Coarray of any type  (optional; if DIM
                 present, required).
-     DIM        default integer scalar (optional). If present,
-                DIM shall be between one and the corank of
-                COARRAY.
+     DIM         default integer scalar (optional).  If present,
+                 DIM shall be between one and the corank of
+                 COARRAY.
 
 _Return value_:
-     Default integer. If COARRAY is not present, it is scalar and its
-     value is the index of the invoking image. Otherwise, if DIM is not
+     Default integer.  If COARRAY is not present, it is scalar and its
+     value is the index of the invoking image.  Otherwise, if DIM is not
      present, a rank-1 array with corank elements is returned,
      containing the cosubscripts for COARRAY specifying the invoking
-     image. If DIM is present, a scalar is returned, with the value of
+     image.  If DIM is present, a scalar is returned, with the value of
      the DIM element of `THIS_IMAGE(COARRAY)'.
 
 _Example_:
@@ -14419,7 +14424,7 @@ _Description_:
      values over that returned by `time(3)'. On a system with a 32-bit
      `time(3)', `TIME8' will return a 32-bit value, even though it is
      converted to a 64-bit `INTEGER(8)' value. That means overflows of
-     the 32-bit value can still occur. Therefore, the values returned
+     the 32-bit value can still occur.  Therefore, the values returned
      by this intrinsic might be or become negative or numerically less
      than previous values during a single run of the compiled program.
 
@@ -14525,8 +14530,8 @@ _Syntax_:
      `RESULT = TRANSFER(SOURCE, MOLD[, SIZE])'
 
 _Arguments_:
-     SOURCE     Shall be a scalar or an array of any type.
-     MOLD       Shall be a scalar or an array of any type.
+     SOURCE      Shall be a scalar or an array of any type.
+     MOLD        Shall be a scalar or an array of any type.
      SIZE       (Optional) shall be a scalar of type `INTEGER'.
 
 _Return value_:
@@ -14535,7 +14540,7 @@ _Return value_:
      one-dimensional array of length SIZE.  If SIZE is absent but MOLD
      is an array (of any size or shape), the result is a one-
      dimensional array of the minimum length needed to contain the
-     entirety of the bitwise representation of SOURCE.   If SIZE is
+     entirety of the bitwise representation of SOURCE.  If SIZE is
      absent and MOLD is a scalar, the result is a scalar.
 
      If the bitwise representation of the result is longer than that of
@@ -14562,7 +14567,7 @@ File: gfortran.info,  Node: TRANSPOSE,  Next: TRIM,  Prev: TRANSFER,  Up: Intrin
 ===================================================
 
 _Description_:
-     Transpose an array of rank two. Element (i, j) of the result has
+     Transpose an array of rank two.  Element (i, j) of the result has
      the value `MATRIX(j, i)', for all i, j.
 
 _Standard_:
@@ -14623,7 +14628,7 @@ File: gfortran.info,  Node: TTYNAM,  Next: UBOUND,  Prev: TRIM,  Up: Intrinsic P
 ====================================================
 
 _Description_:
-     Get the name of a terminal device. For more information, see
+     Get the name of a terminal device.  For more information, see
      `ttyname(3)'.
 
      This intrinsic is provided in both subroutine and function forms;
@@ -14674,7 +14679,7 @@ _Syntax_:
      `RESULT = UBOUND(ARRAY [, DIM [, KIND]])'
 
 _Arguments_:
-     ARRAY      Shall be an array, of any type.
+     ARRAY       Shall be an array, of any type.
      DIM        (Optional) Shall be a scalar `INTEGER'.
      KIND       (Optional) An `INTEGER' initialization
                 expression indicating the kind parameter of
@@ -14714,7 +14719,7 @@ _Syntax_:
      `RESULT = UCOBOUND(COARRAY [, DIM [, KIND]])'
 
 _Arguments_:
-     ARRAY      Shall be an coarray, of any type.
+     ARRAY       Shall be an coarray, of any type.
      DIM        (Optional) Shall be a scalar `INTEGER'.
      KIND       (Optional) An `INTEGER' initialization
                 expression indicating the kind parameter of
@@ -14737,8 +14742,8 @@ File: gfortran.info,  Node: UMASK,  Next: UNLINK,  Prev: UCOBOUND,  Up: Intrinsi
 ===========================================
 
 _Description_:
-     Sets the file creation mask to MASK. If called as a function, it
-     returns the old value. If called as a subroutine and argument OLD
+     Sets the file creation mask to MASK.  If called as a function, it
+     returns the old value.  If called as a subroutine and argument OLD
      if it is supplied, it is set to the old value. See `umask(2)'.
 
 _Standard_:
@@ -14808,7 +14813,7 @@ _Syntax_:
      `RESULT = UNPACK(VECTOR, MASK, FIELD)'
 
 _Arguments_:
-     VECTOR     Shall be an array of any type and rank one. It
+     VECTOR      Shall be an array of any type and rank one.  It
                 shall have at least as many elements as MASK
                 has `TRUE' values.
      MASK       Shall be an array of type `LOGICAL'.
@@ -14906,7 +14911,7 @@ _Syntax_:
 _Arguments_:
      I          The type shall be either  a scalar `INTEGER'
                 type or a scalar `LOGICAL' type.
-     J          The type shall be the same as the type of I.
+     J           The type shall be the same as the type of I.
 
 _Return value_:
      The return type is either a scalar `INTEGER' or a scalar
@@ -14953,12 +14958,12 @@ default-integer named constants:
 
 `ATOMIC_INT_KIND':
      Default-kind integer constant to be used as kind parameter when
-     defining integer variables used in atomic operations. (Fortran
+     defining integer variables used in atomic operations.  (Fortran
      2008 or later.)
 
 `ATOMIC_LOGICAL_KIND':
      Default-kind integer constant to be used as kind parameter when
-     defining logical variables used in atomic operations. (Fortran
+     defining logical variables used in atomic operations.  (Fortran
      2008 or later.)
 
 `CHARACTER_KINDS':
@@ -15002,7 +15007,7 @@ default-integer named constants:
 `IOSTAT_INQUIRE_INTERNAL_UNIT':
      Scalar default-integer constant, used by `INQUIRE' for the
      `IOSTAT=' specifier to denote an that a unit number identifies an
-     internal unit. (Fortran 2008 or later.)
+     internal unit.  (Fortran 2008 or later.)
 
 `NUMERIC_STORAGE_SIZE':
      The size in bits of the numeric storage unit.
@@ -15018,8 +15023,8 @@ default-integer named constants:
 
 `REAL32', `REAL64', `REAL128':
      Kind type parameters to specify a REAL type with a storage size of
-     32, 64, and 128 bits. It is negative if a target platform does not
-     support the particular kind. (Fortran 2008 or later.)
+     32, 64, and 128 bits.  It is negative if a target platform does not
+     support the particular kind.  (Fortran 2008 or later.)
 
 `REAL_KINDS':
      Default-kind integer constant array of rank one containing the
@@ -15029,18 +15034,18 @@ default-integer named constants:
 `STAT_LOCKED':
      Scalar default-integer constant used as STAT= return value by
      `LOCK' to denote that the lock variable is locked by the executing
-     image. (Fortran 2008 or later.)
+     image.  (Fortran 2008 or later.)
 
 `STAT_LOCKED_OTHER_IMAGE':
      Scalar default-integer constant used as STAT= return value by
      `UNLOCK' to denote that the lock variable is locked by another
-     image. (Fortran 2008 or later.)
+     image.  (Fortran 2008 or later.)
 
 `STAT_STOPPED_IMAGE':
      Positive, scalar default-integer constant used as STAT= return
      value if the argument in the statement requires synchronisation
      with an image, which has initiated the termination of the
-     execution. (Fortran 2008 or later.)
+     execution.  (Fortran 2008 or later.)
 
 `STAT_UNLOCKED':
      Scalar default-integer constant used as STAT= return value by
@@ -15094,13 +15099,13 @@ Furthermore, if `__float128' is supported in C, the named constants
 `C_FLOAT128, C_FLOAT128_COMPLEX' are defined.
 
 Fortran     Named constant            C type                    Extension
-Type                                                            
+Type
 `INTEGER'   `C_INT'                   `int'                     
 `INTEGER'   `C_SHORT'                 `short int'               
 `INTEGER'   `C_LONG'                  `long int'                
 `INTEGER'   `C_LONG_LONG'             `long long int'           
 `INTEGER'   `C_SIGNED_CHAR'           `signed char'/`unsigned   
-                                      char'                     
+                                      char'
 `INTEGER'   `C_SIZE_T'                `size_t'                  
 `INTEGER'   `C_INT8_T'                `int8_t'                  
 `INTEGER'   `C_INT16_T'               `int16_t'                 
@@ -15335,7 +15340,7 @@ _Bug hunting/squishing_
      instead of isolating them.  Going through the bugzilla database at
      `http://gcc.gnu.org/bugzilla/' to reduce testcases posted there and
      add more information (for example, for which version does the
-     testcase work, for which versions does it fail?) is also very
+     testcase work, for which versions does it fail?)  is also very
      helpful.
 
 
@@ -15882,7 +15887,7 @@ TERMS AND CONDITIONS
      by modifying or propagating a covered work, you indicate your
      acceptance of this License to do so.
 
- 10. Automatic Licensing of Downstream Recipients.
+  10. Automatic Licensing of Downstream Recipients.
 
      Each time you convey a covered work, the recipient automatically
      receives a license from the original licensors, to run, modify and
@@ -15910,7 +15915,7 @@ TERMS AND CONDITIONS
      using, selling, offering for sale, or importing the Program or any
      portion of it.
 
- 11. Patents.
+  11. Patents.
 
      A "contributor" is a copyright holder who authorizes use under this
      License of the Program or a work on which the Program is based.
@@ -15983,7 +15988,7 @@ TERMS AND CONDITIONS
      any implied license or other defenses to infringement that may
      otherwise be available to you under applicable patent law.
 
- 12. No Surrender of Others' Freedom.
+  12. No Surrender of Others' Freedom.
 
      If conditions are imposed on you (whether by court order,
      agreement or otherwise) that contradict the conditions of this
@@ -15997,7 +16002,7 @@ TERMS AND CONDITIONS
      terms and this License would be to refrain entirely from conveying
      the Program.
 
- 13. Use with the GNU Affero General Public License.
+  13. Use with the GNU Affero General Public License.
 
      Notwithstanding any other provision of this License, you have
      permission to link or combine any covered work with a work licensed
@@ -16008,7 +16013,7 @@ TERMS AND CONDITIONS
      General Public License, section 13, concerning interaction through
      a network will apply to the combination as such.
 
- 14. Revised Versions of this License.
+  14. Revised Versions of this License.
 
      The Free Software Foundation may publish revised and/or new
      versions of the GNU General Public License from time to time.
@@ -16035,19 +16040,19 @@ TERMS AND CONDITIONS
      author or copyright holder as a result of your choosing to follow a
      later version.
 
- 15. Disclaimer of Warranty.
+  15. Disclaimer of Warranty.
 
      THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY
-     APPLICABLE LAW.  EXCEPT WHEN OTHERWISE STATED IN WRITING THE
+     APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN WRITING THE
      COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE PROGRAM "AS IS"
      WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR IMPLIED,
      INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-     MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE.  THE ENTIRE
+     MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE
      RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU.
      SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
      NECESSARY SERVICING, REPAIR OR CORRECTION.
 
- 16. Limitation of Liability.
+  16. Limitation of Liability.
 
      IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN
      WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MODIFIES
@@ -16060,7 +16065,7 @@ TERMS AND CONDITIONS
      PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN ADVISED OF
      THE POSSIBILITY OF SUCH DAMAGES.
 
- 17. Interpretation of Sections 15 and 16.
+  17. Interpretation of Sections 15 and 16.
 
      If the disclaimer of warranty and limitation of liability provided
      above cannot be given local legal effect according to their terms,
@@ -16533,7 +16538,7 @@ GNU Free Documentation License
      not permanently reinstated, receipt of a copy of some or all of
      the same material does not give you any rights to use it.
 
- 10. FUTURE REVISIONS OF THIS LICENSE
+  10. FUTURE REVISIONS OF THIS LICENSE
 
      The Free Software Foundation may publish new, revised versions of
      the GNU Free Documentation License from time to time.  Such new
@@ -16554,7 +16559,7 @@ GNU Free Documentation License
      proxy's public statement of acceptance of a version permanently
      authorizes you to choose that version for the Document.
 
- 11. RELICENSING
+  11. RELICENSING
 
      "Massive Multiauthor Collaboration Site" (or "MMC Site") means any
      World Wide Web server that publishes copyrightable works and also
@@ -16601,7 +16606,7 @@ notices just after the title page:
        Free Documentation License''.
 
    If you have Invariant Sections, Front-Cover Texts and Back-Cover
-Texts, replace the "with...Texts." line with this:
+Texts, replace the "with...Texts."  line with this:
 
          with the Invariant Sections being LIST THEIR TITLES, with
          the Front-Cover Texts being LIST, and with the Back-Cover Texts
@@ -16733,12 +16738,12 @@ look up both forms.
                                                               (line  54)
 * fdump-fortran-optimized:               Debugging Options.   (line  15)
 * fdump-fortran-original:                Debugging Options.   (line  10)
-* fdump-parse-tree:                      Debugging Options.   (line  18)
+* fdump-parse-tree:                      Debugging Options.   (line  19)
 * fexternal-blas:                        Code Gen Options.    (line 278)
 * ff2c:                                  Code Gen Options.    (line  25)
 * ffixed-line-length-N:                  Fortran Dialect Options.
                                                               (line  77)
-* ffpe-trap=LIST:                        Debugging Options.   (line  24)
+* ffpe-trap=LIST:                        Debugging Options.   (line  25)
 * ffree-form:                            Fortran Dialect Options.
                                                               (line  11)
 * ffree-line-length-N:                   Fortran Dialect Options.
@@ -16763,7 +16768,7 @@ look up both forms.
 * fmodule-private:                       Fortran Dialect Options.
                                                               (line  72)
 * fno-automatic:                         Code Gen Options.    (line  15)
-* fno-backtrace:                         Debugging Options.   (line  51)
+* fno-backtrace:                         Debugging Options.   (line  52)
 * fno-fixed-form:                        Fortran Dialect Options.
                                                               (line  11)
 * fno-protect-parens:                    Code Gen Options.    (line 346)
@@ -17039,7 +17044,7 @@ Keyword Index
                                                               (line  60)
 * backtrace:                             BACKTRACE.           (line   6)
 * BACKTRACE:                             BACKTRACE.           (line   6)
-* backtrace:                             Debugging Options.   (line  51)
+* backtrace:                             Debugging Options.   (line  52)
 * base 10 logarithm function:            LOG10.               (line   6)
 * BESJ0:                                 BESSEL_J0.           (line   6)
 * BESJ1:                                 BESSEL_J1.           (line   6)
@@ -17925,7 +17930,7 @@ Keyword Index
 * TIME8:                                 TIME8.               (line   6)
 * TINY:                                  TINY.                (line   6)
 * TR 15581:                              Fortran 2003 status. (line  93)
-* trace:                                 Debugging Options.   (line  51)
+* trace:                                 Debugging Options.   (line  52)
 * TRAILZ:                                TRAILZ.              (line   6)
 * TRANSFER:                              TRANSFER.            (line   6)
 * transforming symbol names:             Code Gen Options.    (line  54)
@@ -18028,358 +18033,358 @@ Keyword Index
 
 
 Tag Table:
-Node: Top1990
-Node: Introduction3377
-Node: About GNU Fortran4126
-Node: GNU Fortran and GCC8115
-Node: Preprocessing and conditional compilation10229
-Node: GNU Fortran and G7711873
-Node: Project Status12446
-Node: Standards14893
-Node: Varying Length Character Strings15906
-Node: Invoking GNU Fortran16657
-Node: Option Summary18380
-Node: Fortran Dialect Options21783
-Node: Preprocessing Options30279
-Node: Error and Warning Options38510
-Node: Debugging Options48571
-Node: Directory Options51554
-Node: Link Options52989
-Node: Runtime Options53613
-Node: Code Gen Options55518
-Node: Environment Variables72500
-Node: Runtime73105
-Node: TMPDIR74207
-Node: GFORTRAN_STDIN_UNIT74876
-Node: GFORTRAN_STDOUT_UNIT75258
-Node: GFORTRAN_STDERR_UNIT75659
-Node: GFORTRAN_UNBUFFERED_ALL76061
-Node: GFORTRAN_UNBUFFERED_PRECONNECTED76592
-Node: GFORTRAN_SHOW_LOCUS77236
-Node: GFORTRAN_OPTIONAL_PLUS77732
-Node: GFORTRAN_DEFAULT_RECL78208
-Node: GFORTRAN_LIST_SEPARATOR78697
-Node: GFORTRAN_CONVERT_UNIT79306
-Node: GFORTRAN_ERROR_BACKTRACE82169
-Node: Fortran 2003 and 2008 status82726
-Node: Fortran 2003 status82986
-Node: Fortran 2008 status87883
-Node: TS 29113 status92668
-Node: Compiler Characteristics93644
-Node: KIND Type Parameters94180
-Node: Internal representation of LOGICAL variables95430
-Node: Thread-safety of the runtime library96787
-Node: Data consistency and durability98214
-Node: Extensions101256
-Node: Extensions implemented in GNU Fortran101861
-Node: Old-style kind specifications103219
-Node: Old-style variable initialization104326
-Node: Extensions to namelist105638
-Node: X format descriptor without count field107635
-Node: Commas in FORMAT specifications108162
-Node: Missing period in FORMAT specifications108679
-Node: I/O item lists109241
-Node: `Q' exponent-letter109628
-Node: BOZ literal constants110228
-Node: Real array indices112807
-Node: Unary operators113106
-Node: Implicitly convert LOGICAL and INTEGER values113520
-Node: Hollerith constants support114480
-Node: Cray pointers116252
-Node: CONVERT specifier121699
-Node: OpenMP123697
-Node: Argument list functions125948
-Node: Extensions not implemented in GNU Fortran127554
-Node: STRUCTURE and RECORD128476
-Node: ENCODE and DECODE statements130912
-Node: Variable FORMAT expressions132272
-Node: Alternate complex function syntax133377
-Node: Mixed-Language Programming133897
-Node: Interoperability with C134437
-Node: Intrinsic Types135775
-Node: Derived Types and struct136290
-Node: Interoperable Global Variables137647
-Node: Interoperable Subroutines and Functions138923
-Node: Working with Pointers142719
-Node: Further Interoperability of Fortran with C147195
-Node: GNU Fortran Compiler Directives150545
-Node: Non-Fortran Main Program152737
-Node: _gfortran_set_args154879
-Node: _gfortran_set_options155814
-Node: _gfortran_set_convert158534
-Node: _gfortran_set_record_marker159398
-Node: _gfortran_set_fpe160206
-Node: _gfortran_set_max_subrecord_length161398
-Node: Intrinsic Procedures162318
-Node: Introduction to Intrinsics177804
-Node: ABORT180156
-Node: ABS180902
-Node: ACCESS182519
-Node: ACHAR184440
-Node: ACOS185641
-Node: ACOSH186878
-Node: ADJUSTL187866
-Node: ADJUSTR188807
-Node: AIMAG189754
-Node: AINT191135
-Node: ALARM192722
-Node: ALL194356
-Node: ALLOCATED196274
-Node: AND197411
-Node: ANINT198708
-Node: ANY200186
-Node: ASIN202116
-Node: ASINH203342
-Node: ASSOCIATED204340
-Node: ATAN207345
-Node: ATAN2208764
-Node: ATANH210536
-Node: ATOMIC_DEFINE211536
-Node: ATOMIC_REF212710
-Node: BACKTRACE214070
-Node: BESSEL_J0214649
-Node: BESSEL_J1215697
-Node: BESSEL_JN216749
-Node: BESSEL_Y0218631
-Node: BESSEL_Y1219631
-Node: BESSEL_YN220631
-Node: BGE222463
-Node: BGT223152
-Node: BIT_SIZE223799
-Node: BLE224620
-Node: BLT225299
-Node: BTEST225934
-Node: C_ASSOCIATED226817
-Node: C_F_POINTER228026
-Node: C_F_PROCPOINTER229450
-Node: C_FUNLOC230951
-Node: C_LOC232320
-Node: C_SIZEOF233597
-Node: CEILING235007
-Node: CHAR236012
-Node: CHDIR237216
-Node: CHMOD238384
-Node: CMPLX240247
-Node: COMMAND_ARGUMENT_COUNT241711
-Node: COMPILER_OPTIONS242634
-Node: COMPILER_VERSION243660
-Node: COMPLEX244624
-Node: CONJG245761
-Node: COS246832
-Node: COSH248278
-Node: COUNT249443
-Node: CPU_TIME251459
-Node: CSHIFT252813
-Node: CTIME254469
-Node: DATE_AND_TIME256122
-Node: DBLE258583
-Node: DCMPLX259376
-Node: DIGITS260570
-Node: DIM261536
-Node: DOT_PRODUCT262794
-Node: DPROD264450
-Node: DREAL265367
-Node: DSHIFTL266033
-Node: DSHIFTR267353
-Node: DTIME268674
-Node: EOSHIFT271477
-Node: EPSILON273550
-Node: ERF274276
-Node: ERFC275050
-Node: ERFC_SCALED275854
-Node: ETIME276546
-Node: EXECUTE_COMMAND_LINE278787
-Node: EXIT281367
-Node: EXP282241
-Node: EXPONENT283514
-Node: EXTENDS_TYPE_OF284274
-Node: FDATE285127
-Node: FGET286609
-Node: FGETC288427
-Node: FLOOR290226
-Node: FLUSH291210
-Node: FNUM293085
-Node: FPUT293807
-Node: FPUTC295432
-Node: FRACTION297203
-Node: FREE298104
-Node: FSEEK298939
-Node: FSTAT301233
-Node: FTELL302313
-Node: GAMMA303291
-Node: GERROR304332
-Node: GETARG305051
-Node: GET_COMMAND306815
-Node: GET_COMMAND_ARGUMENT308179
-Node: GETCWD310215
-Node: GETENV311189
-Node: GET_ENVIRONMENT_VARIABLE312614
-Node: GETGID314767
-Node: GETLOG315304
-Node: GETPID316164
-Node: GETUID316894
-Node: GMTIME317410
-Node: HOSTNM318899
-Node: HUGE319817
-Node: HYPOT320538
-Node: IACHAR321358
-Node: IALL322538
-Node: IAND324015
-Node: IANY324999
-Node: IARGC326485
-Node: IBCLR327506
-Node: IBITS328167
-Node: IBSET329082
-Node: ICHAR329738
-Node: IDATE331910
-Node: IEOR332937
-Node: IERRNO333813
-Node: IMAGE_INDEX334362
-Node: INDEX intrinsic335386
-Node: INT336927
-Node: INT2338629
-Node: INT8339394
-Node: IOR340106
-Node: IPARITY340958
-Node: IRAND342482
-Node: IS_IOSTAT_END343838
-Node: IS_IOSTAT_EOR344935
-Node: ISATTY346062
-Node: ISHFT346845
-Node: ISHFTC347825
-Node: ISNAN349041
-Node: ITIME349789
-Node: KILL350814
-Node: KIND351718
-Node: LBOUND352563
-Node: LCOBOUND353896
-Node: LEADZ355026
-Node: LEN355886
-Node: LEN_TRIM357167
-Node: LGE358149
-Node: LGT359651
-Node: LINK361118
-Node: LLE362153
-Node: LLT363647
-Node: LNBLNK365107
-Node: LOC365883
-Node: LOG366614
-Node: LOG10368017
-Node: LOG_GAMMA368991
-Node: LOGICAL370080
-Node: LONG370888
-Node: LSHIFT371644
-Node: LSTAT372729
-Node: LTIME373923
-Node: MALLOC375334
-Node: MASKL376793
-Node: MASKR377556
-Node: MATMUL378322
-Node: MAX379411
-Node: MAXEXPONENT380910
-Node: MAXLOC381726
-Node: MAXVAL383745
-Node: MCLOCK385378
-Node: MCLOCK8386402
-Node: MERGE387635
-Node: MERGE_BITS388384
-Node: MIN389245
-Node: MINEXPONENT390746
-Node: MINLOC391376
-Node: MINVAL393395
-Node: MOD395047
-Node: MODULO396792
-Node: MOVE_ALLOC398092
-Node: MVBITS399121
-Node: NEAREST400180
-Node: NEW_LINE401276
-Node: NINT402047
-Node: NORM2403450
-Node: NOT404588
-Node: NULL405172
-Node: NUM_IMAGES406077
-Node: OR406893
-Node: PACK408177
-Node: PARITY410169
-Node: PERROR411384
-Node: POPCNT412005
-Node: POPPAR412876
-Node: PRECISION413927
-Node: PRESENT414813
-Node: PRODUCT415919
-Node: RADIX417444
-Node: RAN418256
-Node: RAND418712
-Node: RANDOM_NUMBER420044
-Node: RANDOM_SEED421761
-Node: RANGE425439
-Node: RANK426135
-Node: REAL426916
-Node: RENAME428691
-Node: REPEAT429710
-Node: RESHAPE430436
-Node: RRSPACING431905
-Node: RSHIFT432598
-Node: SAME_TYPE_AS433736
-Node: SCALE434566
-Node: SCAN435346
-Node: SECNDS436896
-Node: SECOND437984
-Node: SELECTED_CHAR_KIND438860
-Node: SELECTED_INT_KIND440451
-Node: SELECTED_REAL_KIND441626
-Node: SET_EXPONENT444292
-Node: SHAPE445288
-Node: SHIFTA446703
-Node: SHIFTL447664
-Node: SHIFTR448499
-Node: SIGN449335
-Node: SIGNAL450619
-Node: SIN452116
-Node: SINH453214
-Node: SIZE454210
-Node: SIZEOF455518
-Node: SLEEP456993
-Node: SPACING457553
-Node: SPREAD458566
-Node: SQRT459711
-Node: SRAND461065
-Node: STAT462233
-Node: STORAGE_SIZE465400
-Node: SUM466279
-Node: SYMLNK467762
-Node: SYSTEM468894
-Node: SYSTEM_CLOCK470145
-Node: TAN472261
-Node: TANH473233
-Node: THIS_IMAGE474390
-Node: TIME475882
-Node: TIME8477007
-Node: TINY478157
-Node: TRAILZ478757
-Node: TRANSFER479574
-Node: TRANSPOSE481608
-Node: TRIM482295
-Node: TTYNAM483152
-Node: UBOUND484067
-Node: UCOBOUND485457
-Node: UMASK486589
-Node: UNLINK487267
-Node: UNPACK488244
-Node: VERIFY489532
-Node: XOR491253
-Node: Intrinsic Modules492625
-Node: ISO_FORTRAN_ENV492868
-Node: ISO_C_BINDING497020
-Node: OpenMP Modules OMP_LIB and OMP_LIB_KINDS501237
-Node: Contributing502523
-Node: Contributors503377
-Node: Projects505044
-Node: Proposed Extensions505848
-Node: Copying507859
-Node: GNU Free Documentation License545423
-Node: Funding570566
-Node: Option Index573091
-Node: Keyword Index588082
+Node: Top2004
+Node: Introduction3391
+Node: About GNU Fortran4140
+Node: GNU Fortran and GCC8129
+Node: Preprocessing and conditional compilation10243
+Node: GNU Fortran and G7711887
+Node: Project Status12460
+Node: Standards14907
+Node: Varying Length Character Strings15920
+Node: Invoking GNU Fortran16671
+Node: Option Summary18394
+Node: Fortran Dialect Options21797
+Node: Preprocessing Options30293
+Node: Error and Warning Options38524
+Node: Debugging Options48585
+Node: Directory Options51591
+Node: Link Options53026
+Node: Runtime Options53650
+Node: Code Gen Options55555
+Node: Environment Variables72537
+Node: Runtime73142
+Node: TMPDIR74244
+Node: GFORTRAN_STDIN_UNIT74913
+Node: GFORTRAN_STDOUT_UNIT75295
+Node: GFORTRAN_STDERR_UNIT75696
+Node: GFORTRAN_UNBUFFERED_ALL76098
+Node: GFORTRAN_UNBUFFERED_PRECONNECTED76629
+Node: GFORTRAN_SHOW_LOCUS77273
+Node: GFORTRAN_OPTIONAL_PLUS77769
+Node: GFORTRAN_DEFAULT_RECL78245
+Node: GFORTRAN_LIST_SEPARATOR78734
+Node: GFORTRAN_CONVERT_UNIT79343
+Node: GFORTRAN_ERROR_BACKTRACE82206
+Node: Fortran 2003 and 2008 status82763
+Node: Fortran 2003 status83023
+Node: Fortran 2008 status87920
+Node: TS 29113 status92705
+Node: Compiler Characteristics93681
+Node: KIND Type Parameters94217
+Node: Internal representation of LOGICAL variables95467
+Node: Thread-safety of the runtime library96824
+Node: Data consistency and durability98251
+Node: Extensions101293
+Node: Extensions implemented in GNU Fortran101898
+Node: Old-style kind specifications103256
+Node: Old-style variable initialization104363
+Node: Extensions to namelist105675
+Node: X format descriptor without count field107672
+Node: Commas in FORMAT specifications108199
+Node: Missing period in FORMAT specifications108716
+Node: I/O item lists109278
+Node: `Q' exponent-letter109665
+Node: BOZ literal constants110265
+Node: Real array indices112844
+Node: Unary operators113143
+Node: Implicitly convert LOGICAL and INTEGER values113557
+Node: Hollerith constants support114517
+Node: Cray pointers116289
+Node: CONVERT specifier121736
+Node: OpenMP123734
+Node: Argument list functions125985
+Node: Extensions not implemented in GNU Fortran127591
+Node: STRUCTURE and RECORD128513
+Node: ENCODE and DECODE statements130949
+Node: Variable FORMAT expressions132309
+Node: Alternate complex function syntax133414
+Node: Mixed-Language Programming133934
+Node: Interoperability with C134474
+Node: Intrinsic Types135812
+Node: Derived Types and struct136327
+Node: Interoperable Global Variables137684
+Node: Interoperable Subroutines and Functions138960
+Node: Working with Pointers142756
+Node: Further Interoperability of Fortran with C147232
+Node: GNU Fortran Compiler Directives150582
+Node: Non-Fortran Main Program152774
+Node: _gfortran_set_args154916
+Node: _gfortran_set_options155851
+Node: _gfortran_set_convert158571
+Node: _gfortran_set_record_marker159435
+Node: _gfortran_set_fpe160243
+Node: _gfortran_set_max_subrecord_length161435
+Node: Intrinsic Procedures162355
+Node: Introduction to Intrinsics177841
+Node: ABORT180193
+Node: ABS180939
+Node: ACCESS182556
+Node: ACHAR184477
+Node: ACOS185678
+Node: ACOSH186915
+Node: ADJUSTL187903
+Node: ADJUSTR188844
+Node: AIMAG189791
+Node: AINT191172
+Node: ALARM192759
+Node: ALL194393
+Node: ALLOCATED196311
+Node: AND197448
+Node: ANINT198745
+Node: ANY200223
+Node: ASIN202153
+Node: ASINH203379
+Node: ASSOCIATED204377
+Node: ATAN207382
+Node: ATAN2208801
+Node: ATANH210573
+Node: ATOMIC_DEFINE211573
+Node: ATOMIC_REF212747
+Node: BACKTRACE214107
+Node: BESSEL_J0214686
+Node: BESSEL_J1215734
+Node: BESSEL_JN216786
+Node: BESSEL_Y0218668
+Node: BESSEL_Y1219668
+Node: BESSEL_YN220668
+Node: BGE222500
+Node: BGT223189
+Node: BIT_SIZE223836
+Node: BLE224657
+Node: BLT225336
+Node: BTEST225971
+Node: C_ASSOCIATED226854
+Node: C_F_POINTER228063
+Node: C_F_PROCPOINTER229487
+Node: C_FUNLOC230988
+Node: C_LOC232357
+Node: C_SIZEOF233634
+Node: CEILING235044
+Node: CHAR236049
+Node: CHDIR237253
+Node: CHMOD238421
+Node: CMPLX240284
+Node: COMMAND_ARGUMENT_COUNT241748
+Node: COMPILER_OPTIONS242671
+Node: COMPILER_VERSION243697
+Node: COMPLEX244661
+Node: CONJG245798
+Node: COS246869
+Node: COSH248315
+Node: COUNT249480
+Node: CPU_TIME251496
+Node: CSHIFT252850
+Node: CTIME254506
+Node: DATE_AND_TIME256159
+Node: DBLE258620
+Node: DCMPLX259413
+Node: DIGITS260607
+Node: DIM261573
+Node: DOT_PRODUCT262831
+Node: DPROD264487
+Node: DREAL265404
+Node: DSHIFTL266070
+Node: DSHIFTR267390
+Node: DTIME268711
+Node: EOSHIFT271514
+Node: EPSILON273587
+Node: ERF274313
+Node: ERFC275087
+Node: ERFC_SCALED275891
+Node: ETIME276583
+Node: EXECUTE_COMMAND_LINE278824
+Node: EXIT281404
+Node: EXP282278
+Node: EXPONENT283551
+Node: EXTENDS_TYPE_OF284311
+Node: FDATE285164
+Node: FGET286646
+Node: FGETC288464
+Node: FLOOR290263
+Node: FLUSH291247
+Node: FNUM293122
+Node: FPUT293844
+Node: FPUTC295469
+Node: FRACTION297240
+Node: FREE298141
+Node: FSEEK298976
+Node: FSTAT301270
+Node: FTELL302350
+Node: GAMMA303328
+Node: GERROR304369
+Node: GETARG305088
+Node: GET_COMMAND306852
+Node: GET_COMMAND_ARGUMENT308216
+Node: GETCWD310252
+Node: GETENV311226
+Node: GET_ENVIRONMENT_VARIABLE312651
+Node: GETGID314804
+Node: GETLOG315341
+Node: GETPID316201
+Node: GETUID316931
+Node: GMTIME317447
+Node: HOSTNM318936
+Node: HUGE319854
+Node: HYPOT320575
+Node: IACHAR321395
+Node: IALL322575
+Node: IAND324052
+Node: IANY325036
+Node: IARGC326522
+Node: IBCLR327543
+Node: IBITS328204
+Node: IBSET329119
+Node: ICHAR329775
+Node: IDATE331947
+Node: IEOR332974
+Node: IERRNO333850
+Node: IMAGE_INDEX334399
+Node: INDEX intrinsic335423
+Node: INT336964
+Node: INT2338666
+Node: INT8339431
+Node: IOR340143
+Node: IPARITY340995
+Node: IRAND342519
+Node: IS_IOSTAT_END343875
+Node: IS_IOSTAT_EOR344972
+Node: ISATTY346099
+Node: ISHFT346882
+Node: ISHFTC347862
+Node: ISNAN349078
+Node: ITIME349826
+Node: KILL350851
+Node: KIND351755
+Node: LBOUND352600
+Node: LCOBOUND353933
+Node: LEADZ355063
+Node: LEN355923
+Node: LEN_TRIM357204
+Node: LGE358186
+Node: LGT359688
+Node: LINK361155
+Node: LLE362190
+Node: LLT363684
+Node: LNBLNK365144
+Node: LOC365920
+Node: LOG366651
+Node: LOG10368054
+Node: LOG_GAMMA369028
+Node: LOGICAL370117
+Node: LONG370925
+Node: LSHIFT371681
+Node: LSTAT372766
+Node: LTIME373960
+Node: MALLOC375371
+Node: MASKL376830
+Node: MASKR377593
+Node: MATMUL378359
+Node: MAX379448
+Node: MAXEXPONENT380947
+Node: MAXLOC381763
+Node: MAXVAL383782
+Node: MCLOCK385415
+Node: MCLOCK8386439
+Node: MERGE387672
+Node: MERGE_BITS388421
+Node: MIN389282
+Node: MINEXPONENT390783
+Node: MINLOC391413
+Node: MINVAL393432
+Node: MOD395084
+Node: MODULO396829
+Node: MOVE_ALLOC398129
+Node: MVBITS399158
+Node: NEAREST400217
+Node: NEW_LINE401313
+Node: NINT402084
+Node: NORM2403487
+Node: NOT404625
+Node: NULL405209
+Node: NUM_IMAGES406114
+Node: OR406930
+Node: PACK408214
+Node: PARITY410206
+Node: PERROR411421
+Node: POPCNT412042
+Node: POPPAR412913
+Node: PRECISION413964
+Node: PRESENT414850
+Node: PRODUCT415956
+Node: RADIX417481
+Node: RAN418293
+Node: RAND418749
+Node: RANDOM_NUMBER420081
+Node: RANDOM_SEED421798
+Node: RANGE425610
+Node: RANK426306
+Node: REAL427087
+Node: RENAME428862
+Node: REPEAT429881
+Node: RESHAPE430607
+Node: RRSPACING432076
+Node: RSHIFT432769
+Node: SAME_TYPE_AS433907
+Node: SCALE434737
+Node: SCAN435517
+Node: SECNDS437067
+Node: SECOND438155
+Node: SELECTED_CHAR_KIND439031
+Node: SELECTED_INT_KIND440622
+Node: SELECTED_REAL_KIND441797
+Node: SET_EXPONENT444463
+Node: SHAPE445459
+Node: SHIFTA446874
+Node: SHIFTL447835
+Node: SHIFTR448670
+Node: SIGN449506
+Node: SIGNAL450790
+Node: SIN452287
+Node: SINH453385
+Node: SIZE454381
+Node: SIZEOF455689
+Node: SLEEP457164
+Node: SPACING457724
+Node: SPREAD458737
+Node: SQRT459882
+Node: SRAND461236
+Node: STAT462404
+Node: STORAGE_SIZE465571
+Node: SUM466450
+Node: SYMLNK467933
+Node: SYSTEM469065
+Node: SYSTEM_CLOCK470316
+Node: TAN472432
+Node: TANH473404
+Node: THIS_IMAGE474561
+Node: TIME476053
+Node: TIME8477178
+Node: TINY478328
+Node: TRAILZ478928
+Node: TRANSFER479745
+Node: TRANSPOSE481779
+Node: TRIM482466
+Node: TTYNAM483323
+Node: UBOUND484238
+Node: UCOBOUND485628
+Node: UMASK486760
+Node: UNLINK487438
+Node: UNPACK488415
+Node: VERIFY489703
+Node: XOR491424
+Node: Intrinsic Modules492796
+Node: ISO_FORTRAN_ENV493039
+Node: ISO_C_BINDING497191
+Node: OpenMP Modules OMP_LIB and OMP_LIB_KINDS501408
+Node: Contributing502694
+Node: Contributors503548
+Node: Projects505215
+Node: Proposed Extensions506019
+Node: Copying508030
+Node: GNU Free Documentation License545594
+Node: Funding570737
+Node: Option Index573262
+Node: Keyword Index588253
 
 End Tag Table

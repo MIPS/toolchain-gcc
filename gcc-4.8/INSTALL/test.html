@@ -3,7 +3,7 @@
 <title>Installing GCC: Testing</title>
 <meta http-equiv="Content-Type" content="text/html">
 <meta name="description" content="Installing GCC: Testing">
-<meta name="generator" content="makeinfo 4.13">
+<meta name="generator" content="makeinfo 4.12">
 <link title="Top" rel="top" href="#Top">
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
@@ -44,10 +44,10 @@ license is included in the section entitled "GNU Free Documentation License".
 Before you install GCC, we encourage you to run the testsuites and to
 compare your results with results from a similar configuration that have
 been submitted to the
-<a href="http://gcc.gnu.org/ml/gcc-testresults/">gcc-testresults mailing list</a>. 
+<a href="http://gcc.gnu.org/ml/gcc-testresults/">gcc-testresults mailing list</a>.
 Some of these archived results are linked from the build status lists
 at <a href="http://gcc.gnu.org/buildstat.html">http://gcc.gnu.org/buildstat.html</a>, although not everyone who
-reports a successful build runs the testsuites and submits the results. 
+reports a successful build runs the testsuites and submits the results.
 This step is optional and may require you to download additional software,
 but it can give you confidence in your new GCC installation or point out
 problems before you install and start using your new GCC.
@@ -136,13 +136,13 @@ The following will run each testsuite eight times using the &lsquo;<samp><span c
 target, as if you had specified all possible combinations yourself:
 
 <pre class="smallexample">     --target_board='arm-sim/-mhard-float/-O1 \
-                     arm-sim/-mhard-float/-O2 \
-                     arm-sim/-mhard-float/-O3 \
-                     arm-sim/-mhard-float \
-                     arm-sim/-msoft-float/-O1 \
-                     arm-sim/-msoft-float/-O2 \
-                     arm-sim/-msoft-float/-O3 \
-                     arm-sim/-msoft-float'
+                arm-sim/-mhard-float/-O2 \
+                arm-sim/-mhard-float/-O3 \
+                arm-sim/-mhard-float \
+                arm-sim/-msoft-float/-O1 \
+                arm-sim/-msoft-float/-O2 \
+                arm-sim/-msoft-float/-O3 \
+                arm-sim/-msoft-float'
 </pre>
    <p>They can be combined as many times as you wish, in arbitrary ways.  This
 list:

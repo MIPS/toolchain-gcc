@@ -3,7 +3,7 @@
 <title>Installing GCC: Configuration</title>
 <meta http-equiv="Content-Type" content="text/html">
 <meta name="description" content="Installing GCC: Configuration">
-<meta name="generator" content="makeinfo 4.13">
+<meta name="generator" content="makeinfo 4.12">
 <link title="Top" rel="top" href="#Top">
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home" title="Texinfo Homepage">
 <!--
@@ -121,7 +121,7 @@ when configuring a cross compiler; examples of valid targets would be
 m68k-elf, sh-elf, etc.
 
      <li>Specifying just <var>target</var> instead of <samp><span class="option">--target=</span><var>target</var></samp>
-implies that the host defaults to <var>target</var>. 
+implies that the host defaults to <var>target</var>.
 </ul>
 
 <h3 class="heading"><a name="TOC2"></a>Options specification</h3>
@@ -383,7 +383,7 @@ target system triple.
           <li>Check in the <samp><span class="env">PATH</span></samp> for a tool whose name is not prefixed by the
 target system triple, if the host and target system triple are
 the same (in other words, we use a host tool if it can be used for
-the target as well). 
+the target as well).
 </ul>
 
      <p>You may want to use <samp><span class="option">--with-as</span></samp> if no assembler
@@ -471,7 +471,7 @@ these are handled by <samp><span class="option">--with-endian</span></samp>.
 processors.  The multilib for the secondary endian remains enabled.
 
           <p>As a special case, if an entry in the list starts with a <code>!</code>
-(exclamation point), then it is added to the list of excluded multilibs. 
+(exclamation point), then it is added to the list of excluded multilibs.
 Entries of this sort should be compatible with &lsquo;<samp><span class="samp">MULTILIB_EXCLUDES</span></samp>&rsquo;
 (once the leading <code>!</code> has been stripped).
 
@@ -495,7 +495,7 @@ respectively.  If <var>list</var> is empty, then there will be no multilibs
 and only the default run-time library will be enabled.
 
           <p>If <samp><span class="option">--with-multilib-list</span></samp> is not given, then only 32-bit and
-64-bit run-time libraries will be enabled. 
+64-bit run-time libraries will be enabled.
 </dl>
 
      <br><dt><code>--with-endian=</code><var>endians</var><dd>Specify what endians to use. 
@@ -511,7 +511,7 @@ Currently only implemented for sh*-*-*.
 
      <br><dt><code>--enable-threads</code><dd>Specify that the target
 supports threads.  This affects the Objective-C compiler and runtime
-library, and exception handling for other languages like C++ and Java. 
+library, and exception handling for other languages like C++ and Java.
 On some systems, this is the default.
 
      <p>In general, the best (and, in many cases, the only known) threading
@@ -579,11 +579,11 @@ enables <samp><span class="option">-msse2</span></samp> or &lsquo;<samp><span cl
 This option is only supported on i386 and x86-64 targets.
 
      <br><dt><code>--with-divide=</code><var>type</var><dd>Specify how the compiler should generate code for checking for
-division by zero.  This option is only supported on the MIPS target. 
+division by zero.  This option is only supported on the MIPS target.
 The possibilities for <var>type</var> are:
           <dl>
 <dt><code>traps</code><dd>Division by zero checks use conditional traps (this is the default on
-systems that support conditional traps). 
+systems that support conditional traps).
 <br><dt><code>breaks</code><dd>Division by zero checks use the break instruction. 
 </dl>
 
@@ -609,7 +609,7 @@ SVR4-based MIPS ABIs and require support from GNU binutils
 and the runtime C library.
 
      <br><dt><code>--enable-__cxa_atexit</code><dd>Define if you want to use __cxa_atexit, rather than atexit, to
-register C++ destructors for local statics and global objects. 
+register C++ destructors for local statics and global objects.
 This is essential for fully standards-compliant handling of
 destructors, but requires __cxa_atexit in libc.  This option is currently
 only available on systems with GNU libc.  When enabled, this will cause
@@ -619,7 +619,7 @@ only available on systems with GNU libc.  When enabled, this will cause
 currently only available on systems with GNU libc on certain targets.
 
      <br><dt><code>--enable-target-optspace</code><dd>Specify that target
-libraries should be optimized for code space instead of code speed. 
+libraries should be optimized for code space instead of code speed.
 This is the default for the m32r platform.
 
      <br><dt><code>--with-cpp-install-dir=</code><var>dirname</var><dd>Specify that the user visible <samp><span class="command">cpp</span></samp> program should be installed
@@ -649,9 +649,9 @@ testing that GCC can compile itself correctly.  If you want to disable
 this process, you can configure with <samp><span class="option">--disable-bootstrap</span></samp>.
 
      <br><dt><code>--enable-bootstrap</code><dd>In special cases, you may want to perform a 3-stage build
-even if the target and host triplets are different. 
+even if the target and host triplets are different.
 This is possible when the host can run code compiled for
-the target (e.g. host is i686-linux, target is i486-linux). 
+the target (e.g. host is i686-linux, target is i486-linux).
 Starting from GCC 4.2, to do this you have to configure explicitly
 with <samp><span class="option">--enable-bootstrap</span></samp>.
 
@@ -686,8 +686,8 @@ their runtime libraries should be built.  For a list of valid values for
 </pre>
      <p>Currently, you can use any of the following:
 <code>all</code>, <code>ada</code>, <code>c</code>, <code>c++</code>, <code>fortran</code>,
-<code>go</code>, <code>java</code>, <code>objc</code>, <code>obj-c++</code>. 
-Building the Ada compiler has special requirements, see below. 
+<code>go</code>, <code>java</code>, <code>objc</code>, <code>obj-c++</code>.
+Building the Ada compiler has special requirements, see below.
 If you do not pass this flag, or specify the option <code>all</code>, then all
 default languages available in the <samp><span class="file">gcc</span></samp> sub-tree will be configured. 
 Ada, Go and Objective-C++ are not default languages; the rest are.
@@ -729,13 +729,13 @@ use DWARF 2 debugging information as the default.
 
      <br><dt><code>--enable-targets=all</code><dt><code>--enable-targets=</code><var>target_list</var><dd>Some GCC targets, e.g. powerpc64-linux, build bi-arch compilers. 
 These are compilers that are able to generate either 64-bit or 32-bit
-code.  Typically, the corresponding 32-bit target, e.g. 
+code.  Typically, the corresponding 32-bit target, e.g.
 powerpc-linux for powerpc64-linux, only generates 32-bit code.  This
 option enables the 32-bit target to be a bi-arch compiler, which is
 useful when you want a bi-arch compiler that defaults to 32-bit, and
-you are building a bi-arch or multi-arch binutils in a combined tree. 
+you are building a bi-arch or multi-arch binutils in a combined tree.
 On mips-linux, this will build a tri-arch compiler (ABI o32/n32/64),
-defaulted to o32. 
+defaulted to o32.
 Currently, this option only affects sparc-linux, powerpc-linux, x86-linux,
 mips-linux and s390-linux.
 
@@ -859,7 +859,7 @@ may enable this option manually.
 
      <br><dt><code>--with-long-double-128</code><dd>Specify if <code>long double</code> type should be 128-bit by default on selected
 GNU/Linux architectures.  If using <code>--without-long-double-128</code>,
-<code>long double</code> will be by default 64-bit, the same as <code>double</code> type. 
+<code>long double</code> will be by default 64-bit, the same as <code>double</code> type.
 When neither of these configure options are used, the default will be
 128-bit <code>long double</code> when built against GNU C Library 2.4 and later,
 64-bit <code>long double</code> otherwise.
@@ -958,7 +958,7 @@ default, and may be disabled using <samp><span class="option">--disable-lto</spa
      <br><dt><code>--with-plugin-ld=</code><var>pathname</var><dd>Enable an alternate linker to be used at link-time optimization (LTO)
 link time when <samp><span class="option">-fuse-linker-plugin</span></samp> is enabled. 
 This linker should have plugin support such as gold starting with
-version 2.20 or GNU ld starting with version 2.21. 
+version 2.20 or GNU ld starting with version 2.21.
 See <samp><span class="option">-fuse-linker-plugin</span></samp> for details.
 
      <br><dt><code>--enable-canonical-system-headers</code><dt><code>--disable-canonical-system-headers</code><dd>Enable system header path canonicalization for <samp><span class="file">libcpp</span></samp>.  This can
@@ -974,7 +974,7 @@ environments.  Enabled by default, and may be disabled using
 
      <dl>
 <dt><code>--with-sysroot</code><dt><code>--with-sysroot=</code><var>dir</var><dd>Tells GCC to consider <var>dir</var> as the root of a tree that contains
-(a subset of) the root filesystem of the target operating system. 
+(a subset of) the root filesystem of the target operating system.
 Target system headers, libraries and run-time object files will be
 searched for in there.  More specifically, this acts as if
 <samp><span class="option">--sysroot=</span><var>dir</var></samp> was added to the default options of the built
@@ -1012,7 +1012,7 @@ option then the compiler will search that directory within <var>dirname</var> fo
 native system headers rather than the default <samp><span class="file">/usr/include</span></samp>.
 
      <br><dt><code>--with-headers</code><dt><code>--with-headers=</code><var>dir</var><dd>Deprecated in favor of <samp><span class="option">--with-sysroot</span></samp>. 
-Specifies that target headers are available when building a cross compiler. 
+Specifies that target headers are available when building a cross compiler.
 The <var>dir</var> argument specifies a directory which has the target include
 files.  These include files will be copied into the <samp><span class="file">gcc</span></samp> install
 directory.  <em>This option with the </em><var>dir</var><em> argument is required</em> when
@@ -1040,7 +1040,7 @@ omitted from <samp><span class="file">libgcc.a</span></samp> on the assumption t
 being used as the target C library.  This causes float support
 functions like <code>__addsf3</code> to be omitted from <samp><span class="file">libgcc.a</span></samp> on
 the assumption that it will be provided by <samp><span class="file">libm.a</span></samp>.  For more
-technical details, cf. <a href="http://gcc.gnu.org/PR54461">PR54461</a>. 
+technical details, cf. <a href="http://gcc.gnu.org/PR54461">PR54461</a>.
 This option is only supported for the AVR target.  It is not supported for
 RTEMS configurations, which currently use newlib.  The option is
 supported since version 4.7.2 and is the default in 4.8.0 and newer.
@@ -1059,7 +1059,7 @@ native tools in <samp><span class="file">/usr/bin</span></samp>.
 <samp><span class="command">ar</span></samp>, <samp><span class="command">as</span></samp>, <samp><span class="command">ld</span></samp>, <samp><span class="command">nm</span></samp>,
 <samp><span class="command">ranlib</span></samp> and <samp><span class="command">strip</span></samp> if necessary, and possibly
 <samp><span class="command">objdump</span></samp>.  Otherwise, GCC may use an inconsistent set of
-tools. 
+tools.
 </dl>
 
 <h4 class="subheading"><a name="TOC4"></a>Java-Specific Options</h4>
@@ -1223,7 +1223,7 @@ on getting <samp><span class="file">unicows.dll</span></samp> from Microsoft.
 
           <br><dt><code>unicode</code><dd>Use the <code>WCHAR</code> and Win32 W functions natively.  Does <em>not</em>
 add <code>-lunicows</code> to <samp><span class="file">libgcj.spec</span></samp>.  The built executables will
-only run on Microsoft Windows NT and above. 
+only run on Microsoft Windows NT and above.
 </dl>
      </dl>
 
