@@ -9984,7 +9984,7 @@ vmlal_u32 (uint64x2_t a, uint32x2_t b, uint32x2_t c)
 #define vmlaq_lane_s32(a, b, c, d)                                      \
   __extension__                                                         \
     ({                                                                  \
-       int32x4_t c_ = (c);                                              \
+       int32x2_t c_ = (c);                                              \
        int32x4_t b_ = (b);                                              \
        int32x4_t a_ = (a);                                              \
        int32x4_t result;                                                \
