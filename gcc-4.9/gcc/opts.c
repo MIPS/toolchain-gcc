@@ -507,7 +507,7 @@ static const struct default_options default_options_table[] =
     { OPT_LEVELS_1_PLUS_NOT_DEBUG, OPT_finline_functions_called_once, NULL, 1 },
     { OPT_LEVELS_3_PLUS, OPT_funswitch_loops, NULL, 1 },
     { OPT_LEVELS_3_PLUS, OPT_fgcse_after_reload, NULL, 1 },
-    { OPT_LEVELS_3_PLUS, OPT_ftree_loop_vectorize, NULL, 1 },
+    { OPT_LEVELS_2_PLUS, OPT_ftree_loop_vectorize, NULL, 1 },
     { OPT_LEVELS_3_PLUS, OPT_ftree_slp_vectorize, NULL, 1 },
     { OPT_LEVELS_3_PLUS, OPT_fvect_cost_model_, NULL, VECT_COST_MODEL_DYNAMIC },
     { OPT_LEVELS_3_PLUS, OPT_fipa_cp_clone, NULL, 1 },
@@ -802,6 +802,14 @@ finish_options (struct gcc_options *opts, struct gcc_options *opts_set,
 			     opts->x_param_values, opts_set->x_param_values);
     }
 
+  /* External id is not supported in LIPO mode.  */
+  /* Also force using internal id in coverage mode for now.  */
+  if (opts->x_flag_dyn_ipa || opts->x_flag_test_coverage)
+    {
+      maybe_set_param_value (PARAM_PROFILE_FUNC_INTERNAL_ID, 1,
+                             opts->x_param_values, opts_set->x_param_values);
+    }
+
   if (opts->x_flag_lto)
     {
 #ifdef ENABLE_LTO
@@ -847,15 +855,42 @@ finish_options (struct gcc_options *opts, struct gcc_options *opts_set,
 	}
     }
 
+  if (opts->x_profile_arc_flag
+      || opts->x_flag_branch_probabilities)
+    {
+      /* With profile data, inlining is much more selective and makes
+	 better decisions, so increase the inlining function size
+	 limits.  Changes must be added to both the generate and use
+	 builds to avoid profile mismatches.  */
+      maybe_set_param_value
+	(PARAM_MAX_INLINE_INSNS_SINGLE, 1000,
+	 opts->x_param_values, opts_set->x_param_values);
+      maybe_set_param_value
+	(PARAM_MAX_INLINE_INSNS_AUTO, 1000,
+	 opts->x_param_values, opts_set->x_param_values);
+    }
+
   /* Tune vectorization related parametees according to cost model.  */
   if (opts->x_flag_vect_cost_model == VECT_COST_MODEL_CHEAP)
     {
       maybe_set_param_value (PARAM_VECT_MAX_VERSION_FOR_ALIAS_CHECKS,
-            6, opts->x_param_values, opts_set->x_param_values);
+            8, opts->x_param_values, opts_set->x_param_values);
       maybe_set_param_value (PARAM_VECT_MAX_VERSION_FOR_ALIGNMENT_CHECKS,
             0, opts->x_param_values, opts_set->x_param_values);
       maybe_set_param_value (PARAM_VECT_MAX_PEELING_FOR_ALIGNMENT,
             0, opts->x_param_values, opts_set->x_param_values);
+    }
+
+  /* Set PARAM_MAX_COMPLETELY_PEELED_INSNS to the default original value during
+     -O2 when -funroll-loops and -fpeel-loops are not set.   */
+  if (optimize == 2 && !opts->x_flag_unroll_loops && !opts->x_flag_peel_loops
+      && !opts->x_flag_unroll_all_loops)
+
+    {
+      maybe_set_param_value
+       (PARAM_MAX_COMPLETELY_PEELED_INSNS,
+        PARAM_VALUE (PARAM_MAX_DEFAULT_COMPLETELY_PEELED_INSNS),
+	opts->x_param_values, opts_set->x_param_values);
     }
 
   /* Set PARAM_MAX_STORES_TO_SINK to 0 if either vectorization or if-conversion
@@ -865,9 +900,13 @@ finish_options (struct gcc_options *opts, struct gcc_options *opts_set,
     maybe_set_param_value (PARAM_MAX_STORES_TO_SINK, 0,
                            opts->x_param_values, opts_set->x_param_values);
 
-  /* The -gsplit-dwarf option requires -gpubnames.  */
+  /* The -gsplit-dwarf option requires -ggnu_pubnames.  */
   if (opts->x_dwarf_split_debug_info)
-    opts->x_debug_generate_pub_sections = 1;
+    opts->x_debug_generate_pub_sections = 2;
+
+  /* Turn on -ffunction-sections when -freorder-functions=* is used.  */
+  if (opts->x_flag_reorder_functions > 1)
+    opts->x_flag_function_sections = 1;
 }
 
 #define LEFT_COLUMN	27
@@ -1249,6 +1288,7 @@ print_specific_help (unsigned int include_flags,
 		       opts->x_help_columns, opts, lang_mask);
 }
 
+
 /* Handle target- and language-independent options.  Return zero to
    generate an "unknown option" message.  Only options that need
    extra handling need to be listed here; if you simply want
@@ -1536,6 +1576,10 @@ common_handle_option (struct gcc_options *opts,
 			       opts, opts_set, loc, dc);
       break;
 
+    case OPT_Wforce_warnings:
+      dc->force_warnings_requested = value;
+      break;
+
     case OPT_Wlarger_than_:
       opts->x_larger_than_size = value;
       opts->x_warn_larger_than = value != -1;
@@ -1553,6 +1597,15 @@ common_handle_option (struct gcc_options *opts,
     case OPT_Wstack_usage_:
       opts->x_warn_stack_usage = value;
       opts->x_flag_stack_usage_info = value != -1;
+      break;
+
+    case OPT_Wshadow:
+      warn_shadow_local = value;
+      warn_shadow_compatible_local = value;
+      break;
+
+    case OPT_Wshadow_local:
+      warn_shadow_compatible_local = value;
       break;
 
     case OPT_Wstrict_aliasing:
@@ -1690,8 +1743,6 @@ common_handle_option (struct gcc_options *opts,
 	opts->x_flag_unroll_loops = value;
       if (!opts_set->x_flag_peel_loops)
 	opts->x_flag_peel_loops = value;
-      if (!opts_set->x_flag_tracer)
-	opts->x_flag_tracer = value;
       if (!opts_set->x_flag_value_profile_transformations)
 	opts->x_flag_value_profile_transformations = value;
       if (!opts_set->x_flag_inline_functions)
@@ -1710,11 +1761,6 @@ common_handle_option (struct gcc_options *opts,
       if (!opts_set->x_flag_tree_loop_vectorize
           && !opts_set->x_flag_tree_vectorize)
 	opts->x_flag_tree_loop_vectorize = value;
-      if (!opts_set->x_flag_tree_slp_vectorize
-          && !opts_set->x_flag_tree_vectorize)
-	opts->x_flag_tree_slp_vectorize = value;
-      if (!opts_set->x_flag_vect_cost_model)
-	opts->x_flag_vect_cost_model = VECT_COST_MODEL_DYNAMIC;
       if (!opts_set->x_flag_tree_loop_distribute_patterns)
 	opts->x_flag_tree_loop_distribute_patterns = value;
       if (!opts_set->x_flag_profile_reorder_functions)
@@ -1724,6 +1770,43 @@ common_handle_option (struct gcc_options *opts,
       if (!opts_set->x_flag_devirtualize_speculatively
 	  && opts->x_flag_value_profile_transformations)
 	opts->x_flag_devirtualize_speculatively = false;
+      break;
+
+    case OPT_fauto_profile_:
+      auto_profile_file = xstrdup (arg);
+      opts->x_flag_auto_profile = true;
+      maybe_set_param_value (
+	PARAM_EARLY_INLINER_MAX_ITERATIONS, 10,
+	opts->x_param_values, opts_set->x_param_values);
+      value = true;
+    /* No break here - do -fauto-profile processing. */
+    case OPT_fauto_profile:
+      if (!opts_set->x_flag_branch_probabilities)
+	opts->x_flag_branch_probabilities = value;
+      if (!opts_set->x_flag_unroll_loops)
+	opts->x_flag_unroll_loops = value;
+      if (!opts_set->x_flag_peel_loops)
+	opts->x_flag_peel_loops = value;
+      if (!opts_set->x_flag_value_profile_transformations)
+	opts->x_flag_value_profile_transformations = value;
+      if (!opts_set->x_flag_inline_functions)
+	opts->x_flag_inline_functions = value;
+      if (!opts_set->x_flag_ipa_cp)
+	opts->x_flag_ipa_cp = value;
+      if (!opts_set->x_flag_ipa_cp_clone
+	  && value && opts->x_flag_ipa_cp)
+	opts->x_flag_ipa_cp_clone = value;
+      if (!opts_set->x_flag_predictive_commoning)
+	opts->x_flag_predictive_commoning = value;
+      if (!opts_set->x_flag_unswitch_loops)
+	opts->x_flag_unswitch_loops = value;
+      if (!opts_set->x_flag_gcse_after_reload)
+	opts->x_flag_gcse_after_reload = value;
+      if (!opts_set->x_flag_tree_loop_vectorize
+          && !opts_set->x_flag_tree_vectorize)
+	opts->x_flag_tree_loop_vectorize = value;
+      if (!opts_set->x_flag_tree_loop_distribute_patterns)
+	opts->x_flag_tree_loop_distribute_patterns = value;
       break;
 
     case OPT_fprofile_generate_:
@@ -1740,8 +1823,12 @@ common_handle_option (struct gcc_options *opts,
       /* FIXME: Instrumentation we insert makes ipa-reference bitmaps
 	 quadratic.  Disable the pass until better memory representation
 	 is done.  */
-      if (!opts_set->x_flag_ipa_reference && opts->x_in_lto_p)
+      if (!opts_set->x_flag_ipa_reference)
         opts->x_flag_ipa_reference = false;
+      break;
+
+    case OPT_fripa_inc_path_sub_:
+      lipo_inc_path_pattern = xstrdup (arg);
       break;
 
     case OPT_ftree_vectorize:
@@ -1820,13 +1907,8 @@ common_handle_option (struct gcc_options *opts,
       break;
 
     case OPT_g:
-      /* -g by itself should force -g2.  */
-      if (*arg == '\0')
-	set_debug_level (NO_DEBUG, DEFAULT_GDB_EXTENSIONS, "2", opts, opts_set,
-			 loc);
-      else
-	set_debug_level (NO_DEBUG, DEFAULT_GDB_EXTENSIONS, arg, opts, opts_set,
-			 loc);
+      set_debug_level (NO_DEBUG, DEFAULT_GDB_EXTENSIONS, arg, opts, opts_set,
+                       loc);
       break;
 
     case OPT_gcoff:
@@ -1865,6 +1947,12 @@ common_handle_option (struct gcc_options *opts,
     case OPT_gstabs:
     case OPT_gstabs_:
       set_debug_level (DBX_DEBUG, code == OPT_gstabs_, arg, opts, opts_set,
+		       loc);
+      break;
+
+    case OPT_gmlt:
+      /* Synonym for -g1.  */
+      set_debug_level (NO_DEBUG, DEFAULT_GDB_EXTENSIONS, "1", opts, opts_set,
 		       loc);
       break;
 
@@ -2077,10 +2165,12 @@ set_debug_level (enum debug_info_type type, int extended, const char *arg,
       opts_set->x_write_symbols = type;
     }
 
-  /* A debug flag without a level defaults to level 2.  */
+  /* A debug flag without a level defaults to level 2.
+     If off or at level 1, set it to level 2, but if already
+     at level 3, don't lower it.  */ 
   if (*arg == '\0')
     {
-      if (!opts->x_debug_info_level)
+      if (opts->x_debug_info_level < DINFO_LEVEL_NORMAL)
 	opts->x_debug_info_level = DINFO_LEVEL_NORMAL;
     }
   else

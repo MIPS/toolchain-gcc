@@ -75,6 +75,7 @@ along with GCC; see the file COPYING3.  If not see
 #include "except.h"
 #include "debug.h"
 #include "intl.h"
+#include "l-ipo.h"
 
 /* Tree code classes.  */
 
@@ -252,7 +253,7 @@ unsigned const char omp_clause_num_ops[] =
   4, /* OMP_CLAUSE_REDUCTION  */
   1, /* OMP_CLAUSE_COPYIN  */
   1, /* OMP_CLAUSE_COPYPRIVATE  */
-  2, /* OMP_CLAUSE_LINEAR  */
+  3, /* OMP_CLAUSE_LINEAR  */
   2, /* OMP_CLAUSE_ALIGNED  */
   1, /* OMP_CLAUSE_DEPEND  */
   1, /* OMP_CLAUSE_UNIFORM  */
@@ -11079,8 +11080,13 @@ walk_tree_1 (tree *tp, walk_tree_fn func, void *data,
 	    WALK_SUBTREE_TAIL (OMP_CLAUSE_CHAIN (*tp));
 	  }
 
-	case OMP_CLAUSE_ALIGNED:
 	case OMP_CLAUSE_LINEAR:
+	  WALK_SUBTREE (OMP_CLAUSE_DECL (*tp));
+	  WALK_SUBTREE (OMP_CLAUSE_LINEAR_STEP (*tp));
+	  WALK_SUBTREE (OMP_CLAUSE_LINEAR_STMT (*tp));
+	  WALK_SUBTREE_TAIL (OMP_CLAUSE_CHAIN (*tp));
+
+	case OMP_CLAUSE_ALIGNED:
 	case OMP_CLAUSE_FROM:
 	case OMP_CLAUSE_TO:
 	case OMP_CLAUSE_MAP:
@@ -11895,7 +11901,7 @@ types_same_for_odr (tree type1, tree type2)
   if (!same_for_odr (TYPE_CONTEXT (type1), TYPE_CONTEXT (type2)))
     return false;
   /* When not in LTO the MAIN_VARIANT check should be the same.  */
-  gcc_assert (in_lto_p);
+  gcc_assert (in_lto_p || L_IPO_COMP_MODE);
     
   return true;
 }

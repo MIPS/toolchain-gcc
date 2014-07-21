@@ -44,6 +44,20 @@ void __gcov_init (struct gcov_info *p __attribute__ ((unused))) {}
 #ifdef L_gcov
 #include "gcov-io.c"
 
+#ifndef IN_GCOV_TOOL
+extern gcov_unsigned_t __gcov_sampling_period;
+extern gcov_unsigned_t __gcov_has_sampling;
+static int gcov_sampling_period_initialized = 0;
+#endif
+
+/* Unique identifier assigned to each module (object file).  */
+static gcov_unsigned_t gcov_cur_module_id = 0;
+
+
+/* Dynamic call graph build and form module groups.  */
+void __gcov_compute_module_groups (void) ATTRIBUTE_HIDDEN;
+void __gcov_finalize_dyn_callgraph (void) ATTRIBUTE_HIDDEN;
+
 /* The following functions can be called from outside of this file.  */
 extern void gcov_clear (void) ATTRIBUTE_HIDDEN;
 extern void gcov_exit (void) ATTRIBUTE_HIDDEN;
@@ -51,6 +65,45 @@ extern void set_gcov_dump_complete (void) ATTRIBUTE_HIDDEN;
 extern void reset_gcov_dump_complete (void) ATTRIBUTE_HIDDEN;
 extern int get_gcov_dump_complete (void) ATTRIBUTE_HIDDEN;
 extern void set_gcov_list (struct gcov_info *) ATTRIBUTE_HIDDEN;
+__attribute__((weak)) void __coverage_callback (gcov_type, int); 
+
+#ifndef IN_GCOV_TOOL
+/* Create a strong reference to these symbols so that they are
+   unconditionally pulled into the instrumented binary, even when
+   the only reference is a weak reference. This is necessary because
+   we are using weak references to enable references from code that
+   may not be linked with libgcov. These are the only symbols that
+   should be accessed via link references from application code!
+
+   A subtlety of the linker is that it will only resolve weak references
+   defined within archive libraries when there is a strong reference to
+   something else defined within the same object file. Since these functions
+   are defined within their own object files, they would not automatically
+   get resolved. Since there are symbols within the main L_gcov
+   section that are strongly referenced during -fprofile-generate and
+   -ftest-coverage builds, these dummy symbols will always need to be
+   resolved.  */
+void (*__gcov_dummy_ref1)(void) = &__gcov_reset;
+void (*__gcov_dummy_ref2)(void) = &__gcov_dump;
+extern char *__gcov_get_profile_prefix (void);
+char *(*__gcov_dummy_ref3)(void) = &__gcov_get_profile_prefix;
+extern void __gcov_set_sampling_period (unsigned int period);
+char *(*__gcov_dummy_ref4)(void) = &__gcov_set_sampling_period;
+extern unsigned int __gcov_sampling_enabled (void);
+char *(*__gcov_dummy_ref5)(void) = &__gcov_sampling_enabled;
+extern void __gcov_flush (void);
+char *(*__gcov_dummy_ref6)(void) = &__gcov_flush;
+extern unsigned int __gcov_profiling_for_test_coverage (void);
+char *(*__gcov_dummy_ref7)(void) = &__gcov_profiling_for_test_coverage;
+#endif
+
+/* Default callback function for profile instrumentation callback.  */
+__attribute__((weak)) void
+__coverage_callback (gcov_type funcdef_no __attribute__ ((unused)),
+                     int edge_no __attribute__ ((unused)))
+{
+   /* nothing */
+}
 
 struct gcov_fn_buffer
 {
@@ -67,17 +120,21 @@ struct gcov_summary_buffer
 };
 
 /* Chain of per-object gcov structures.  */
-static struct gcov_info *gcov_list;
+extern struct gcov_info *__gcov_list;
 
 /* Set the head of gcov_list.  */
 void
 set_gcov_list (struct gcov_info *head)
 {
-  gcov_list = head;
+  __gcov_list = head;
 }
 
 /* Size of the longest file name. */
-static size_t gcov_max_filename = 0;
+/* We need to expose this static variable when compiling for gcov-tool.  */
+#ifndef IN_GCOV_TOOL
+static
+#endif
+size_t gcov_max_filename = 0;
 
 /* Flag when the profile has already been dumped via __gcov_dump().  */
 static int gcov_dump_complete;
@@ -191,6 +248,14 @@ fail:
   return (struct gcov_fn_buffer **)free_fn_data (gi_ptr, fn_buffer, ix);
 }
 
+/* Determine whether a counter is active.  */
+
+static inline int
+gcov_counter_active (const struct gcov_info *info, unsigned int type)
+{
+  return (info->merge[type] != 0);
+}
+
 /* Add an unsigned value to the current crc */
 
 static gcov_unsigned_t
@@ -226,8 +291,12 @@ gcov_version (struct gcov_info *ptr, gcov_unsigned_t version,
       GCOV_UNSIGNED2STRING (v, version);
       GCOV_UNSIGNED2STRING (e, GCOV_VERSION);
 
-      gcov_error ("profiling:%s:Version mismatch - expected %.4s got %.4s\n",
-                  filename? filename : ptr->filename, e, v);
+      if (filename)
+        gcov_error ("profiling:%s:Version mismatch - expected %.4s got %.4s\n",
+                   filename? filename : ptr->filename, e, v);
+      else
+        gcov_error ("profiling:Version mismatch - expected %.4s got %.4s\n", e, v);
+
       return 0;
     }
   return 1;
@@ -276,7 +345,7 @@ gcov_compute_histogram (struct gcov_summary *sum)
 
   /* Walk through all the per-object structures and record each of
      the count values in histogram.  */
-  for (gi_ptr = gcov_list; gi_ptr; gi_ptr = gi_ptr->next)
+  for (gi_ptr = __gcov_list; gi_ptr; gi_ptr = gi_ptr->next)
     {
       if (!gi_ptr->merge[t_ix])
         continue;
@@ -331,7 +400,7 @@ gcov_exit_compute_summary (struct gcov_summary *this_prg)
 
   /* Find the totals for this execution.  */
   memset (this_prg, 0, sizeof (*this_prg));
-  for (gi_ptr = gcov_list; gi_ptr; gi_ptr = gi_ptr->next)
+  for (gi_ptr = __gcov_list; gi_ptr; gi_ptr = gi_ptr->next)
     {
       crc32 = crc32_unsigned (crc32, gi_ptr->stamp);
       crc32 = crc32_unsigned (crc32, gi_ptr->n_functions);
@@ -518,7 +587,7 @@ gcov_exit_merge_gcda (struct gcov_info *gi_ptr,
         goto read_error;
     }
 
-  if (tag)
+  if (tag && tag != GCOV_TAG_MODULE_INFO)
     {
     read_mismatch:;
       gcov_error ("profiling:%s:Merge mismatch for %s %u\n",
@@ -539,7 +608,7 @@ read_error:
    We will write the file starting from SUMMAY_POS.  */
 
 static void
-gcov_exit_write_gcda (const struct gcov_info *gi_ptr,
+gcov_exit_write_gcda (struct gcov_info *gi_ptr,
                       const struct gcov_summary *prg_p,
                       const gcov_position_t eof_pos,
                       const gcov_position_t summary_pos)
@@ -627,6 +696,7 @@ gcov_exit_write_gcda (const struct gcov_info *gi_ptr,
         fn_buffer = free_fn_data (gi_ptr, fn_buffer, GCOV_COUNTERS);
     }
 
+  gi_ptr->eof_pos = gcov_position ();
   gcov_write_unsigned (0);
 }
 
@@ -709,6 +779,77 @@ gcov_exit_merge_summary (const struct gcov_info *gi_ptr, struct gcov_summary *pr
   return 0;
 }
 
+/* Sort N entries in VALUE_ARRAY in descending order.
+   Each entry in VALUE_ARRAY has two values. The sorting
+   is based on the second value.  */
+
+GCOV_LINKAGE  void
+gcov_sort_n_vals (gcov_type *value_array, int n)
+{
+  int j, k;
+  for (j = 2; j < n; j += 2)
+    {
+      gcov_type cur_ent[2];
+      cur_ent[0] = value_array[j];
+      cur_ent[1] = value_array[j + 1];
+      k = j - 2;
+      while (k >= 0 && value_array[k + 1] < cur_ent[1])
+        {
+          value_array[k + 2] = value_array[k];
+          value_array[k + 3] = value_array[k+1];
+          k -= 2;
+        }
+      value_array[k + 2] = cur_ent[0];
+      value_array[k + 3] = cur_ent[1];
+    }
+}
+
+/* Sort the profile counters for all indirect call sites. Counters
+   for each call site are allocated in array COUNTERS.  */
+
+static void
+gcov_sort_icall_topn_counter (const struct gcov_ctr_info *counters)
+{
+  int i;
+  gcov_type *values;
+  int n = counters->num;
+  gcc_assert (!(n % GCOV_ICALL_TOPN_NCOUNTS));
+
+  values = counters->values;
+
+  for (i = 0; i < n; i += GCOV_ICALL_TOPN_NCOUNTS)
+    {
+      gcov_type *value_array = &values[i + 1];
+      gcov_sort_n_vals (value_array, GCOV_ICALL_TOPN_NCOUNTS - 1);
+    }
+}
+
+static void
+gcov_sort_topn_counter_arrays (const struct gcov_info *gi_ptr)
+{
+  unsigned int i;
+  int f_ix;
+  const struct gcov_fn_info *gfi_ptr;
+  const struct gcov_ctr_info *ci_ptr;
+
+  for (f_ix = 0; (unsigned)f_ix != gi_ptr->n_functions; f_ix++)
+    {
+      gfi_ptr = gi_ptr->functions[f_ix];
+      ci_ptr = gfi_ptr->ctrs;
+      for (i = 0; i < GCOV_COUNTERS; i++)
+        {
+          if (!gcov_counter_active (gi_ptr, i))
+            continue;
+          if (i == GCOV_COUNTER_ICALL_TOPNV)
+            {
+              gcov_sort_icall_topn_counter (ci_ptr);
+              break;
+            }
+          ci_ptr++;
+        }
+     }
+}
+
 /* Dump the coverage counts for one gcov_info object. We merge with existing
    counts when possible, to avoid growing the .da files ad infinitum. We use
    this program's checksum to make sure we only accumulate whole program
@@ -729,6 +870,8 @@ gcov_exit_dump_gcov (struct gcov_info *gi_ptr, struct gcov_filename_aux *gf,
 
   fn_buffer = 0;
   sum_buffer = 0;
+
+  gcov_sort_topn_counter_arrays (gi_ptr);
 
   error = gcov_exit_open_gcda_file (gi_ptr, gf);
   if (error == -1)
@@ -775,6 +918,79 @@ read_fatal:;
                 gi_filename);
 }
 
+/* Write imported files (auxiliary modules) for primary module GI_PTR
+   into file GI_FILENAME.  */
+
+static void
+gcov_write_import_file (char *gi_filename, struct gcov_info *gi_ptr)
+{
+  char  *gi_imports_filename;
+  const char *gcov_suffix;
+  FILE *imports_file;
+  size_t prefix_length, suffix_length;
+
+  gcov_suffix = getenv ("GCOV_IMPORTS_SUFFIX");
+  if (!gcov_suffix || !strlen (gcov_suffix))
+    gcov_suffix = ".imports";
+  suffix_length = strlen (gcov_suffix);
+  prefix_length = strlen (gi_filename);
+  gi_imports_filename = (char *) alloca (prefix_length + suffix_length + 1);
+  memset (gi_imports_filename, 0, prefix_length + suffix_length + 1);
+  memcpy (gi_imports_filename, gi_filename, prefix_length);
+  memcpy (gi_imports_filename + prefix_length, gcov_suffix, suffix_length);
+  imports_file = fopen (gi_imports_filename, "w");
+  if (imports_file)
+    {
+      const struct dyn_imp_mod **imp_mods;
+      unsigned i, imp_len;
+      imp_mods = gcov_get_sorted_import_module_array (gi_ptr, &imp_len);
+      if (imp_mods)
+        {
+          for (i = 0; i < imp_len; i++)
+            {
+              fprintf (imports_file, "%s\n",
+                       imp_mods[i]->imp_mod->mod_info->source_filename);
+              fprintf (imports_file, "%s%s\n",
+                       imp_mods[i]->imp_mod->mod_info->da_filename, GCOV_DATA_SUFFIX);
+            }
+          free (imp_mods);
+        }
+      fclose (imports_file);
+    }
+}
+
+static void
+gcov_dump_module_info (struct gcov_filename_aux *gf)
+{
+  struct gcov_info *gi_ptr;
+
+  __gcov_compute_module_groups ();
+
+  /* Now write out module group info.  */
+  for (gi_ptr = __gcov_list; gi_ptr; gi_ptr = gi_ptr->next)
+    {
+      int error; 
+
+      if (gcov_exit_open_gcda_file (gi_ptr, gf) == -1)
+	continue;
+
+      /* Overwrite the zero word at the of the file.  */
+      gcov_rewrite ();
+      gcov_seek (gi_ptr->eof_pos);
+
+      gcov_write_module_infos (gi_ptr);
+      /* Write the end marker  */
+      gcov_write_unsigned (0);
+      gcov_truncate (); 
+      
+      if ((error = gcov_close ()))
+        gcov_error (error  < 0 ?  "profiling:%s:Overflow writing\n" :
+                                  "profiling:%s:Error writing\n",
+                                  gi_filename);
+      gcov_write_import_file (gi_filename, gi_ptr);
+    }
+  __gcov_finalize_dyn_callgraph ();
+}
 
 /* Dump all the coverage counts for the program. It first computes program
    summary and then traverses gcov_list list and dumps the gcov_info
@@ -786,6 +1002,7 @@ gcov_exit (void)
   struct gcov_info *gi_ptr;
   struct gcov_filename_aux gf;
   gcov_unsigned_t crc32;
+  int dump_module_info = 0;
   struct gcov_summary all_prg;
   struct gcov_summary this_prg;
 
@@ -802,9 +1019,18 @@ gcov_exit (void)
 #endif
 
   /* Now merge each file.  */
-  for (gi_ptr = gcov_list; gi_ptr; gi_ptr = gi_ptr->next)
-    gcov_exit_dump_gcov (gi_ptr, &gf, crc32, &all_prg, &this_prg);
+  for (gi_ptr = __gcov_list; gi_ptr; gi_ptr = gi_ptr->next)
+    {
+      gcov_exit_dump_gcov (gi_ptr, &gf, crc32, &all_prg, &this_prg);
+
+      /* The IS_PRIMARY field is overloaded to indicate if this module
+       is FDO/LIPO.  */
+      dump_module_info |= gi_ptr->mod_info->is_primary;
+    }
   run_accounted = 1;
+
+  if (dump_module_info)
+    gcov_dump_module_info (&gf);
 
   if (gi_filename)
     free (gi_filename);
@@ -817,7 +1043,7 @@ gcov_clear (void)
 {
   const struct gcov_info *gi_ptr;
 
-  for (gi_ptr = gcov_list; gi_ptr; gi_ptr = gi_ptr->next)
+  for (gi_ptr = __gcov_list; gi_ptr; gi_ptr = gi_ptr->next)
     {
       unsigned f_ix;
 
@@ -847,6 +1073,20 @@ gcov_clear (void)
 void
 __gcov_init (struct gcov_info *info)
 {
+#ifndef IN_GCOV_TOOL
+   if (!gcov_sampling_period_initialized)
+    {
+      const char* env_value_str = getenv ("GCOV_SAMPLING_PERIOD");
+      if (env_value_str)
+        {
+          int env_value_int = atoi(env_value_str);
+          if (env_value_int >= 1)
+            __gcov_sampling_period = env_value_int;
+        }
+      gcov_sampling_period_initialized = 1;
+    }
+#endif
+
   if (!info->version || !info->n_functions)
     return;
   if (gcov_version (info, info->version, 0))
@@ -857,11 +1097,17 @@ __gcov_init (struct gcov_info *info)
       if (filename_length > gcov_max_filename)
         gcov_max_filename = filename_length;
 
-      if (!gcov_list)
+      /* Assign the module ID (starting at 1).  */
+      info->mod_info->ident = (++gcov_cur_module_id);
+      gcc_assert (EXTRACT_MODULE_ID_FROM_GLOBAL_ID (GEN_FUNC_GLOBAL_ID (
+                                                       info->mod_info->ident, 0))
+                  == info->mod_info->ident);
+
+      if (!__gcov_list)
         atexit (gcov_exit);
 
-      info->next = gcov_list;
-      gcov_list = info;
+      info->next = __gcov_list;
+      __gcov_list = info;
     }
   info->version = 0;
 }

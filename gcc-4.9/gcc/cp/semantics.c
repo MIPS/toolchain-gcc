@@ -2600,7 +2600,6 @@ finish_compound_literal (tree type, tree compound_literal,
   if ((!at_function_scope_p () || CP_TYPE_CONST_P (type))
       && TREE_CODE (type) == ARRAY_TYPE
       && !TYPE_HAS_NONTRIVIAL_DESTRUCTOR (type)
-      && !cp_unevaluated_operand
       && initializer_constant_valid_p (compound_literal, type))
     {
       tree decl = create_temporary_var (type);
@@ -2621,10 +2620,16 @@ finish_compound_literal (tree type, tree compound_literal,
       decl = pushdecl_top_level (decl);
       DECL_NAME (decl) = make_anon_name ();
       SET_DECL_ASSEMBLER_NAME (decl, DECL_NAME (decl));
+
+      /* Capture the current module info for statics.  */
+      if (L_IPO_COMP_MODE)
+        varpool_node_for_decl (decl);
+
       /* Make sure the destructor is callable.  */
       tree clean = cxx_maybe_build_cleanup (decl, complain);
       if (clean == error_mark_node)
 	return error_mark_node;
+
       return decl;
     }
   else
@@ -3867,6 +3872,7 @@ simplify_aggr_init_expr (tree *tp)
 				    aggr_init_expr_nargs (aggr_init_expr),
 				    AGGR_INIT_EXPR_ARGP (aggr_init_expr));
   TREE_NOTHROW (call_expr) = TREE_NOTHROW (aggr_init_expr);
+  CALL_EXPR_LIST_INIT_P (call_expr) = CALL_EXPR_LIST_INIT_P (aggr_init_expr);
 
   if (style == ctor)
     {
@@ -3924,6 +3930,18 @@ emit_associated_thunks (tree fn)
       && ! DECL_REALLY_EXTERN (fn))
     {
       tree thunk;
+
+      if (L_IPO_COMP_MODE)
+        {
+          /* In LIPO mode, multiple copies of definitions for the same function
+             may exist, but assembler hash table keeps only one copy which might
+             have been deleted at this point.  */
+          struct cgraph_node *n = cgraph_get_create_node (fn);
+	  #ifdef FIXME_LIPO
+          insert_to_assembler_name_hash ((symtab_node)n);
+	  #endif
+          cgraph_link_node (n);
+        }
 
       for (thunk = DECL_THUNKS (fn); thunk; thunk = DECL_CHAIN (thunk))
 	{
@@ -5283,6 +5301,8 @@ finish_omp_clauses (tree clauses)
 			  break;
 			}
 		    }
+		  else
+		    t = fold_convert (TREE_TYPE (OMP_CLAUSE_DECL (c)), t);
 		}
 	      OMP_CLAUSE_LINEAR_STEP (c) = t;
 	    }
@@ -7964,6 +7984,15 @@ cx_check_missing_mem_inits (tree fun, tree body, bool complain)
   return bad;
 }
 
+/* Clear constexpr hash table  */
+
+void
+cp_clear_constexpr_hashtable (void)
+{
+  /* htab_delete (constexpr_fundef_table); */
+  constexpr_fundef_table = NULL;
+}
+
 /* We are processing the definition of the constexpr function FUN.
    Check that its BODY fulfills the propriate requirements and
    enter it in the constexpr function definition table.
@@ -8511,11 +8540,24 @@ cxx_eval_call_expression (const constexpr_call *old_call, tree t,
 bool
 reduced_constant_expression_p (tree t)
 {
-  if (TREE_CODE (t) == PTRMEM_CST)
-    /* Even if we can't lower this yet, it's constant.  */
-    return true;
-  /* FIXME are we calling this too much?  */
-  return initializer_constant_valid_p (t, TREE_TYPE (t)) != NULL_TREE;
+  switch (TREE_CODE (t))
+    {
+    case PTRMEM_CST:
+      /* Even if we can't lower this yet, it's constant.  */
+      return true;
+
+    case CONSTRUCTOR:
+      /* And we need to handle PTRMEM_CST wrapped in a CONSTRUCTOR.  */
+      tree elt; unsigned HOST_WIDE_INT idx;
+      FOR_EACH_CONSTRUCTOR_VALUE (CONSTRUCTOR_ELTS (t), idx, elt)
+	if (!reduced_constant_expression_p (elt))
+	  return false;
+      return true;
+
+    default:
+      /* FIXME are we calling this too much?  */
+      return initializer_constant_valid_p (t, TREE_TYPE (t)) != NULL_TREE;
+    }
 }
 
 /* Some expressions may have constant operands but are not constant

@@ -57,6 +57,7 @@ along with GCC; see the file COPYING3.  If not see
 #include "timevar.h"
 #include "pointer-set.h"
 #include "splay-tree.h"
+#include "cgraph.h"
 #include "plugin.h"
 #include "cgraph.h"
 #include "cilk.h"
@@ -561,6 +562,7 @@ poplevel (int keep, int reverse, int functionbody)
   cp_label_binding *label_bind;
 
   bool subtime = timevar_cond_start (TV_NAME_LOOKUP);
+
  restart:
 
   block = NULL_TREE;
@@ -870,7 +872,7 @@ walk_namespaces (walk_namespaces_fn f, void* data)
    wrapup_global_declarations for this NAMESPACE.  */
 
 int
-wrapup_globals_for_namespace (tree name_space, void* data)
+wrapup_globals_for_namespace (tree name_space, void *data)
 {
   cp_binding_level *level = NAMESPACE_LEVEL (name_space);
   vec<tree, va_gc> *statics = level->static_decls;
@@ -2467,7 +2469,26 @@ duplicate_decls (tree newdecl, tree olddecl, bool newdecl_is_friend)
   /* The NEWDECL will no longer be needed.  Because every out-of-class
      declaration of a member results in a call to duplicate_decls,
      freeing these nodes represents in a significant savings.  */
-  ggc_free (newdecl);
+  {
+    tree clone;
+    bool found_clone = false;
+    /* Fix dangling reference.  */
+    FOR_EACH_CLONE (clone, newdecl)
+      {
+        if (DECL_CLONED_FUNCTION (clone) == newdecl)
+          {
+            found_clone = true;
+            break;
+          }
+        if (DECL_ABSTRACT_ORIGIN (clone) == newdecl)
+          {
+            found_clone = true;
+            break;
+          }
+      }
+    if (!found_clone)
+      ggc_free (newdecl);
+  }
 
   return olddecl;
 }
@@ -3696,6 +3717,7 @@ cxx_init_decl_processing (void)
 {
   tree void_ftype;
   tree void_ftype_ptr;
+  tree void_ftype_ptr_sizetype;
 
   /* Create all the identifiers we need.  */
   initialize_predefined_identifiers ();
@@ -3757,8 +3779,14 @@ cxx_init_decl_processing (void)
   void_ftype = build_function_type_list (void_type_node, NULL_TREE);
   void_ftype_ptr = build_function_type_list (void_type_node,
 					     ptr_type_node, NULL_TREE);
+  void_ftype_ptr_sizetype = build_function_type_list (void_type_node,
+                                                      ptr_type_node,
+                                                      size_type_node,
+                                                      NULL_TREE);
   void_ftype_ptr
     = build_exception_variant (void_ftype_ptr, empty_except_spec);
+  void_ftype_ptr_sizetype
+    = build_exception_variant (void_ftype_ptr_sizetype, empty_except_spec);
 
   /* C++ extensions */
 
@@ -3809,7 +3837,7 @@ cxx_init_decl_processing (void)
 
   {
     tree newattrs, extvisattr;
-    tree newtype, deltype;
+    tree newtype, deltype, deltype2;
     tree ptr_ftype_sizetype;
     tree new_eh_spec;
 
@@ -3847,10 +3875,12 @@ cxx_init_decl_processing (void)
     newtype = build_exception_variant (newtype, new_eh_spec);
     deltype = cp_build_type_attribute_variant (void_ftype_ptr, extvisattr);
     deltype = build_exception_variant (deltype, empty_except_spec);
+    deltype2 = build_exception_variant (void_ftype_ptr_sizetype, empty_except_spec);
     DECL_IS_OPERATOR_NEW (push_cp_library_fn (NEW_EXPR, newtype, 0)) = 1;
     DECL_IS_OPERATOR_NEW (push_cp_library_fn (VEC_NEW_EXPR, newtype, 0)) = 1;
     global_delete_fndecl = push_cp_library_fn (DELETE_EXPR, deltype, ECF_NOTHROW);
     push_cp_library_fn (VEC_DELETE_EXPR, deltype, ECF_NOTHROW);
+    push_cp_library_fn (DELETE_EXPR, deltype2, ECF_NOTHROW);
 
     nullptr_type_node = make_node (NULLPTR_TYPE);
     TYPE_SIZE (nullptr_type_node) = bitsize_int (GET_MODE_BITSIZE (ptr_mode));
@@ -5797,6 +5827,13 @@ check_initializer (tree decl, tree init, int flags, vec<tree, va_gc> **cleanups)
   if (init && init != error_mark_node)
     init_code = build2 (INIT_EXPR, type, decl, init);
 
+  if (init_code)
+    {
+      /* We might have set these in cp_finish_decl.  */
+      DECL_INITIALIZED_BY_CONSTANT_EXPRESSION_P (decl) = false;
+      TREE_CONSTANT (decl) = false;
+    }
+
   if (init_code && DECL_IN_AGGR_P (decl))
     {
       static int explained = 0;
@@ -5900,6 +5937,10 @@ make_rtl_for_nonlocal_decl (tree decl, tree init, const char* asmspec)
   else if (DECL_LANG_SPECIFIC (decl)
 	   && DECL_IMPLICIT_INSTANTIATION (decl))
     defer_p = 1;
+
+  /* Capture the current module info.  */
+  if (L_IPO_COMP_MODE)
+    varpool_node_for_decl (decl);
 
   /* If we're not deferring, go ahead and assemble the variable.  */
   if (!defer_p)

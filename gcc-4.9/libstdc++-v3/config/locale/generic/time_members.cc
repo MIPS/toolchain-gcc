@@ -45,13 +45,17 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
     {
       char* __old = setlocale(LC_ALL, 0);
       char* __sav = 0;
+#if defined (__ANDROID__)
       if (__old)
         {
+#endif
           const size_t __llen = strlen(__old) + 1;
           __sav = new char[__llen];
           memcpy(__sav, __old, __llen);
           setlocale(LC_ALL, _M_name_timepunct);
+#if defined (__ANDROID__)
         }
+#endif
       const size_t __len = strftime(__s, __maxlen, __format, __tm);
       setlocale(LC_ALL, __sav);
       delete [] __sav;
@@ -134,13 +138,17 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
     {
       char* __old = setlocale(LC_ALL, 0);
       char* __sav = 0;
+#if defined (__ANDROID__)
       if (__old)
         {
+#endif
           const size_t __llen = strlen(__old) + 1;
           __sav = new char[__llen];
           memcpy(__sav, __old, __llen);
           setlocale(LC_ALL, _M_name_timepunct);
+#if defined (__ANDROID__)
         }
+#endif
       const size_t __len = wcsftime(__s, __maxlen, __format, __tm);
       setlocale(LC_ALL, __sav);
       delete [] __sav;

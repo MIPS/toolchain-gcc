@@ -22,6 +22,10 @@ along with GCC; see the file COPYING3.  If not see
 #define GCC_IPA_UTILS_H
 #include "cgraph.h"
 
+/* Used for parsing attributes of asm code.  */
+extern tree memory_identifier_string;
+extern tree get_memory_identifier_string (void);
+
 struct ipa_dfs_info {
   int dfn_number;
   int low_link;
@@ -187,5 +191,3 @@ possible_polymorphic_call_target_p (tree call,
 					     n);
 }
 #endif  /* GCC_IPA_UTILS_H  */
-
-

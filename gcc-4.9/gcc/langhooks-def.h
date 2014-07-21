@@ -36,6 +36,12 @@ struct diagnostic_info;
 
 extern void lhd_do_nothing (void);
 extern void lhd_do_nothing_t (tree);
+extern void lhd_do_nothing_u (unsigned);
+extern void lhd_do_nothing_t_t (tree, tree);
+extern int lhd_do_nothing_t_return_int (tree);
+extern bool lhd_do_nothing_t_return_bool (tree);
+extern int lhd_do_nothing_t_t_return_int (tree, tree);
+extern bool lhd_do_nothing_t_vp_return_bool (tree, void *);
 extern void lhd_do_nothing_f (struct function *);
 extern tree lhd_pass_through_t (tree);
 extern bool lhd_post_options (const char **);
@@ -60,6 +66,7 @@ extern size_t lhd_tree_size (enum tree_code);
 extern HOST_WIDE_INT lhd_to_target_charset (HOST_WIDE_INT);
 extern tree lhd_expr_to_decl (tree, bool *, bool *);
 extern tree lhd_builtin_function (tree);
+extern bool lhd_user_conv_function_p (tree decl);
 
 /* Declarations of default tree inlining hooks.  */
 extern void lhd_initialize_diagnostics (diagnostic_context *);
@@ -74,6 +81,7 @@ extern bool lhd_handle_option (size_t, const char *, int, int, location_t,
 extern int lhd_gimplify_expr (tree *, gimple_seq *, gimple_seq *);
 extern enum omp_clause_default_kind lhd_omp_predetermined_sharing (tree);
 extern tree lhd_omp_assignment (tree, tree, tree);
+extern void lhd_omp_finish_clause (tree, gimple_seq *);
 struct gimplify_omp_ctx;
 extern void lhd_omp_firstprivatize_type_sizes (struct gimplify_omp_ctx *,
 					       tree);
@@ -109,6 +117,7 @@ extern bool lhd_omp_mappable_type (tree);
 #define LANG_HOOKS_TYPES_COMPATIBLE_P	lhd_types_compatible_p
 #define LANG_HOOKS_BUILTIN_FUNCTION	lhd_builtin_function
 #define LANG_HOOKS_BUILTIN_FUNCTION_EXT_SCOPE	LANG_HOOKS_BUILTIN_FUNCTION
+#define LANG_HOOKS_USER_CONV_FUNCTION	lhd_user_conv_function_p
 #define LANG_HOOKS_EXPR_TO_DECL		lhd_expr_to_decl
 #define LANG_HOOKS_TO_TARGET_CHARSET	lhd_to_target_charset
 #define LANG_HOOKS_INIT_TS		lhd_do_nothing
@@ -194,6 +203,39 @@ extern tree lhd_make_node (enum tree_code);
   LANG_HOOKS_RECONSTRUCT_COMPLEX_TYPE \
 }
 
+#define LANG_HOOKS_ADD_BUILT_IN_DECL lhd_do_nothing_t
+#define LANG_HOOKS_SAVE_BUILT_IN_PRE lhd_do_nothing
+#define LANG_HOOKS_RESTORE_BUILT_IN_PRE lhd_do_nothing
+#define LANG_HOOKS_SAVE_BUILT_IN_POST lhd_do_nothing
+#define LANG_HOOKS_RESTORE_BUILT_IN_POST lhd_do_nothing
+#define LANG_HOOKS_CLEAR_NAME_BINDINGS lhd_do_nothing_t
+#define LANG_HOOKS_HAS_GLOBAL_NAME lhd_do_nothing_t_vp_return_bool
+#define LANG_HOOKS_GET_LANG_DECL_SIZE lhd_do_nothing_t_return_int
+#define LANG_HOOKS_DUP_LANG_TYPE lhd_do_nothing_t_t
+#define LANG_HOOKS_COPY_LANG_TYPE lhd_do_nothing_t_t
+#define LANG_HOOKS_PROCESS_PENDING_DECLS lhd_do_nothing_u
+#define LANG_HOOKS_CLEAR_DEFFERED_FNS lhd_do_nothing
+#define LANG_HOOKS_IS_GENERATED_TYPE lhd_do_nothing_t_return_bool
+#define LANG_HOOKS_CMP_LANG_TYPE lhd_do_nothing_t_t_return_int
+
+
+#define LANG_HOOKS_FOR_LIPO_INITIALIZER { \
+  LANG_HOOKS_ADD_BUILT_IN_DECL, \
+  LANG_HOOKS_SAVE_BUILT_IN_PRE, \
+  LANG_HOOKS_RESTORE_BUILT_IN_PRE, \
+  LANG_HOOKS_SAVE_BUILT_IN_POST, \
+  LANG_HOOKS_RESTORE_BUILT_IN_POST, \
+  LANG_HOOKS_CLEAR_NAME_BINDINGS, \
+  LANG_HOOKS_HAS_GLOBAL_NAME, \
+  LANG_HOOKS_GET_LANG_DECL_SIZE, \
+  LANG_HOOKS_DUP_LANG_TYPE, \
+  LANG_HOOKS_COPY_LANG_TYPE, \
+  LANG_HOOKS_PROCESS_PENDING_DECLS, \
+  LANG_HOOKS_CLEAR_DEFFERED_FNS, \
+  LANG_HOOKS_IS_GENERATED_TYPE, \
+  LANG_HOOKS_CMP_LANG_TYPE,  \
+}
+
 /* Declaration hooks.  */
 #define LANG_HOOKS_GLOBAL_BINDINGS_P global_bindings_p
 #define LANG_HOOKS_PUSHDECL	pushdecl
@@ -211,8 +253,9 @@ extern tree lhd_make_node (enum tree_code);
 #define LANG_HOOKS_OMP_CLAUSE_DEFAULT_CTOR hook_tree_tree_tree_tree_null
 #define LANG_HOOKS_OMP_CLAUSE_COPY_CTOR lhd_omp_assignment
 #define LANG_HOOKS_OMP_CLAUSE_ASSIGN_OP lhd_omp_assignment
+#define LANG_HOOKS_OMP_CLAUSE_LINEAR_CTOR NULL
 #define LANG_HOOKS_OMP_CLAUSE_DTOR hook_tree_tree_tree_null
-#define LANG_HOOKS_OMP_FINISH_CLAUSE hook_void_tree
+#define LANG_HOOKS_OMP_FINISH_CLAUSE lhd_omp_finish_clause
 
 #define LANG_HOOKS_DECLS { \
   LANG_HOOKS_GLOBAL_BINDINGS_P, \
@@ -234,6 +277,7 @@ extern tree lhd_make_node (enum tree_code);
   LANG_HOOKS_OMP_CLAUSE_DEFAULT_CTOR, \
   LANG_HOOKS_OMP_CLAUSE_COPY_CTOR, \
   LANG_HOOKS_OMP_CLAUSE_ASSIGN_OP, \
+  LANG_HOOKS_OMP_CLAUSE_LINEAR_CTOR, \
   LANG_HOOKS_OMP_CLAUSE_DTOR, \
   LANG_HOOKS_OMP_FINISH_CLAUSE \
 }
@@ -291,6 +335,7 @@ extern void lhd_end_section (void);
   LANG_HOOKS_TREE_DUMP_INITIALIZER, \
   LANG_HOOKS_DECLS, \
   LANG_HOOKS_FOR_TYPES_INITIALIZER, \
+  LANG_HOOKS_FOR_LIPO_INITIALIZER, \
   LANG_HOOKS_LTO, \
   LANG_HOOKS_GET_INNERMOST_GENERIC_PARMS, \
   LANG_HOOKS_GET_INNERMOST_GENERIC_ARGS, \
@@ -298,6 +343,7 @@ extern void lhd_end_section (void);
   LANG_HOOKS_GIMPLIFY_EXPR, \
   LANG_HOOKS_BUILTIN_FUNCTION, \
   LANG_HOOKS_BUILTIN_FUNCTION_EXT_SCOPE, \
+  LANG_HOOKS_USER_CONV_FUNCTION, \
   LANG_HOOKS_INIT_TS,          \
   LANG_HOOKS_EXPR_TO_DECL, \
   LANG_HOOKS_EH_PERSONALITY, \

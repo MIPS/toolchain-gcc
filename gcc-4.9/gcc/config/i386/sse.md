@@ -8255,6 +8255,36 @@
   DONE;
 })
 
+(define_expand "usadv16qi"
+  [(match_operand:V4SI 0 "register_operand")
+   (match_operand:V16QI 1 "register_operand")
+   (match_operand:V16QI 2 "nonimmediate_operand")
+   (match_operand:V4SI 3 "nonimmediate_operand")]
+  "TARGET_SSE2"
+{
+  rtx t1 = gen_reg_rtx (V2DImode);
+  rtx t2 = gen_reg_rtx (V4SImode);
+  emit_insn (gen_sse2_psadbw (t1, operands[1], operands[2]));
+  convert_move (t2, t1, 0);
+  emit_insn (gen_addv4si3 (operands[0], t2, operands[3]));
+  DONE;
+})
+
+(define_expand "usadv32qi"
+  [(match_operand:V8SI 0 "register_operand")
+   (match_operand:V32QI 1 "register_operand")
+   (match_operand:V32QI 2 "nonimmediate_operand")
+   (match_operand:V8SI 3 "nonimmediate_operand")]
+  "TARGET_AVX2"
+{
+  rtx t1 = gen_reg_rtx (V4DImode);
+  rtx t2 = gen_reg_rtx (V8SImode);
+  emit_insn (gen_avx2_psadbw (t1, operands[1], operands[2]));
+  convert_move (t2, t1, 0);
+  emit_insn (gen_addv8si3 (operands[0], t2, operands[3]));
+  DONE;
+})
+
 (define_insn "ashr<mode>3"
   [(set (match_operand:VI24_AVX2 0 "register_operand" "=x,x")
 	(ashiftrt:VI24_AVX2
@@ -15606,3 +15636,37 @@
   [(set_attr "type" "sselog1")
    (set_attr "length_immediate" "1")
    (set_attr "mode" "TI")])
+
+;; merge movsd/movhpd to movupd when TARGET_SSE_UNALIGNED_LOAD_OPTIMAL
+;; is true.
+(define_peephole2
+  [(set (match_operand:DF 0 "register_operand")
+	(match_operand:DF 1 "memory_operand"))
+   (set (match_operand:V2DF 2 "register_operand")
+	(vec_concat:V2DF (match_dup 0)
+	 (match_operand:DF 3 "memory_operand")))]
+  "TARGET_SSE_UNALIGNED_LOAD_OPTIMAL
+   && REGNO (operands[0]) == REGNO (operands[2])
+   && adjacent_mem_locations (operands[1], operands[3])"
+  [(set (match_dup 2)
+	(unspec:V2DF [(match_dup 4)] UNSPEC_LOADU))]
+{
+  operands[4] = gen_rtx_MEM (V2DFmode, XEXP(operands[1], 0));
+})
+
+;; merge movsd/movhpd to movupd when TARGET_SSE_UNALIGNED_STORE_OPTIMAL
+;; is true.
+(define_peephole2
+  [(set (match_operand:DF 0 "memory_operand")
+	(vec_select:DF (match_operand:V2DF 1 "register_operand")
+		       (parallel [(const_int 0)])))
+   (set (match_operand:DF 2 "memory_operand")
+	(vec_select:DF (match_dup 1)
+		       (parallel [(const_int 1)])))]
+  "TARGET_SSE_UNALIGNED_STORE_OPTIMAL
+   && adjacent_mem_locations (operands[0], operands[2])"
+  [(set (match_dup 3)
+	(unspec:V2DF [(match_dup 1)] UNSPEC_STOREU))]
+{
+  operands[3] = gen_rtx_MEM (V2DFmode, XEXP(operands[0], 0));
+})

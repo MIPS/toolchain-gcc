@@ -61,6 +61,7 @@ along with GCC; see the file COPYING3.  If not see
 #include "tree-pass.h"
 #include "predict.h"
 #include "df.h"
+#include "l-ipo.h"
 #include "params.h"
 #include "bb-reorder.h"
 
@@ -1347,9 +1348,13 @@ static int cfa_offset;
 #define STACK_POINTER_OFFSET	0
 #endif
 
+#if defined (REG_PARM_STACK_SPACE) && !defined (INCOMING_REG_PARM_STACK_SPACE)
+#define INCOMING_REG_PARM_STACK_SPACE REG_PARM_STACK_SPACE
+#endif
+
 /* If not defined, pick an appropriate default for the offset of dynamically
    allocated memory depending on the value of ACCUMULATE_OUTGOING_ARGS,
-   REG_PARM_STACK_SPACE, and OUTGOING_REG_PARM_STACK_SPACE.  */
+   INCOMING_REG_PARM_STACK_SPACE, and OUTGOING_REG_PARM_STACK_SPACE.  */
 
 #ifndef STACK_DYNAMIC_OFFSET
 
@@ -1361,12 +1366,12 @@ static int cfa_offset;
    `crtl->outgoing_args_size'.  Nevertheless, we must allow
    for it when allocating stack dynamic objects.  */
 
-#if defined(REG_PARM_STACK_SPACE)
+#ifdef INCOMING_REG_PARM_STACK_SPACE
 #define STACK_DYNAMIC_OFFSET(FNDECL)	\
 ((ACCUMULATE_OUTGOING_ARGS						      \
   ? (crtl->outgoing_args_size				      \
      + (OUTGOING_REG_PARM_STACK_SPACE ((!(FNDECL) ? NULL_TREE : TREE_TYPE (FNDECL))) ? 0 \
-					       : REG_PARM_STACK_SPACE (FNDECL))) \
+					       : INCOMING_REG_PARM_STACK_SPACE (FNDECL))) \
   : 0) + (STACK_POINTER_OFFSET))
 #else
 #define STACK_DYNAMIC_OFFSET(FNDECL)	\
@@ -2221,8 +2226,9 @@ assign_parms_initialize_all (struct assign_parm_data_all *all)
 #endif
   all->args_so_far = pack_cumulative_args (&all->args_so_far_v);
 
-#ifdef REG_PARM_STACK_SPACE
-  all->reg_parm_stack_space = REG_PARM_STACK_SPACE (current_function_decl);
+#ifdef INCOMING_REG_PARM_STACK_SPACE
+  all->reg_parm_stack_space
+    = INCOMING_REG_PARM_STACK_SPACE (current_function_decl);
 #endif
 }
 
@@ -4465,10 +4471,27 @@ pop_cfun (void)
 }
 
 /* Return value of funcdef and increase it.  */
+
 int
 get_next_funcdef_no (void)
 {
   return funcdef_no++;
+}
+
+/* Restore funcdef_no to FN.  */
+
+void
+set_funcdef_no (int fn)
+{
+  funcdef_no = fn;
+}
+
+/* Reset the funcdef number.  */
+
+void
+reset_funcdef_no (void)
+{
+  funcdef_no = 0;
 }
 
 /* Return value of funcdef.  */
@@ -4512,6 +4535,7 @@ allocate_struct_function (tree fndecl, bool abstract_p)
       DECL_STRUCT_FUNCTION (fndecl) = cfun;
       cfun->decl = fndecl;
       current_function_funcdef_no = get_next_funcdef_no ();
+      cfun->module_id = current_module_id;
     }
 
   invoke_set_current_function_hook (fndecl);
@@ -4536,6 +4560,7 @@ allocate_struct_function (tree fndecl, bool abstract_p)
       /* ??? This could be set on a per-function basis by the front-end
          but is this worth the hassle?  */
       cfun->can_throw_non_call_exceptions = flag_non_call_exceptions;
+      cfun->can_delete_dead_exceptions = flag_delete_dead_exceptions;
     }
 }
 

@@ -760,6 +760,21 @@ AC_ARG_WITH(build-sysroot,
   [SYSROOT_CFLAGS_FOR_TARGET=])
 AC_SUBST(SYSROOT_CFLAGS_FOR_TARGET)
 
+AC_ARG_WITH([runtime-root-prefix],
+  [  --with-runtime-root-prefix=prefix
+                          prepend prefix to paths used by the compiler to
+                          name the dynamic linker and other files used at
+                          runtime.  Defaults to empty (no prefix).],
+[
+ case ${with_runtime_root_prefix} in
+ yes|no) AC_MSG_ERROR([bad value ${withval} given for runtime root prefix]) ;;
+ /*) ;;
+ *) AC_MSG_ERROR([${withval} should be an absolute directory]) ;;
+ esac
+ RUNTIME_ROOT_PREFIX_DEFINE="-DRUNTIME_ROOT_PREFIX=\\\"${withval}\\\""
+], [RUNTIME_ROOT_PREFIX_DEFINE=""])
+AC_SUBST(RUNTIME_ROOT_PREFIX_DEFINE)
+
 if test "x$prefix" = xNONE; then
  test_prefix=/usr/local
 else
@@ -1945,6 +1960,10 @@ case $use_collect2 in
     esac
     ;;
 esac
+
+AC_DEFINE_UNQUOTED(FRPLUGINSONAME,"${host_function_reordering_plugin_soname}",
+[Define to the name of the function reordering plugin DSO that must be
+  passed to the linker's -plugin=LIB option.])
 
 AC_DEFINE_UNQUOTED(LTOPLUGINSONAME,"${host_lto_plugin_soname}",
 [Define to the name of the LTO plugin DSO that must be
@@ -4587,23 +4606,24 @@ if test x"$gcc_cv_ld_eh_frame_hdr" = xyes; then
     *) AC_MSG_ERROR(['$enable_eh_frame_hdr_for_static' is an invalid
 value for --enable-eh-frame-hdr-for-static.
 Valid choices are 'yes' and 'no'.]) ;;
-    esac],
-# Only support for glibc 2.3.0 or higher with AT_PHDR/AT_PHNUM from
-# Linux kernel.
-   [[if test x$host = x$build -a x$host = x$target &&
-       ldd --version 2>&1 >/dev/null &&
-       glibcver=`ldd --version 2>/dev/null | sed 's/.* //;q'`; then
-      glibcmajor=`expr "$glibcver" : "\([0-9]*\)"`
-      glibcminor=`expr "$glibcver" : "[2-9]*\.\([0-9]*\)"`
-      glibcnum=`expr $glibcmajor \* 1000 + $glibcminor`
-      if test "$glibcnum" -ge 2003 ; then
-	auvx=`LD_SHOW_AUXV=1 ldd 2>/dev/null`
-	if echo "$auvx" | grep AT_PHDR > /dev/null &&
-	   echo "$auvx" | grep AT_PHNUM > /dev/null; then
-	  enable_eh_frame_hdr_for_static=yes
-	fi
-      fi
-    fi]])
+    esac])
+## Only support for glibc 2.3.0 or higher with AT_PHDR/AT_PHNUM from
+## Linux kernel.
+#   [[if test x$host = x$build -a x$host = x$target &&
+#       ldd --version 2>&1 >/dev/null &&
+#       glibcver=`ldd --version 2>/dev/null | sed 's/.* //;q'`; then
+#      glibcmajor=`expr "$glibcver" : "\([0-9]*\)"`
+#      glibcminor=`expr "$glibcver" : "[2-9]*\.\([0-9]*\)"`
+#      glibcnum=`expr $glibcmajor \* 1000 + $glibcminor`
+#      if test "$glibcnum" -ge 2003 ; then
+#	auvx=`LD_SHOW_AUXV=1 ldd 2>/dev/null`
+#	if echo "$auvx" | grep AT_PHDR > /dev/null &&
+#	   echo "$auvx" | grep AT_PHNUM > /dev/null; then
+#	  enable_eh_frame_hdr_for_static=yes
+#	fi
+#      fi
+#    fi]])
+
   if test x$enable_eh_frame_hdr_for_static = xyes; then
     AC_DEFINE(USE_EH_FRAME_HDR_FOR_STATIC, 1,
 [Define if your system supports PT_GNU_EH_FRAME for static executable.])
@@ -4847,6 +4867,21 @@ if test x"$gcc_cv_ld_as_needed" = xyes; then
 	AC_DEFINE_UNQUOTED(LD_NO_AS_NEEDED_OPTION, "$gcc_cv_ld_no_as_needed_option",
 [Define to the linker option to keep unused dependencies.])
 fi
+
+AC_MSG_CHECKING(linker mapfile support for clearing hardware capabilities)
+saved_LDFLAGS="$LDFLAGS"
+for clearcap_map in sol2-clearcapv2.map sol2-clearcap.map; do
+  LDFLAGS="$saved_LDFLAGS -Wl,-M,${srcdir}/config/$clearcap_map"
+  AC_LINK_IFELSE([int main(void) {return 0;}],
+    [gcc_cv_ld_clearcap=yes; break], [gcc_cv_ld_clearcap=no])
+done
+LDFLAGS="$saved_LDFLAGS"
+if test "x$gcc_cv_ld_clearcap" = xyes; then
+  AC_DEFINE([HAVE_LD_CLEARCAP], 1,
+[Define if the linker supports clearing hardware capabilities via mapfile.])
+  AC_CONFIG_LINKS([clearcap.map:${srcdir}/config/$clearcap_map])
+fi
+AC_MSG_RESULT($gcc_cv_ld_clearcap)
 
 case "$target:$tm_file" in
   powerpc64-*-freebsd* | powerpc64*-*-linux* | powerpc*-*-linux*rs6000/biarch64.h*)
@@ -5408,6 +5443,18 @@ AC_ARG_ENABLE(version-specific-runtime-libs,
                 [specify that runtime libraries should be
                  installed in a compiler-specific directory])])
 
+# Set default prefix canonicalization.
+
+AC_ARG_ENABLE(canonical-prefixes,
+[  --enable-canonical-prefixes
+                          enable or disable prefix canonicalization],
+[],
+enable_canonical_prefixes=yes)
+if test x"$enable_canonical_prefixes" = xyes; then
+  AC_DEFINE(ENABLE_CANONICAL_PREFIXES,
+            1, [Define to enable prefix canonicalization.])
+fi
+
 # Substitute configuration variables
 AC_SUBST(subdirs)
 AC_SUBST(srcdir)
@@ -5625,6 +5672,20 @@ if test "${ENABLE_LIBQUADMATH_SUPPORT}" != "no" ; then
   AC_DEFINE(ENABLE_LIBQUADMATH_SUPPORT, 1,
             [Define to 1 to enable libquadmath support])
 fi
+
+
+warn_frame_larger_than_extra_text=
+AC_ARG_WITH(warn-frame-larger-than-extra-text,
+[  --with-warn-frame-larger-than-extra-text=TEXT
+                          specifies extra text for frame size warnings],
+[case "${withval}" in
+yes)	AC_MSG_ERROR(bad value ${withval} given for frame size warning text) ;;
+no)	;;
+*)	warn_frame_larger_than_extra_text="$withval" ;;
+esac])
+AC_DEFINE_UNQUOTED(WARN_FRAME_LARGER_THAN_EXTRA_TEXT,
+                   "$warn_frame_larger_than_extra_text",
+                   [Define to be extra text for frame size warnings.])
 
 
 # Specify what hash style to use by default.

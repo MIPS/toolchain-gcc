@@ -380,6 +380,13 @@ static tree handle_omp_declare_simd_attribute (tree *, tree, tree, int,
 static tree handle_omp_declare_target_attribute (tree *, tree, tree, int,
 						 bool *);
 
+static tree handle_always_patch_for_instrumentation_attribute (tree *, tree,
+                                                               tree, int,
+                                                               bool *);
+static tree handle_never_patch_for_instrumentation_attribute (tree *, tree,
+                                                              tree, int,
+                                                              bool *);
+
 static void check_function_nonnull (tree, int, tree *);
 static void check_nonnull_arg (void *, tree, unsigned HOST_WIDE_INT);
 static bool nonnull_check_p (tree, unsigned HOST_WIDE_INT);
@@ -758,6 +765,13 @@ const struct attribute_spec c_common_attribute_table[] =
      The name contains space to prevent its usage in source code.  */
   { "fn spec",	 	      1, 1, false, true, true,
 			      handle_fnspec_attribute, false },
+  { "always_patch_for_instrumentation", 0, 0, true,  false, false,
+                              handle_always_patch_for_instrumentation_attribute,
+                              false },
+  { "never_patch_for_instrumentation", 0, 0, true,  false, false,
+                              handle_never_patch_for_instrumentation_attribute,
+                              false },
+
   { "warn_unused",            0, 0, false, false, false,
 			      handle_warn_unused_attribute, false },
   { "returns_nonnull",        0, 0, false, true, true,
@@ -4927,6 +4941,26 @@ c_common_get_alias_set (tree t)
   return -1;
 }
 
+/* Return the least alignment required for type TYPE.  */
+
+unsigned int
+min_align_of_type (tree type)
+{
+  unsigned int align = TYPE_ALIGN (type);
+  align = MIN (align, BIGGEST_ALIGNMENT);
+#ifdef BIGGEST_FIELD_ALIGNMENT
+  align = MIN (align, BIGGEST_FIELD_ALIGNMENT);
+#endif
+  unsigned int field_align = align;
+#ifdef ADJUST_FIELD_ALIGN
+  tree field = build_decl (UNKNOWN_LOCATION, FIELD_DECL, NULL_TREE,
+			   type);
+  field_align = ADJUST_FIELD_ALIGN (field, field_align);
+#endif
+  align = MIN (align, field_align);
+  return align / BITS_PER_UNIT;
+}
+
 /* Compute the value of 'sizeof (TYPE)' or '__alignof__ (TYPE)', where
    the IS_SIZEOF parameter indicates which operator is being applied.
    The COMPLAIN flag controls whether we should diagnose possibly
@@ -5005,21 +5039,7 @@ c_sizeof_or_alignof_type (location_t loc,
 				size_int (TYPE_PRECISION (char_type_node)
 					  / BITS_PER_UNIT));
       else if (min_alignof)
-	{
-	  unsigned int align = TYPE_ALIGN (type);
-	  align = MIN (align, BIGGEST_ALIGNMENT);
-#ifdef BIGGEST_FIELD_ALIGNMENT
-	  align = MIN (align, BIGGEST_FIELD_ALIGNMENT);
-#endif
-	  unsigned int field_align = align;
-#ifdef ADJUST_FIELD_ALIGN
-	  tree field = build_decl (UNKNOWN_LOCATION, FIELD_DECL, NULL_TREE,
-				   type);
-	  field_align = ADJUST_FIELD_ALIGN (field, field_align);
-#endif
-	  align = MIN (align, field_align);
-	  value = size_int (align / BITS_PER_UNIT);
-	}
+	value = size_int (min_align_of_type (type));
       else
 	value = size_int (TYPE_ALIGN_UNIT (type));
     }
@@ -6867,6 +6887,7 @@ handle_unused_attribute (tree *node, tree name, tree ARG_UNUSED (args),
 
       if (TREE_CODE (decl) == PARM_DECL
 	  || TREE_CODE (decl) == VAR_DECL
+	  || TREE_CODE (decl) == FIELD_DECL
 	  || TREE_CODE (decl) == FUNCTION_DECL
 	  || TREE_CODE (decl) == LABEL_DECL
 	  || TREE_CODE (decl) == TYPE_DECL)
@@ -8679,6 +8700,47 @@ handle_nonnull_attribute (tree *node, tree ARG_UNUSED (name),
 
   return NULL_TREE;
 }
+
+/* Handle a "always_patch_for_instrumentation" attribute; arguments as in
+   struct attribute_spec.handler.  */
+
+static tree
+handle_always_patch_for_instrumentation_attribute (tree *node, tree name,
+                                                   tree ARG_UNUSED (args),
+                                                   int ARG_UNUSED (flags),
+                                                   bool *no_add_attrs)
+{
+  if (TREE_CODE (*node) == FUNCTION_DECL)
+    {
+      /* Disable inlining if forced instrumentation.  */
+      DECL_UNINLINABLE (*node) = 1;
+    }
+  else
+    {
+      warning (OPT_Wattributes, "%qE attribute ignored", name);
+      *no_add_attrs = true;
+    }
+  return NULL_TREE;
+}
+
+
+/* Handle a "never_patch_for_instrumentation" attribute; arguments as in
+   struct attribute_spec.handler.  */
+
+static tree
+handle_never_patch_for_instrumentation_attribute (tree *node, tree name,
+                                                  tree ARG_UNUSED (args),
+                                                  int ARG_UNUSED (flags),
+                                                  bool *no_add_attrs)
+{
+  if (TREE_CODE (*node) != FUNCTION_DECL)
+    {
+      warning (OPT_Wattributes, "%qE attribute ignored", name);
+      *no_add_attrs = true;
+    }
+  return NULL_TREE;
+}
+
 
 /* Check the argument list of a function call for null in argument slots
    that are marked as requiring a non-null pointer argument.  The NARGS
@@ -11725,6 +11787,31 @@ keyword_is_decl_specifier (enum rid keyword)
     default:
       return false;
     }
+}
+
+/* Check for and warn about self-assignment or self-initialization.
+   LHS and RHS are the tree nodes for the left-hand side and right-hand side
+   of the assignment or initialization we are checking.
+   LOCATION is the source location for RHS.  */
+
+void
+check_for_self_assign (location_t location, tree lhs, tree rhs)
+{
+  if (lhs == NULL_TREE || rhs == NULL_TREE)
+    return;
+
+  /* Deal with TREE_LIST initializers (may be generated by class
+     member initialization in C++).  */
+  if (TREE_CODE (rhs) == TREE_LIST)
+    rhs = TREE_VALUE (rhs);
+
+  /* Only emit a warning if RHS is not a folded expression so that we don't
+     warn on something like x = x / 1.  */
+  if (!EXPR_FOLDED (rhs)
+      && operand_equal_p (lhs, rhs,
+                          OEP_PURE_SAME | OEP_ALLOW_NULL | OEP_ALLOW_NO_TYPE))
+    warning_at (location, OPT_Wself_assign, G_("%qE is assigned to itself"),
+                lhs);
 }
 
 /* Initialize language-specific-bits of tree_contains_struct.  */

@@ -78,6 +78,7 @@ along with GCC; see the file COPYING3.  If not see
 #include "diagnostic.h"
 #include "dumpfile.h"
 #include "tree-pass.h"
+#include "cfgloop.h"
 #include "context.h"
 #include "pass_manager.h"
 #include "target-globals.h"
@@ -5017,8 +5018,11 @@ ix86_in_large_data_p (tree exp)
       HOST_WIDE_INT size = int_size_in_bytes (TREE_TYPE (exp));
 
       /* If this is an incomplete type with size 0, then we can't put it
-	 in data because it might be too big when completed.  */
-      if (!size || size > ix86_section_threshold)
+	 in data because it might be too big when completed.  Also,
+	 int_size_in_bytes returns -1 if size can vary or is larger than
+	 an integer in which case also it is safer to assume that it goes in
+	 large data.  */
+      if (size <= 0 || size > ix86_section_threshold)
 	return true;
     }
 
@@ -11730,6 +11734,246 @@ ix86_expand_epilogue (int style)
   m->fs = frame_state_save;
 }
 
+
+/* True if the current function should be patched with nops at prologue and
+   returns.  */
+static bool patch_current_function_p = false;
+
+static inline bool
+has_attribute (const char* attribute_name)
+{
+  return lookup_attribute (attribute_name,
+                           DECL_ATTRIBUTES (current_function_decl)) != NULL;
+}
+
+/* Return true if we patch the current function. By default a function
+   is patched if it has loops or if the number of insns is greater than
+   patch_functions_min_instructions (number of insns roughly translates
+   to number of instructions).  */
+
+static bool
+check_should_patch_current_function (void)
+{
+  int num_insns = 0;
+  rtx insn;
+  const char *func_name = NULL;
+  struct loops *loops;
+  int num_loops = 0;
+  int min_functions_instructions;
+
+  /* If a function has an attribute forcing patching on or off, do as it
+     indicates.  */
+  if (has_attribute ("always_patch_for_instrumentation"))
+    return true;
+  else if (has_attribute ("never_patch_for_instrumentation"))
+    return false;
+
+  /* Patch the function if it has at least a loop.  */
+  if (!patch_functions_ignore_loops)
+    {
+      if (DECL_STRUCT_FUNCTION (current_function_decl)->cfg)
+        {
+          loops = flow_loops_find (NULL);
+          num_loops = loops->larray->length();
+          /* FIXME - Deallocating the loop causes a seg-fault.  */
+#if 0
+          flow_loops_free (loops);
+#endif
+          /* We are not concerned with the function body as a loop.  */
+          if (num_loops > 1)
+            return true;
+        }
+    }
+
+  /* Else, check if function has more than patch_functions_min_instrctions.  */
+
+  /* Borrowed this code from rest_of_handle_final() in final.c.  */
+  func_name = XSTR (XEXP (DECL_RTL (current_function_decl), 0), 0);
+  if (!patch_functions_dont_always_patch_main &&
+      func_name &&
+      strcmp("main", func_name) == 0)
+    return true;
+
+  min_functions_instructions =
+      PARAM_VALUE (PARAM_FUNCTION_PATCH_MIN_INSTRUCTIONS);
+  if (min_functions_instructions > 0)
+    {
+      /* Calculate the number of instructions in this function and only emit
+         function patch for instrumentation if it is greater than
+         patch_functions_min_instructions.  */
+      for (insn = get_insns (); insn; insn = NEXT_INSN (insn))
+        {
+          if (NONDEBUG_INSN_P (insn))
+            ++num_insns;
+        }
+      if (num_insns < min_functions_instructions)
+        return false;
+    }
+
+  return true;
+}
+
+/* Emit the 11-byte patch space for the function prologue for functions that
+   qualify.  */
+
+static void
+ix86_output_function_prologue (FILE *file,
+                               HOST_WIDE_INT size ATTRIBUTE_UNUSED)
+{
+  /* Only for 64-bit target.  */
+  if (TARGET_64BIT && patch_functions_for_instrumentation)
+    {
+      patch_current_function_p = check_should_patch_current_function();
+      /* Emit the instruction 'jmp 09' followed by 9 bytes to make it 11-bytes
+         of nop.  */
+      ix86_output_function_nops_prologue_epilogue (
+          file,
+          FUNCTION_PATCH_PROLOGUE_SECTION,
+          ASM_BYTE"0xeb,0x09",
+          9);
+    }
+}
+
+/* Emit the nop bytes at function prologue or return (including tail call
+   jumps). The number of nop bytes generated is at least 8.
+   Also emits a section named SECTION_NAME, which is a backpointer section
+   holding the addresses of the nop bytes in the text section.
+   SECTION_NAME is either '_function_patch_prologue' or
+   '_function_patch_epilogue'. The backpointer section can be used to navigate
+   through all the function entry and exit points which are patched with nops.
+   PRE_INSTRUCTIONS are the instructions, if any, at the start of the nop byte
+   sequence. NUM_REMAINING_NOPS are the number of nop bytes to fill,
+   excluding the number of bytes in PRE_INSTRUCTIONS.
+   Returns true if the function was patched, false otherwise.  */
+
+bool
+ix86_output_function_nops_prologue_epilogue (FILE *file,
+                                             const char *section_name,
+                                             const char *pre_instructions,
+                                             int num_remaining_nops)
+{
+  static int labelno = 0;
+  char label[32], section_label[32];
+  section *section = NULL;
+  int num_actual_nops = num_remaining_nops - sizeof(void *);
+  unsigned int section_flags = SECTION_RELRO;
+  char *section_name_comdat = NULL;
+  const char *decl_section_name = NULL;
+  const char *func_name = NULL;
+  char *section_name_function_sections = NULL;
+  size_t len;
+
+  gcc_assert (num_remaining_nops >= 0);
+
+  if (!patch_current_function_p)
+    return false;
+
+  ASM_GENERATE_INTERNAL_LABEL (label, "LFPEL", labelno);
+  ASM_GENERATE_INTERNAL_LABEL (section_label, "LFPESL", labelno++);
+
+  /* Align the start of nops to 2-byte boundary so that the 2-byte jump
+     instruction can be patched atomically at run time.  */
+  ASM_OUTPUT_ALIGN (file, 1);
+
+  /* Emit nop bytes. They look like the following:
+       $LFPEL0:
+         <pre_instruction>
+         0x90 (repeated num_actual_nops times)
+         .quad $LFPESL0 - .
+     followed by section 'section_name' which contains the address
+     of instruction at 'label'.
+   */
+  ASM_OUTPUT_INTERNAL_LABEL (file, label);
+  if (pre_instructions)
+    fprintf (file, "%s\n", pre_instructions);
+
+  while (num_actual_nops-- > 0)
+    asm_fprintf (file, ASM_BYTE"0x90\n");
+
+  fprintf (file, ASM_QUAD);
+  /* Output "section_label - ." for the relative address of the entry in
+     the section 'section_name'.  */
+  assemble_name_raw (file, section_label);
+  fprintf (file, " - .");
+  fprintf (file, "\n");
+
+  /* Emit the backpointer section. For functions belonging to comdat group,
+     we emit a different section named '<section_name>.foo' where 'foo' is
+     the name of the comdat section. This section is later renamed to
+     '<section_name>' by ix86_elf_asm_named_section().
+     We emit a unique section name for the back pointer section for comdat
+     functions because otherwise the 'get_section' call may return an existing
+     non-comdat section with the same name, leading to references from
+     non-comdat section to comdat functions.
+  */
+  if (current_function_decl != NULL_TREE &&
+      DECL_ONE_ONLY (current_function_decl) &&
+      HAVE_COMDAT_GROUP)
+    {
+      decl_section_name =
+          TREE_STRING_POINTER (DECL_SECTION_NAME (current_function_decl));
+      len = strlen (decl_section_name) + strlen (section_name) + 2;
+      section_name_comdat = (char *) alloca (len);
+      sprintf (section_name_comdat, "%s.%s", section_name, decl_section_name);
+      section_name = section_name_comdat;
+      section_flags |= SECTION_LINKONCE;
+    }
+  else if (flag_function_sections)
+    {
+      func_name = XSTR (XEXP (DECL_RTL (current_function_decl), 0), 0);
+      if (func_name)
+        {
+          len = strlen (func_name) + strlen (section_name) + 2;
+          section_name_function_sections = (char *) alloca (len);
+          sprintf (section_name_function_sections, "%s.%s", section_name,
+                   func_name);
+          section_name = section_name_function_sections;
+        }
+    }
+  section = get_section (section_name, section_flags, current_function_decl);
+  switch_to_section (section);
+  /* Align the section to 8-byte boundary.  */
+  ASM_OUTPUT_ALIGN (file, 3);
+
+  /* Emit address of the start of nop bytes in the section:
+       $LFPESP0:
+         .quad $LFPEL0
+   */
+  ASM_OUTPUT_INTERNAL_LABEL (file, section_label);
+  fprintf(file, ASM_QUAD);
+  assemble_name_raw (file, label);
+  fprintf (file, "\n");
+
+  /* Switching back to text section.  */
+  switch_to_section (function_section (current_function_decl));
+  return true;
+}
+
+/* Strips the characters after '_function_patch_prologue' or
+   '_function_patch_epilogue' and emits the section.  */
+
+static void
+ix86_elf_asm_named_section (const char *name, unsigned int flags,
+                            tree decl)
+{
+  const char *section_name = name;
+  if (!flag_function_sections && HAVE_COMDAT_GROUP && flags & SECTION_LINKONCE)
+    {
+      const int prologue_section_name_length =
+          sizeof(FUNCTION_PATCH_PROLOGUE_SECTION) - 1;
+      const int epilogue_section_name_length =
+          sizeof(FUNCTION_PATCH_EPILOGUE_SECTION) - 1;
+
+      if (strncmp (name, FUNCTION_PATCH_PROLOGUE_SECTION,
+                   prologue_section_name_length) == 0)
+        section_name = FUNCTION_PATCH_PROLOGUE_SECTION;
+      else if (strncmp (name, FUNCTION_PATCH_EPILOGUE_SECTION,
+                        epilogue_section_name_length) == 0)
+        section_name = FUNCTION_PATCH_EPILOGUE_SECTION;
+    }
+  default_elf_asm_named_section (section_name, flags, decl);
+}
+
 /* Reset from the function's potential modifications.  */
 
 static void
@@ -12659,7 +12903,9 @@ legitimate_pic_address_disp_p (rtx disp)
 		return true;
 	    }
 	  else if (!SYMBOL_REF_FAR_ADDR_P (op0)
-		   && SYMBOL_REF_LOCAL_P (op0)
+	      	   && (SYMBOL_REF_LOCAL_P (op0)
+		       || (TARGET_64BIT && ix86_pie_copyrelocs && flag_pie
+			   && !SYMBOL_REF_FUNCTION_P (op0)))
 		   && ix86_cmodel != CM_LARGE_PIC)
 	    return true;
 	  break;
@@ -21507,7 +21753,7 @@ ix86_expand_vec_perm (rtx operands[])
 	  t1 = gen_reg_rtx (V32QImode);
 	  t2 = gen_reg_rtx (V32QImode);
 	  t3 = gen_reg_rtx (V32QImode);
-	  vt2 = GEN_INT (128);
+	  vt2 = GEN_INT (-128);
 	  for (i = 0; i < 32; i++)
 	    vec[i] = vt2;
 	  vt = gen_rtx_CONST_VECTOR (V32QImode, gen_rtvec_v (32, vec));
@@ -23794,7 +24040,7 @@ decide_alg (HOST_WIDE_INT count, HOST_WIDE_INT expected_size,
 {
   const struct stringop_algs * algs;
   bool optimize_for_speed;
-  int max = -1;
+  int max = 0;
   const struct processor_costs *cost;
   int i;
   bool any_alg_usable_p = false;
@@ -23832,7 +24078,7 @@ decide_alg (HOST_WIDE_INT count, HOST_WIDE_INT expected_size,
   /* If expected size is not known but max size is small enough
      so inline version is a win, set expected size into
      the range.  */
-  if (max > 1 && (unsigned HOST_WIDE_INT) max >= max_size
+  if (((max > 1 && (unsigned HOST_WIDE_INT) max >= max_size) || max == -1)
       && expected_size == -1)
     expected_size = min_size / 2 + max_size / 2;
 
@@ -23921,7 +24167,7 @@ decide_alg (HOST_WIDE_INT count, HOST_WIDE_INT expected_size,
             *dynamic_check = 128;
           return loop_1_byte;
         }
-      if (max == -1)
+      if (max <= 0)
 	max = 4096;
       alg = decide_alg (count, max / 2, min_size, max_size, memset,
 			zero_memset, dynamic_check, noalign);
@@ -24944,6 +25190,15 @@ ix86_output_call_insn (rtx insn, rtx call_op)
 	xasm = "rex.W jmp %A0";
       else
 	xasm = "jmp\t%A0";
+
+      /* Just before the sibling call, add 11-bytes of nops to patch function
+         exit: 2 bytes for 'jmp 09' and remaining 9 bytes.  */
+      if (TARGET_64BIT && patch_functions_for_instrumentation)
+        ix86_output_function_nops_prologue_epilogue (
+            asm_out_file,
+            FUNCTION_PATCH_EPILOGUE_SECTION,
+            ASM_BYTE"0xeb, 0x09",
+            9);
 
       output_asm_insn (xasm, &call_op);
       return "";
@@ -26238,13 +26493,17 @@ ix86_dependencies_evaluation_hook (rtx head, rtx tail)
 	      {
 		edge e;
 		edge_iterator ei;
-		/* Assume that region is SCC, i.e. all immediate predecessors
-	           of non-head block are in the same region.  */
+
+		/* Regions are SCCs with the exception of selective
+		   scheduling with pipelining of outer blocks enabled.
+		   So also check that immediate predecessors of a non-head
+		   block are in the same region.  */
 		FOR_EACH_EDGE (e, ei, bb->preds)
 		  {
 		    /* Avoid creating of loop-carried dependencies through
-		       using topological odering in region.  */
-		    if (BLOCK_TO_BB (bb->index) > BLOCK_TO_BB (e->src->index))
+		       using topological ordering in the region.  */
+		    if (rgn == CONTAINING_RGN (e->src->index)
+			&& BLOCK_TO_BB (bb->index) > BLOCK_TO_BB (e->src->index))
 		      add_dependee_for_func_arg (first_arg, e->src); 
 		  }
 	      }
@@ -28789,7 +29048,8 @@ def_builtin (HOST_WIDE_INT mask, const char *name,
       ix86_builtins_isa[(int) code].isa = mask;
 
       mask &= ~OPTION_MASK_ISA_64BIT;
-      if (mask == 0
+      if (flag_dyn_ipa
+	  || mask == 0
 	  || (mask & ix86_isa_flags) != 0
 	  || (lang_hooks.builtin_function
 	      == lang_hooks.builtin_function_ext_scope))
@@ -37802,10 +38062,10 @@ ix86_rtx_costs (rtx x, int code_i, int outer_code_i, int opno, int *total,
       else if (TARGET_64BIT && !x86_64_zext_immediate_operand (x, VOIDmode))
 	*total = 2;
       else if (flag_pic && SYMBOLIC_CONST (x)
-	       && (!TARGET_64BIT
-		   || (!GET_CODE (x) != LABEL_REF
-		       && (GET_CODE (x) != SYMBOL_REF
-		           || !SYMBOL_REF_LOCAL_P (x)))))
+	       && !(TARGET_64BIT
+		    && (GET_CODE (x) == LABEL_REF
+			|| (GET_CODE (x) == SYMBOL_REF
+			    && SYMBOL_REF_LOCAL_P (x)))))
 	*total = 1;
       else
 	*total = 0;
@@ -46745,6 +47005,70 @@ ix86_atomic_assign_expand_fenv (tree *hold, tree *clear, tree *update)
 		    atomic_feraiseexcept_call);
 }
 
+/* Try to determine BASE/OFFSET/SIZE parts of the given MEM.
+   Return true if successful, false if all the values couldn't
+   be determined.
+
+   This function only looks for REG/SYMBOL or REG/SYMBOL+CONST
+   address forms. */
+
+static bool
+get_memref_parts (rtx mem, rtx *base, HOST_WIDE_INT *offset,
+		  HOST_WIDE_INT *size)
+{
+  rtx addr_rtx;
+  if MEM_SIZE_KNOWN_P (mem)
+    *size = MEM_SIZE (mem);
+  else
+    return false;
+
+  if (GET_CODE (XEXP (mem, 0)) == CONST)
+    addr_rtx = XEXP (XEXP (mem, 0), 0);
+  else
+    addr_rtx = (XEXP (mem, 0));
+
+  if (GET_CODE (addr_rtx) == REG
+      || GET_CODE (addr_rtx) == SYMBOL_REF)
+    {
+      *base = addr_rtx;
+      *offset = 0;
+    }
+  else if (GET_CODE (addr_rtx) == PLUS
+	   && CONST_INT_P (XEXP (addr_rtx, 1)))
+    {
+      *base = XEXP (addr_rtx, 0);
+      *offset = INTVAL (XEXP (addr_rtx, 1));
+    }
+  else
+    return false;
+
+  return true;
+}
+
+/* If MEM1 is adjacent to MEM2 and MEM1 has lower address,
+   return true.  */
+
+extern bool
+adjacent_mem_locations (rtx mem1, rtx mem2)
+{
+  rtx base1, base2;
+  HOST_WIDE_INT off1, size1, off2, size2;
+
+  if (get_memref_parts (mem1, &base1, &off1, &size1)
+      && get_memref_parts (mem2, &base2, &off2, &size2))
+    {
+      if (GET_CODE (base1) == SYMBOL_REF
+	  && GET_CODE (base2) == SYMBOL_REF
+	  && SYMBOL_REF_DECL (base1) == SYMBOL_REF_DECL (base2))
+        return (off1 + size1 == off2);
+      else if (REG_P (base1)
+	       && REG_P (base2)
+	       && REGNO (base1) == REGNO (base2))
+        return (off1 + size1 == off2);
+    }
+  return false;
+}
+
 /* Initialize the GCC target structure.  */
 #undef TARGET_RETURN_IN_MEMORY
 #define TARGET_RETURN_IN_MEMORY ix86_return_in_memory
@@ -46787,8 +47111,14 @@ ix86_atomic_assign_expand_fenv (tree *hold, tree *clear, tree *update)
 #undef TARGET_BUILTIN_RECIPROCAL
 #define TARGET_BUILTIN_RECIPROCAL ix86_builtin_reciprocal
 
+#undef TARGET_ASM_FUNCTION_PROLOGUE
+#define TARGET_ASM_FUNCTION_PROLOGUE ix86_output_function_prologue
+
 #undef TARGET_ASM_FUNCTION_EPILOGUE
 #define TARGET_ASM_FUNCTION_EPILOGUE ix86_output_function_epilogue
+
+#undef TARGET_ASM_NAMED_SECTION
+#define TARGET_ASM_NAMED_SECTION ix86_elf_asm_named_section
 
 #undef TARGET_ENCODE_SECTION_INFO
 #ifndef SUBTARGET_ENCODE_SECTION_INFO

@@ -382,6 +382,30 @@ proc check_ifunc_available { } {
     }]
 }
 
+# Returns true if tool chain supports "e" section attribute.
+
+proc check_section_exclude_available { } {
+    return [check_runtime_nocache section_exclude_available {
+		asm(".section \".gnu.callgraph.text.main\", \"e\"");
+		int main()
+		{
+		  return 0;
+		}
+  }]
+}
+
+# If this target uses a linker that supports plugins and can load
+# the function reordering linker plugin.
+
+proc check_linker_function_reordering_plugin_supported {} {
+    return [check_runtime_nocache function_reordering_plugin_supported {
+		int main()
+		{
+		  return 0;
+		}    
+  } "-freorder-functions=callgraph"]
+}
+
 # Returns true if --gc-sections is supported on the target.
 
 proc check_gc_sections_available { } {
@@ -1914,6 +1938,15 @@ proc check_effective_target_large_long_double { } {
 proc check_effective_target_large_double { } {
     return [check_no_compiler_messages large_double object {
 	int dummy[sizeof(double) > sizeof(float) ? 1 : -1];
+    }]
+}
+
+# Return 1 if the target supports long double of 128 bits,
+# 0 otherwise.
+
+proc check_effective_target_longdouble128 { } {
+    return [check_no_compiler_messages longdouble128 object {
+	int dummy[sizeof(long double) == 16 ? 1 : -1];
     }]
 }
 
@@ -3990,6 +4023,26 @@ proc check_effective_target_vect_udot_hi { } {
     return $et_vect_udot_hi_saved
 }
 
+# Return 1 if the target plus current options supports a vector
+# sad operation of unsigned chars, 0 otherwise.
+#
+# This won't change for different subtargets so cache the result.
+
+proc check_effective_target_vect_usad_char { } {
+    global et_vect_usad_char
+
+    if [info exists et_vect_usad_char_saved] {
+        verbose "check_effective_target_vect_usad_char: using cached result" 2
+    } else {
+        set et_vect_usad_char_saved 0
+        if { ([istarget i?86-*-*]
+             || [istarget x86_64-*-*]) } {
+            set et_vect_usad_char_saved 1
+        }
+    }
+    verbose "check_effective_target_vect_usad_char: returning $et_vect_usad_char_saved" 2
+    return $et_vect_usad_char_saved
+}
 
 # Return 1 if the target plus current options supports a vector
 # demotion (packing) of shorts (to chars) and ints (to shorts) 

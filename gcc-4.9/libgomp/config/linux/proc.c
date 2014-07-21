@@ -31,11 +31,14 @@
 #include "libgomp.h"
 #include "proc.h"
 #include <errno.h>
-#include <unistd.h>
-#include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
+#if defined (__ANDROID__)
+#include <stdio.h>
+#include <string.h>
 #include <fcntl.h>
 #include <errno.h>
+#endif
 #ifdef HAVE_GETLOADAVG
 # ifdef HAVE_SYS_LOADAVG_H
 #  include <sys/loadavg.h>
@@ -76,6 +79,7 @@ gomp_cpuset_popcount (unsigned long cpusetsize, cpu_set_t *cpusetp)
 }
 #endif
 
+#if defined (__ANDROID__)
 /* Read the content of a file.
  * Return the length of the data, or -1 on error. Does *not*
  * zero-terminate the content. Will not read more
@@ -255,6 +259,7 @@ sc_nprocessors_actu ()
     }
     return cpuCount;
 }
+#endif
 
 /* At startup, determine the default number of threads.  It would seem
    this should be related to the number of cpus online.  */

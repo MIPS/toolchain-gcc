@@ -115,7 +115,60 @@ __gcov_dump (void)
   set_gcov_dump_complete ();
 }
 
+/* Emitted in coverage.c.  */
+extern gcov_unsigned_t __gcov_test_coverage;
+
+unsigned int __gcov_profiling_for_test_coverage (void);
+
+/* Function that can be called from application to distinguish binaries
+   instrumented for coverage from those instrumented for profile
+   optimization (e.g. -fprofile-generate).  */
+
+unsigned int __gcov_profiling_for_test_coverage (void)
+{
+  return __gcov_test_coverage;
+}
+
 #endif /* L_gcov_dump */
+
+#ifdef L_gcov_sampling
+
+/* Emitted in coverage.c.  */
+
+/* Sampling period.  */
+extern gcov_unsigned_t __gcov_sampling_period;
+extern gcov_unsigned_t __gcov_has_sampling;
+void __gcov_set_sampling_period (unsigned int period);
+unsigned int __gcov_sampling_enabled ();
+/* Per thread sample counter.  */
+__thread gcov_unsigned_t __gcov_sample_counter = 0;
+
+/* Set sampling period to PERIOD.  */
+
+void __gcov_set_sampling_period (unsigned int period)
+{
+  gcc_assert (__gcov_has_sampling);
+  __gcov_sampling_period = period;
+}
+
+unsigned int __gcov_sampling_enabled ()
+{
+  return __gcov_has_sampling;
+}
+
+#endif
+
+#ifdef L_gcov_prefix
+
+/* Profile directory prefix specified to -fprofile-generate=.  */
+extern char * __gcov_profile_prefix;
+
+char *__gcov_get_profile_prefix ()
+{
+  return __gcov_profile_prefix;
+}
+
+#endif
 
 
 #ifdef L_gcov_fork

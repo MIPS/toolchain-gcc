@@ -219,12 +219,71 @@ struct lang_hooks_for_decls
   /* Similarly, except use an assignment operator instead.  */
   tree (*omp_clause_assign_op) (tree clause, tree dst, tree src);
 
+  /* Build and return code for a constructor of DST that sets it to
+     SRC + ADD.  */
+  tree (*omp_clause_linear_ctor) (tree clause, tree dst, tree src, tree add);
+
   /* Build and return code destructing DECL.  Return NULL if nothing
      to be done.  */
   tree (*omp_clause_dtor) (tree clause, tree decl);
 
   /* Do language specific checking on an implicitly determined clause.  */
-  void (*omp_finish_clause) (tree clause);
+  void (*omp_finish_clause) (tree clause, gimple_seq *pre_p);
+};
+
+/* Lang hooks for LIPO.  */
+
+struct lang_hooks_for_lipo
+{
+  /* Add DECL to the list of predefined builtins.  */
+  void (*add_built_in_decl) (tree decl);
+
+  /* Save the tree (by making a copy) and binding values
+     for builtins before parsing start.  */
+  void (*save_built_in_decl_pre_parsing) (void);
+
+  /* Restore builtins and their bindings to their values
+     before parsing. */
+  void (*restore_built_in_decl_pre_parsing) (void);
+
+  /* Save the tree (by making a copy) and binding values for
+     builtins after parsing of a file.  */
+  void (*save_built_in_decl_post_module_parsing) (void);
+
+  /* Restore builtins and their bindings to their post
+     parsing values.  */
+  void (*restore_built_in_decl_post_module_parsing) (void);
+
+  /* Clear symbol binding for name ID. */
+  void (*clear_global_name_bindings) (tree id);
+
+  /* Return true if DECL in SCOPE is scoped in global/namespace scope,
+     otherwise return false. */
+  bool (*has_global_name) (tree decl, void *scope);
+
+  /* Return the actual size of the lang_decl struct for
+     decl T.  */
+  int (*get_lang_decl_size) (tree t);
+
+  /* Duplicate language specific type information from SRC
+   to DEST.  */
+  void (*dup_lang_type) (tree src, tree dest);
+
+  /* Copy DEST into SRC.  */
+  void (*copy_lang_type) (tree src, tree dest);
+
+  /* Process decls after parsing of a source module.  */
+  void (*process_pending_decls) (unsigned);
+
+  /* Clear the list of deferred functions.  */
+  void (*clear_deferred_fns) (void);
+
+  /* Return true if T is compiler generated.  */
+  bool (*is_compiler_generated_type) (tree t);
+
+  /* Compare language specific types T1 and T2.
+     Return 1 if they are compatible.  */
+  int (*cmp_lang_type) (tree t1, tree t2);
 };
 
 /* Language hooks related to LTO serialization.  */
@@ -408,6 +467,8 @@ struct lang_hooks
 
   struct lang_hooks_for_types types;
   
+  struct lang_hooks_for_lipo l_ipo;
+
   struct lang_hooks_for_lto lto;
 
   /* Returns a TREE_VEC of the generic parameters of an instantiation of
@@ -437,6 +498,9 @@ struct lang_hooks
      ISAs.  If this points to the same function as builtin_function, the
      backend must add all of the builtins at program initialization time.  */
   tree (*builtin_function_ext_scope) (tree decl);
+
+  /* Returns true if DECL is a user defined conversion operator (C++) */
+  bool (*user_conv_function_p) (tree decl);
 
   /* Used to set up the tree_contains_structure array for a frontend. */
   void (*init_ts) (void);

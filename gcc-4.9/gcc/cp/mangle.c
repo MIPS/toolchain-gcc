@@ -752,6 +752,10 @@ decl_mangling_context (tree decl)
   if (tcontext != NULL_TREE)
     return tcontext;
 
+  if (TREE_CODE (decl) == TEMPLATE_DECL
+      && DECL_TEMPLATE_RESULT (decl))
+    decl = DECL_TEMPLATE_RESULT (decl);
+
   if (TREE_CODE (decl) == TYPE_DECL
       && LAMBDA_TYPE_P (TREE_TYPE (decl)))
     {
@@ -3507,10 +3511,15 @@ mangle_decl (const tree decl)
       tree id2, alias;
 #endif
 
-      SET_IDENTIFIER_GLOBAL_VALUE (id, decl);
-      if (IDENTIFIER_GLOBAL_VALUE (id) != decl)
-	inform (DECL_SOURCE_LOCATION (decl), "-fabi-version=6 (or =0) "
-		"avoids this error with a change in mangling");
+      if (!L_IPO_COMP_MODE || !is_parsing_done_p ())
+        SET_IDENTIFIER_GLOBAL_VALUE (id, decl);
+      if (L_IPO_COMP_MODE && !is_parsing_done_p ())
+        add_decl_to_current_module_scope (decl,
+                                          NAMESPACE_LEVEL (global_namespace));
+      if (!L_IPO_COMP_MODE || !is_parsing_done_p ())
+        if (IDENTIFIER_GLOBAL_VALUE (id) != decl)
+          inform (DECL_SOURCE_LOCATION (decl), "-fabi-version=6 (or =0) "
+                  "avoids this error with a change in mangling");
 
 #ifdef ASM_OUTPUT_DEF
       save_ver = flag_abi_version;
@@ -3786,6 +3795,14 @@ mangle_conv_op_name_for_type (const tree type)
   return identifier;
 }
 
+/* Clear the conversion map.  */
+
+void
+cp_clear_conv_type_map (void)
+{
+  conv_type_names = NULL;
+}
+
 /* Write out the appropriate string for this variable when generating
    another mangled name based on this one.  */
 
@@ -3856,6 +3873,14 @@ decl_tls_wrapper_p (const tree fn)
    as well call them something readable.  */
 
 static GTY(()) int temp_count;
+
+/* Reset static variable temp_count to 0.  */
+
+void
+reset_temp_count (void)
+{
+  temp_count = 0;
+}
 
 tree
 mangle_ref_init_variable (const tree variable)

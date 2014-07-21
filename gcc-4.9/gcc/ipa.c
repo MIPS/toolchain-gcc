@@ -25,6 +25,7 @@ along with GCC; see the file COPYING3.  If not see
 #include "calls.h"
 #include "stringpool.h"
 #include "cgraph.h"
+#include "toplev.h"
 #include "tree-pass.h"
 #include "pointer-set.h"
 #include "gimple-expr.h"
@@ -32,11 +33,13 @@ along with GCC; see the file COPYING3.  If not see
 #include "flags.h"
 #include "target.h"
 #include "tree-iterator.h"
+#include "l-ipo.h"
 #include "ipa-utils.h"
 #include "ipa-inline.h"
 #include "tree-inline.h"
 #include "profile.h"
 #include "params.h"
+#include "l-ipo.h"
 
 /* Return true when NODE can not be local. Worker for cgraph_local_node_p.  */
 
@@ -138,7 +141,10 @@ process_references (struct ipa_ref_list *list,
       symtab_node *node = ref->referred;
 
       if (node->definition && !node->in_other_partition
-	  && ((!DECL_EXTERNAL (node->decl) || node->alias)
+	  && ((!(DECL_EXTERNAL (node->decl)
+               || (is_a <cgraph_node> (node)
+                   && cgraph_is_aux_decl_external (dyn_cast<cgraph_node> (node))))
+              || node->alias)
 	      || (((before_inlining_p
 		    && (cgraph_state < CGRAPH_STATE_IPA_SSA
 		        || !lookup_attribute ("always_inline",
@@ -151,6 +157,13 @@ process_references (struct ipa_ref_list *list,
 		      && ctor_for_folding (node->decl)
 		         != error_mark_node))))
 	pointer_set_insert (reachable, node);
+      else if (L_IPO_COMP_MODE
+               && cgraph_pre_profiling_inlining_done
+               && is_a <varpool_node> (node)
+               && ctor_for_folding (real_varpool_node (node->decl)->decl)
+               != error_mark_node)
+	pointer_set_insert (reachable, node);
+
       enqueue_node (node, first, reachable);
     }
 }
@@ -182,6 +195,9 @@ walk_polymorphic_call_targets (pointer_set_t *reachable_call_targets,
       for (i = 0; i < targets.length (); i++)
 	{
 	  struct cgraph_node *n = targets[i];
+
+	  if (L_IPO_COMP_MODE && cgraph_pre_profiling_inlining_done)
+	    n = cgraph_lipo_get_resolved_node (n->decl);
 
 	  /* Do not bother to mark virtual methods in anonymous namespace;
 	     either we will find use of virtual table defining it, or it is
@@ -303,6 +319,14 @@ symtab_remove_unreachable_nodes (bool before_inlining_p, FILE *file)
   struct pointer_set_t *body_needed_for_clonning = pointer_set_create ();
   struct pointer_set_t *reachable_call_targets = pointer_set_create ();
 
+  /* In LIPO mode, do not remove functions until after global linking
+     is performed. Otherwise functions needed for cross module inlining
+     may get eliminated. Global linking will be done just before tree
+     profiling.  */
+  if (L_IPO_COMP_MODE
+     && !cgraph_pre_profiling_inlining_done)
+    return false;
+
   timevar_push (TV_IPA_UNREACHABLE);
 #ifdef ENABLE_CHECKING
   verify_symtab ();
@@ -412,10 +436,22 @@ symtab_remove_unreachable_nodes (bool before_inlining_p, FILE *file)
 		  if (e->callee->definition
 		      && !e->callee->in_other_partition
 		      && (!e->inline_failed
-			  || !DECL_EXTERNAL (e->callee->decl)
+			  || !(DECL_EXTERNAL (e->callee->decl)
+			       || cgraph_is_aux_decl_external (e->callee))
 			  || e->callee->alias
 			  || before_inlining_p))
-		    pointer_set_insert (reachable, e->callee);
+		    {
+		      /* Be sure that we will not optimize out alias target
+			 body.  */
+		      if (DECL_EXTERNAL (e->callee->decl)
+			  && e->callee->alias
+			  && before_inlining_p)
+			{
+		          pointer_set_insert (reachable,
+					      cgraph_function_node (e->callee));
+			}
+		      pointer_set_insert (reachable, e->callee);
+		    }
 		  enqueue_node (e->callee, &first, reachable);
 		}
 
@@ -505,8 +541,14 @@ symtab_remove_unreachable_nodes (bool before_inlining_p, FILE *file)
 				    DECL_ATTRIBUTES (node->decl));
 	      if (!node->in_other_partition)
 		node->local.local = false;
+#ifdef FIXME_LIPO
+error " Check the following code "
+#endif
+              if (!cgraph_is_aux_decl_external (node)) {
 	      cgraph_node_remove_callees (node);
+	      symtab_remove_from_same_comdat_group (node);
 	      ipa_remove_all_references (&node->ref_list);
+              }
 	      changed = true;
 	    }
 	}
@@ -523,6 +565,20 @@ symtab_remove_unreachable_nodes (bool before_inlining_p, FILE *file)
       if (node->global.inlined_to
 	  && !node->callers)
 	{
+          /* Clean up dangling references from callees as well.
+             TODO -- should be done recursively.  */
+          if (L_IPO_COMP_MODE)
+            {
+	      struct cgraph_edge *e;
+              for (e = node->callees; e; e = e->next_callee)
+                {
+                  struct cgraph_node *callee_node;
+
+                  callee_node = e->callee;
+                  if (callee_node->global.inlined_to)
+                    callee_node->global.inlined_to = node;
+                }
+            }
 	  gcc_assert (node->clones);
 	  node->global.inlined_to = NULL;
 	  update_inlined_to_pointer (node, node);
@@ -532,7 +588,10 @@ symtab_remove_unreachable_nodes (bool before_inlining_p, FILE *file)
 
   /* Remove unreachable variables.  */
   if (file)
-    fprintf (file, "\nReclaiming variables:");
+    fprintf (file, "\n");
+
+  if (file)
+    fprintf (file, "Reclaiming variables:");
   for (vnode = varpool_first_variable (); vnode; vnode = vnext)
     {
       vnext = varpool_next_variable (vnode);
@@ -560,6 +619,8 @@ symtab_remove_unreachable_nodes (bool before_inlining_p, FILE *file)
 	  vnode->definition = false;
 	  vnode->analyzed = false;
 	  vnode->aux = NULL;
+
+	  symtab_remove_from_same_comdat_group (vnode);
 
 	  /* Keep body if it may be useful for constant folding.  */
 	  if ((init = ctor_for_folding (vnode->decl)) == error_mark_node)
@@ -697,6 +758,8 @@ address_taken_from_non_vtable_p (symtab_node *node)
 static bool
 comdat_can_be_unshared_p_1 (symtab_node *node)
 {
+  if (!node->externally_visible)
+    return true;
   /* When address is taken, we don't know if equality comparison won't
      break eventually. Exception are virutal functions, C++
      constructors/destructors and vtables, where this is not possible by
@@ -1155,6 +1218,10 @@ function_and_variable_visibility (bool whole_program)
 	    symtab_dissolve_same_comdat_group_list (vnode);
 	  vnode->resolution = LDPR_PREVAILING_DEF_IRONLY;
 	}
+      /* Static variables defined in auxiliary modules are externalized to
+         allow cross module inlining.  */
+      gcc_assert (TREE_STATIC (vnode->decl)
+                  || varpool_is_auxiliary (vnode));
     }
 
   if (dump_file)

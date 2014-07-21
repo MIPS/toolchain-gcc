@@ -33,7 +33,9 @@ along with GCC; see the file COPYING3.  If not see
 #include "target.h"
 #include "output.h"
 #include "gimple-expr.h"
+#include "toplev.h"
 #include "flags.h"
+#include "l-ipo.h"
 #include "pointer-set.h"
 
 /* List of hooks triggered on varpool_node events.  */
@@ -150,6 +152,7 @@ varpool_node_for_decl (tree decl)
     return node;
 
   node = varpool_create_empty_node ();
+  node->module_id = current_module_id;
   node->decl = decl;
   symtab_register_node (node);
   return node;
@@ -161,12 +164,15 @@ varpool_remove_node (varpool_node *node)
 {
   tree init;
   varpool_call_node_removal_hooks (node);
+  varpool_remove_link_node (node);
   symtab_unregister_node (node);
 
   /* Because we remove references from external functions before final compilation,
      we may end up removing useful constructors.
      FIXME: We probably want to trace boundaries better.  */
-  if ((init = ctor_for_folding (node->decl)) == error_mark_node)
+  if (cgraph_state == CGRAPH_LTO_STREAMING)
+    ;
+  else if ((init = ctor_for_folding (node->decl)) == error_mark_node)
     varpool_remove_initializer (node);
   else
     DECL_INITIAL (node->decl) = init;
@@ -302,7 +308,18 @@ ctor_for_folding (tree decl)
   if (DECL_VIRTUAL_P (real_decl))
     {
       gcc_checking_assert (TREE_READONLY (real_decl));
-      return DECL_INITIAL (real_decl);
+      if (DECL_INITIAL (real_decl))
+	return DECL_INITIAL (real_decl);
+      else
+	{
+	  /* The C++ front end creates VAR_DECLs for vtables of typeinfo
+	     classes not defined in the current TU so that it can refer
+	     to them from typeinfo objects.  Avoid returning NULL_TREE.  */
+	  /* In LIPO mode, the DECL_CONTEXT may have been cleared.  */
+	  if (!L_IPO_COMP_MODE)
+	    gcc_checking_assert (!COMPLETE_TYPE_P (DECL_CONTEXT (real_decl)));
+	  return error_mark_node;
+	}
     }
 
   /* If there is no constructor, we have nothing to do.  */
@@ -504,7 +521,7 @@ varpool_remove_unreferenced_decls (void)
 	{
 	  enqueue_node (node, &first);
           if (cgraph_dump_file)
-	    fprintf (cgraph_dump_file, " %s", node->asm_name ());
+	    fprintf (cgraph_dump_file, " %s/%d", node->asm_name (), node->order);
 	}
     }
   while (first != (varpool_node *)(void *)1)
@@ -545,7 +562,7 @@ varpool_remove_unreferenced_decls (void)
       if (!node->aux)
 	{
           if (cgraph_dump_file)
-	    fprintf (cgraph_dump_file, " %s", node->asm_name ());
+	    fprintf (cgraph_dump_file, " %s/%d", node->asm_name (), node->order);
 	  if (pointer_set_contains (referenced, node))
 	    varpool_remove_initializer (node);
 	  else

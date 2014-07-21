@@ -903,13 +903,18 @@ aarch64*-*-elf)
 	TM_MULTILIB_CONFIG=`echo $TM_MULTILIB_CONFIG | sed 's/^,//'`
 	;;
 aarch64*-*-linux*)
-	tm_file="${tm_file} dbxelf.h elfos.h gnu-user.h linux.h linux-android.h glibc-stdint.h"
+	tm_file="${tm_file} dbxelf.h elfos.h gnu-user.h linux.h  linux-android.h glibc-stdint.h"
 	tm_file="${tm_file} aarch64/aarch64-elf.h aarch64/aarch64-linux.h"
 	extra_options="${extra_options} linux-android.opt"
 	tmake_file="${tmake_file} aarch64/t-aarch64 aarch64/t-aarch64-linux"
+	default_gnu_indirect_function=yes
+
 	case $target in
 	aarch64_be-*)
 		tm_defines="${tm_defines} TARGET_BIG_ENDIAN_DEFAULT=1"
+		;;
+	aarch64*-*-linux-android*)
+		tm_file="${tm_file} aarch64/aarch64-linux-android.h"
 		;;
 	esac
 	aarch64_multilibs="${with_multilib_list}"
@@ -1022,9 +1027,30 @@ arm*-*-linux-*)			# ARM GNU/Linux with ELF
 	    ;;
 	esac
 	tmake_file="${tmake_file} arm/t-arm arm/t-arm-elf arm/t-bpabi arm/t-linux-eabi"
-	tm_file="$tm_file arm/bpabi.h arm/linux-eabi.h arm/aout.h arm/arm.h"
+	tm_file="$tm_file arm/bpabi.h arm/linux-eabi.h arm/aout.h vxworks-dummy.h arm/arm.h"
 	# Define multilib configuration for arm-linux-androideabi.
 	case ${target} in
+	arm*-*-linux-*eabi)
+	    tmake_file="$tmake_file arm/t-arm-elf arm/t-bpabi arm/t-linux-eabi"
+	    # Define multilib configuration for arm-linux-androideabi.
+	    case ${target} in
+	    *-androideabi)
+		tmake_file="$tmake_file arm/t-linux-androideabi"
+		;;
+	    esac
+	    # Pull in spec changes for GRTE configurations.
+	    case ${target} in
+	    *-grte*)
+		tm_file="${tm_file} linux-grte.h arm/linux-grte.h"
+		;;
+	    esac
+  	    # The BPABI long long divmod functions return a 128-bit value in
+	    # registers r0-r3.  Correctly modeling that requires the use of
+	    # TImode.
+	    need_64bit_hwint=yes
+	    # The EABI requires the use of __cxa_atexit.
+	    default_use_cxa_atexit=yes
+	    ;;
 	*-androideabi)
 	    tmake_file="$tmake_file arm/t-linux-androideabi"
 	    ;;
@@ -1438,6 +1464,12 @@ i[34567]86-*-linux* | i[34567]86-*-kfreebsd*-gnu | i[34567]86-*-knetbsd*-gnu | i
 		else
 			tm_file="${tm_file} i386/gnu-user-common.h i386/gnu-user.h i386/linux-common.h i386/linux.h"
 		fi
+		# Pull in spec changes for GRTE configurations.
+		case ${target} in
+		*-grte*)
+			tm_file="${tm_file} linux-grte.h"
+			;;
+		esac
 		;;
 	i[34567]86-*-knetbsd*-gnu)
 		tm_file="${tm_file} i386/gnu-user-common.h i386/gnu-user.h knetbsd-gnu.h i386/knetbsd-gnu.h"
@@ -1462,6 +1494,12 @@ x86_64-*-linux* | x86_64-*-kfreebsd*-gnu | x86_64-*-knetbsd*-gnu)
 		extra_options="${extra_options} linux-android.opt"
 		# Assume modern glibc
 		default_gnu_indirect_function=yes
+		# Pull in spec changes for GRTE configurations.
+		case ${target} in
+		*-grte*)
+			tm_file="${tm_file} linux-grte.h"
+			;;
+		esac
 	  	;;
 	x86_64-*-kfreebsd*-gnu)
 		tm_file="${tm_file} kfreebsd-gnu.h i386/kfreebsd-gnu64.h"
@@ -2315,8 +2353,10 @@ powerpc-*-rtems*)
 powerpc*-*-linux*)
 	tm_file="${tm_file} dbxelf.h elfos.h freebsd-spec.h rs6000/sysv4.h"
 	extra_options="${extra_options} rs6000/sysv4.opt"
+	extra_options="${extra_options} linux-android.opt"
 	tmake_file="rs6000/t-fprules rs6000/t-ppcos ${tmake_file} rs6000/t-ppccomm"
 	extra_objs="$extra_objs rs6000-linux.o"
+	default_gnu_indirect_function=yes
 	case ${target} in
 	    powerpc*le-*-*)
 		tm_file="${tm_file} rs6000/sysv4le.h" ;;
@@ -2376,6 +2416,12 @@ powerpc*-*-linux*)
 	if test x${enable_secureplt} = xyes; then
 		tm_file="rs6000/secureplt.h ${tm_file}"
 	fi
+	# Pull in spec changes for GRTE configurations.
+	case ${target} in
+	*-grte*)
+	    tm_file="${tm_file} rs6000/linux-grte.h"
+	    ;;
+	esac
 	;;
 powerpc-wrs-vxworks|powerpc-wrs-vxworksae)
 	tm_file="${tm_file} elfos.h freebsd-spec.h rs6000/sysv4.h"

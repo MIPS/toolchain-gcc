@@ -52,13 +52,17 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
       // Assumes __s formatted for "C" locale.
       char* __old = setlocale(LC_ALL, 0);
       char* __sav = 0;
+#if defined (__ANDROID__)
       if (__old)
         {
+#endif
           const size_t __len = strlen(__old) + 1;
           __sav = new char[__len];
           memcpy(__sav, __old, __len);
           setlocale(LC_ALL, "C");
+#if defined (__ANDROID__)
         }
+#endif
       char* __sanity;
       bool __overflow = false;
 
@@ -121,13 +125,17 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
       // Assumes __s formatted for "C" locale.
       char* __old = setlocale(LC_ALL, 0);
       char* __sav = 0;
+#if defined (__ANDROID__)
       if (__old)
         {
+#endif
           const size_t __len = strlen(__old) + 1;
           __sav = new char[__len];
           memcpy(__sav, __old, __len);
           setlocale(LC_ALL, "C");
+#if defined (__ANDROID__)
         }
+#endif
       char* __sanity;
 
 #if !__DBL_HAS_INFINITY__
@@ -170,13 +178,17 @@ _GLIBCXX_BEGIN_NAMESPACE_VERSION
       // Assumes __s formatted for "C" locale.
       char* __old = setlocale(LC_ALL, 0);
       char* __sav = 0;
+#if defined (__ANDROID__)
       if (__old)
         {
+#endif
           const size_t __len = strlen(__old) + 1;
           __sav = new char[__len];
           memcpy(__sav, __old, __len);
           setlocale(LC_ALL, "C");
+#if defined (__ANDROID__)
         }
+#endif
 
 #if !__LDBL_HAS_INFINITY__
       errno = 0;

@@ -52,6 +52,7 @@ along with GCC; see the file COPYING3.  If not see
 #include "targhooks.h"
 #include "cgraph.h"
 #include "pointer-set.h"
+#include "l-ipo.h"
 #include "asan.h"
 #include "basic-block.h"
 
@@ -1548,6 +1549,13 @@ notice_global_symbol (tree decl)
       || !MEM_P (DECL_RTL (decl)))
     return;
 
+  if (L_IPO_COMP_MODE
+      && ((TREE_CODE (decl) == FUNCTION_DECL
+           && cgraph_is_auxiliary (decl))
+          || (TREE_CODE (decl) == VAR_DECL && varpool_get_node (decl)
+              && varpool_is_auxiliary (varpool_get_node (decl)))))
+    return;
+
   /* We win when global object is found, but it is useful to know about weak
      symbol as well so we can produce nicer unique names.  */
   if (DECL_WEAK (decl) || DECL_ONE_ONLY (decl) || flag_shlib)
@@ -2287,6 +2295,13 @@ assemble_external (tree decl ATTRIBUTE_UNUSED)
       If it's not, we should not be calling this function.  */
   gcc_assert (asm_out_file);
 
+  /* Processing pending items from auxiliary modules are not supported
+     which means platforms that requires ASM_OUTPUT_EXTERNAL may 
+     have issues.  (TODO : one way is to flush the pending items from
+     auxiliary modules at the end of parsing the module)  */
+  if (L_IPO_IS_AUXILIARY_MODULE)
+    return;
+
   /* In a perfect world, the following condition would be true.
      Sadly, the Java and Go front ends emit assembly *from the front end*,
      bypassing the call graph.  See PR52739.  Fix before GCC 4.8.  */
@@ -2370,7 +2385,7 @@ mark_decl_referenced (tree decl)
 	 functions can be marked reachable, just use the external
 	 definition.  */
       struct cgraph_node *node = cgraph_get_create_node (decl);
-      if (!DECL_EXTERNAL (decl)
+      if (!(DECL_EXTERNAL (decl) || cgraph_is_aux_decl_external (node))
 	  && !node->definition)
 	cgraph_mark_force_output_node (node);
     }
@@ -5550,6 +5565,11 @@ do_assemble_alias (tree decl, tree target)
   if (TREE_ASM_WRITTEN (decl))
     return;
 
+  if (L_IPO_COMP_MODE
+      && lookup_attribute ("weakref", DECL_ATTRIBUTES (decl))
+      && TREE_ASM_WRITTEN (DECL_ASSEMBLER_NAME (decl)))
+    return;
+
   /* We must force creation of DECL_RTL for debug info generation, even though
      we don't use it here.  */
   make_decl_rtl (decl);
@@ -5647,6 +5667,12 @@ void
 assemble_alias (tree decl, tree target)
 {
   tree target_decl;
+
+  if (L_IPO_IS_AUXILIARY_MODULE)
+    {
+      if (!lookup_attribute ("weakref", DECL_ATTRIBUTES (decl)))
+        return;
+    }
 
   if (lookup_attribute ("weakref", DECL_ATTRIBUTES (decl)))
     {

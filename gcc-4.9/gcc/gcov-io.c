@@ -64,15 +64,22 @@ GCOV_LINKAGE struct gcov_var
 } gcov_var;
 
 /* Save the current position in the gcov file.  */
-static inline gcov_position_t
+/* We need to expose this function when compiling for gcov-tool.  */
+#ifndef IN_GCOV_TOOL
+static inline
+#endif
+gcov_position_t
 gcov_position (void)
 {
-  gcc_assert (gcov_var.mode > 0); 
   return gcov_var.start + gcov_var.offset;
 }
 
 /* Return nonzero if the error flag is set.  */
-static inline int 
+/* We need to expose this function when compiling for gcov-tool.  */
+#ifndef IN_GCOV_TOOL
+static inline
+#endif
+int
 gcov_is_error (void)
 {
   return gcov_var.file ? gcov_var.error : 1;
@@ -560,11 +567,13 @@ gcov_read_counter (void)
   return value;
 }
 
+/* We need to expose the below function when compiling for gcov-tool.  */
+
+#if !IN_LIBGCOV || defined (IN_GCOV_TOOL)
 /* Read string from coverage file. Returns a pointer to a static
    buffer, or NULL on empty string. You must copy the string before
    calling another gcov function.  */
 
-#if !IN_LIBGCOV
 GCOV_LINKAGE const char *
 gcov_read_string (void)
 {
@@ -641,7 +650,62 @@ gcov_read_summary (struct gcov_summary *summary)
     }
 }
 
-#if !IN_LIBGCOV
+#if (!IN_LIBGCOV && IN_GCOV != 1) || defined (IN_GCOV_TOOL)
+/* Read LEN words (unsigned type) and construct MOD_INFO.  */
+
+GCOV_LINKAGE void
+gcov_read_module_info (struct gcov_module_info *mod_info,
+                       gcov_unsigned_t len)
+{
+  gcov_unsigned_t src_filename_len, filename_len, i, j, num_strings;
+  mod_info->ident = gcov_read_unsigned ();
+  mod_info->is_primary = gcov_read_unsigned ();
+  mod_info->flags = gcov_read_unsigned ();
+  mod_info->lang = gcov_read_unsigned ();
+  mod_info->ggc_memory = gcov_read_unsigned ();
+  mod_info->num_quote_paths = gcov_read_unsigned ();
+  mod_info->num_bracket_paths = gcov_read_unsigned ();
+  mod_info->num_system_paths = gcov_read_unsigned ();
+  mod_info->num_cpp_defines = gcov_read_unsigned ();
+  mod_info->num_cpp_includes = gcov_read_unsigned ();
+  mod_info->num_cl_args = gcov_read_unsigned ();
+  len -= 11;
+
+  filename_len = gcov_read_unsigned ();
+  mod_info->da_filename = (char *) xmalloc (filename_len *
+                                            sizeof (gcov_unsigned_t));
+  for (i = 0; i < filename_len; i++)
+    ((gcov_unsigned_t *) mod_info->da_filename)[i] = gcov_read_unsigned ();
+  len -= (filename_len + 1);
+
+  src_filename_len = gcov_read_unsigned ();
+  mod_info->source_filename = (char *) xmalloc (src_filename_len *
+						sizeof (gcov_unsigned_t));
+  for (i = 0; i < src_filename_len; i++)
+    ((gcov_unsigned_t *) mod_info->source_filename)[i] = gcov_read_unsigned ();
+  len -= (src_filename_len + 1);
+
+  num_strings = mod_info->num_quote_paths + mod_info->num_bracket_paths
+    + mod_info->num_system_paths
+    + mod_info->num_cpp_defines + mod_info->num_cpp_includes
+    + mod_info->num_cl_args;
+  for (j = 0; j < num_strings; j++)
+   {
+     gcov_unsigned_t string_len = gcov_read_unsigned ();
+     mod_info->string_array[j] =
+       (char *) xmalloc (string_len * sizeof (gcov_unsigned_t));
+     for (i = 0; i < string_len; i++)
+       ((gcov_unsigned_t *) mod_info->string_array[j])[i] =
+	 gcov_read_unsigned ();
+     len -= (string_len + 1);
+   }
+  gcc_assert (!len);
+}
+#endif
+
+/* We need to expose the below function when compiling for gcov-tool.  */
+
+#if !IN_LIBGCOV || defined (IN_GCOV_TOOL)
 /* Reset to a known position.  BASE should have been obtained from
    gcov_position, LENGTH should be a record length.  */
 
@@ -672,6 +736,22 @@ gcov_seek (gcov_position_t base)
     gcov_write_block (gcov_var.offset);
   fseek (gcov_var.file, base << 2, SEEK_SET);
   gcov_var.start = ftell (gcov_var.file) >> 2;
+}
+
+/* Truncate the gcov file at the current position.  */
+
+GCOV_LINKAGE void
+gcov_truncate (void)
+{
+  long offs;
+  int filenum;
+  gcc_assert (gcov_var.mode < 0);
+  if (gcov_var.offset)
+    gcov_write_block (gcov_var.offset);
+  offs = ftell (gcov_var.file);
+  filenum = fileno (gcov_var.file);
+  if (offs == -1 || filenum == -1 || ftruncate (filenum, offs))
+    gcov_var.error = 1;
 }
 #endif
 

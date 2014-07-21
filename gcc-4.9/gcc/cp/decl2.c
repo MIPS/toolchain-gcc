@@ -103,9 +103,6 @@ static GTY(()) vec<tree, va_gc> *deferred_fns;
    sure are defined.  */
 static GTY(()) vec<tree, va_gc> *no_linkage_decls;
 
-/* Nonzero if we're done parsing and into end-of-file activities.  */
-
-int at_eof;
 
 
 /* Return a member function type (a METHOD_TYPE), given FNTYPE (a
@@ -3333,11 +3330,13 @@ start_static_storage_duration_function (unsigned count)
 {
   tree type;
   tree body;
-  char id[sizeof (SSDF_IDENTIFIER) + 1 /* '\0' */ + 32];
+  char id[sizeof (SSDF_IDENTIFIER) + 1 /* '\0' */ + 64];
 
   /* Create the identifier for this function.  It will be of the form
      SSDF_IDENTIFIER_<number>.  */
   sprintf (id, "%s_%u", SSDF_IDENTIFIER, count);
+  if (L_IPO_IS_AUXILIARY_MODULE)
+    sprintf (id, "%s.cmo.%u", id, current_module_id);
 
   type = build_function_type_list (void_type_node,
 				   integer_type_node, integer_type_node,
@@ -3772,6 +3771,9 @@ prune_vars_needing_no_initialization (tree *vars)
 	  continue;
 	}
 
+      gcc_assert (!L_IPO_IS_AUXILIARY_MODULE
+                  || varpool_is_auxiliary (varpool_node_for_decl (decl)));
+
       /* This variable is going to need initialization and/or
 	 finalization, so we add it to the list.  */
       *var = TREE_CHAIN (t);
@@ -4137,6 +4139,22 @@ no_linkage_error (tree decl)
 	       "to declare function %q#D with linkage", t, decl);
 }
 
+/* Clear the list of deferred functions.  */
+
+void
+cp_clear_deferred_fns (void)
+{
+  vec_free (deferred_fns);
+  deferred_fns = NULL;
+  keyed_classes = NULL;
+  vec_free (no_linkage_decls);
+  no_linkage_decls = NULL;
+  cp_clear_constexpr_hashtable ();
+  clear_pending_templates ();
+  reset_anon_name ();
+  reset_temp_count ();
+}
+
 /* Collect declarations from all namespaces relevant to SOURCE_FILE.  */
 
 static void
@@ -4237,68 +4255,15 @@ dump_tu (void)
    first, since that way we only need to reverse the decls once.  */
 
 void
-cp_write_global_declarations (void)
+cp_process_pending_declarations (location_t locus)
 {
-  tree vars;
+  tree vars, decl;
   bool reconsider;
   size_t i;
-  location_t locus;
   unsigned ssdf_count = 0;
   int retries = 0;
-  tree decl;
-  struct pointer_set_t *candidates;
-
-  locus = input_location;
-  at_eof = 1;
-
-  /* Bad parse errors.  Just forget about it.  */
-  if (! global_bindings_p () || current_class_type
-      || !vec_safe_is_empty (decl_namespace_list))
-    return;
-
-  /* This is the point to write out a PCH if we're doing that.
-     In that case we do not want to do anything else.  */
-  if (pch_file)
-    {
-      c_common_write_pch ();
-      dump_tu ();
-      return;
-    }
-
-  cgraph_process_same_body_aliases ();
-
-  /* Handle -fdump-ada-spec[-slim] */
-  if (flag_dump_ada_spec || flag_dump_ada_spec_slim)
-    {
-      if (flag_dump_ada_spec_slim)
-	collect_source_ref (main_input_filename);
-      else
-	collect_source_refs (global_namespace);
-
-      dump_ada_specs (collect_all_refs, cpp_check);
-    }
-
-  /* FIXME - huh?  was  input_line -= 1;*/
 
   timevar_start (TV_PHASE_DEFERRED);
-
-  /* We now have to write out all the stuff we put off writing out.
-     These include:
-
-       o Template specializations that we have not yet instantiated,
-	 but which are needed.
-       o Initialization and destruction for non-local objects with
-	 static storage duration.  (Local objects with static storage
-	 duration are initialized when their scope is first entered,
-	 and are cleaned up via atexit.)
-       o Virtual function tables.
-
-     All of these may cause others to be needed.  For example,
-     instantiating one function may cause another to be needed, and
-     generating the initializer for an object may cause templates to be
-     instantiated, etc., etc.  */
-
-  emit_support_tinfos ();
 
   do
     {
@@ -4535,6 +4500,26 @@ cp_write_global_declarations (void)
     }
   while (reconsider);
 
+  if (L_IPO_IS_AUXILIARY_MODULE)
+    {
+      tree fndecl;
+      int i;
+
+      gcc_assert (flag_dyn_ipa && L_IPO_COMP_MODE);
+
+      /* Do some cleanup -- we do not really need static init function
+         to be created for auxiliary modules -- they are created to keep
+         funcdef_no consistent between profile use and profile gen.  */
+      FOR_EACH_VEC_SAFE_ELT (ssdf_decls, i, fndecl)
+        /* Such ssdf_decls are not called from GLOBAL ctor/dtor, mark
+	   them reachable to avoid being eliminated too early before
+	   gimplication.  */
+        cgraph_enqueue_node (cgraph_get_create_node (fndecl));
+      ssdf_decls = NULL;
+      timevar_stop (TV_PHASE_DEFERRED);
+      return;
+    }
+
   /* All used inline functions must have a definition at this point.  */
   FOR_EACH_VEC_SAFE_ELT (deferred_fns, i, decl)
     {
@@ -4586,7 +4571,10 @@ cp_write_global_declarations (void)
 
   /* We're done with the splay-tree now.  */
   if (priority_info_map)
-    splay_tree_delete (priority_info_map);
+    {
+      splay_tree_delete (priority_info_map);
+      priority_info_map = NULL;
+    }
 
   /* Generate any missing aliases.  */
   maybe_apply_pending_pragma_weaks ();
@@ -4595,10 +4583,76 @@ cp_write_global_declarations (void)
      linkage now.  */
   pop_lang_context ();
 
+  ssdf_decls = NULL;
+  timevar_stop (TV_PHASE_DEFERRED);
+}
+
+/* This routine is called at the end of compilation.
+   Its job is to create all the code needed to initialize and
+   destroy the global aggregates.  We do the destruction
+   first, since that way we only need to reverse the decls once.  */
+
+void
+cp_write_global_declarations (void)
+{
+  bool reconsider = false;
+  location_t locus;
+  struct pointer_set_t *candidates;
+
+  locus = input_location;
+  at_eof = 1;
+
+  /* Bad parse errors.  Just forget about it.  */
+  if (! global_bindings_p () || current_class_type
+      || !vec_safe_is_empty (decl_namespace_list))
+    return;
+
+  if (pch_file)
+    {
+      c_common_write_pch ();
+      return;
+    }
+
+  cgraph_process_same_body_aliases ();
+
+  /* Handle -fdump-ada-spec[-slim] */
+  if (flag_dump_ada_spec || flag_dump_ada_spec_slim)
+    {
+      if (flag_dump_ada_spec_slim)
+	collect_source_ref (main_input_filename);
+      else
+	collect_source_refs (global_namespace);
+
+      dump_ada_specs (collect_all_refs, cpp_check);
+    }
+
+  /* FIXME - huh?  was  input_line -= 1;*/
+
+  /* We now have to write out all the stuff we put off writing out.
+     These include:
+
+       o Template specializations that we have not yet instantiated,
+	 but which are needed.
+       o Initialization and destruction for non-local objects with
+	 static storage duration.  (Local objects with static storage
+	 duration are initialized when their scope is first entered,
+	 and are cleaned up via atexit.)
+       o Virtual function tables.
+
+     All of these may cause others to be needed.  For example,
+     instantiating one function may cause another to be needed, and
+     generating the initializer for an object may cause templates to be
+     instantiated, etc., etc.  */
+
+  emit_support_tinfos ();
+
+  if (!L_IPO_COMP_MODE)
+    cp_process_pending_declarations (locus);
+
   /* Collect candidates for Java hidden aliases.  */
   candidates = collect_candidates_for_java_method_aliases ();
 
-  timevar_stop (TV_PHASE_DEFERRED);
+
   timevar_start (TV_PHASE_OPT_GEN);
 
   if (flag_vtable_verify)

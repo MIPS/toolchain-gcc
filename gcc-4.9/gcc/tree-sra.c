@@ -105,11 +105,13 @@ along with GCC; see the file COPYING3.  If not see
 #include "ipa-prop.h"
 #include "statistics.h"
 #include "params.h"
+#include "toplev.h"
 #include "target.h"
 #include "flags.h"
 #include "dbgcnt.h"
 #include "tree-inline.h"
 #include "gimple-pretty-print.h"
+#include "l-ipo.h"
 #include "ipa-inline.h"
 #include "ipa-utils.h"
 
@@ -4801,7 +4803,8 @@ convert_callers_for_node (struct cgraph_node *node,
 		 xstrdup (cs->callee->name ()),
 		 cs->callee->order);
 
-      ipa_modify_call_arguments (cs, cs->call_stmt, *adjustments);
+      if (cs->call_stmt)
+        ipa_modify_call_arguments (cs, cs->call_stmt, *adjustments);
 
       pop_cfun ();
     }
@@ -4861,12 +4864,15 @@ modify_function (struct cgraph_node *node, ipa_parm_adjustment_vec adjustments)
 {
   struct cgraph_node *new_node;
   bool cfg_changed;
-  vec<cgraph_edge_p> redirect_callers = collect_callers_of_node (node);
 
   rebuild_cgraph_edges ();
   free_dominance_info (CDI_DOMINATORS);
   pop_cfun ();
 
+  /* This must be done after rebuilding cgraph edges for node above.
+     Otherwise any recursive calls to node that are recorded in
+     redirect_callers will be corrupted.  */
+  vec<cgraph_edge_p> redirect_callers = collect_callers_of_node (node);
   new_node = cgraph_function_versioning (node, redirect_callers,
 					 NULL,
 					 NULL, false, NULL, NULL, "isra");
@@ -4878,6 +4884,7 @@ modify_function (struct cgraph_node *node, ipa_parm_adjustment_vec adjustments)
   sra_ipa_reset_debug_stmts (adjustments);
   convert_callers (new_node, node->decl, adjustments);
   cgraph_make_node_local (new_node);
+
   return cfg_changed;
 }
 
@@ -5049,7 +5056,7 @@ ipa_early_sra (void)
 static bool
 ipa_early_sra_gate (void)
 {
-  return flag_ipa_sra && dbg_cnt (eipa_sra);
+  return flag_ipa_sra && !flag_dyn_ipa && dbg_cnt (eipa_sra);
 }
 
 namespace {

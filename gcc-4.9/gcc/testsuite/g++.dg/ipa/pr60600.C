@@ -14,7 +14,7 @@ struct intermediate: top {
 };
 
 struct child1: top {
-    void childf()
+    __attribute__((noinline)) void childf()
     {
         data d(topf());
     }
@@ -30,5 +30,5 @@ void test(top& t)
     test(d);
 }
 
-/* { dg-final { scan-ipa-dump "Type inconsident devirtualization" "cp" } } */
+/* { dg-final { scan-ipa-dump "Type inconsistent devirtualization" "cp" } } */
 /* { dg-final { cleanup-ipa-dump "cp" } } */
