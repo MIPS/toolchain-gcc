@@ -61,17 +61,22 @@ extern void lipo_set_substitute_string (const char *);
    -- otherwise we get duplicated defintions.
    Make the defines weak to link with other objects/libraries
    that potentially compiled with -fprofile-generate.  */
+#if !defined(_WIN32)
+#define WEAK_ATTR __attribute__ ((weak))
+#else
+#define WEAK_ATTR
+#endif
 
-__attribute__ ((weak)) gcov_unsigned_t __gcov_lipo_grouping_algorithm;
-__attribute__ ((weak)) gcov_unsigned_t __gcov_lipo_merge_modu_edges;
-__attribute__ ((weak)) gcov_unsigned_t __gcov_lipo_weak_inclusion;
-__attribute__ ((weak)) gcov_unsigned_t __gcov_lipo_max_mem;
-__attribute__ ((weak)) gcov_unsigned_t __gcov_lipo_comdat_algorithm;
-__attribute__ ((weak)) gcov_unsigned_t __gcov_lipo_random_group_size;
-__attribute__ ((weak)) gcov_unsigned_t __gcov_lipo_cutoff;
-__attribute__ ((weak)) gcov_unsigned_t __gcov_lipo_random_seed;
-__attribute__ ((weak)) gcov_unsigned_t __gcov_lipo_dump_cgraph;
-__attribute__ ((weak)) gcov_unsigned_t __gcov_lipo_propagate_scale;
+WEAK_ATTR gcov_unsigned_t __gcov_lipo_grouping_algorithm;
+WEAK_ATTR gcov_unsigned_t __gcov_lipo_merge_modu_edges;
+WEAK_ATTR gcov_unsigned_t __gcov_lipo_weak_inclusion;
+WEAK_ATTR gcov_unsigned_t __gcov_lipo_max_mem;
+WEAK_ATTR gcov_unsigned_t __gcov_lipo_comdat_algorithm;
+WEAK_ATTR gcov_unsigned_t __gcov_lipo_random_group_size;
+WEAK_ATTR gcov_unsigned_t __gcov_lipo_cutoff;
+WEAK_ATTR gcov_unsigned_t __gcov_lipo_random_seed;
+WEAK_ATTR gcov_unsigned_t __gcov_lipo_dump_cgraph;
+WEAK_ATTR gcov_unsigned_t __gcov_lipo_propagate_scale;
 #else
 gcov_unsigned_t __gcov_lipo_grouping_algorithm;
 gcov_unsigned_t __gcov_lipo_merge_modu_edges;
@@ -84,6 +89,8 @@ gcov_unsigned_t __gcov_lipo_random_seed;
 gcov_unsigned_t __gcov_lipo_dump_cgraph;
 gcov_unsigned_t __gcov_lipo_propagate_scale;
 #endif
+
+#undef WEAK_ATTR
 
 /* Set to verbose output mode.  */
 static bool verbose;
