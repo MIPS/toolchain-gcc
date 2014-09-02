@@ -54,7 +54,6 @@ extern void set_use_existing_grouping (void);
 extern void set_use_modu_list (void);
 extern void lipo_set_substitute_string (const char *);
 
-#if !defined(_WIN32)
 /* The following defines are needed by dyn-ipa.c.
    They will also be emitted by the compiler with -fprofile-generate,
    which means this file cannot be compiled with -fprofile-generate
@@ -77,18 +76,6 @@ WEAK_ATTR gcov_unsigned_t __gcov_lipo_cutoff;
 WEAK_ATTR gcov_unsigned_t __gcov_lipo_random_seed;
 WEAK_ATTR gcov_unsigned_t __gcov_lipo_dump_cgraph;
 WEAK_ATTR gcov_unsigned_t __gcov_lipo_propagate_scale;
-#else
-gcov_unsigned_t __gcov_lipo_grouping_algorithm;
-gcov_unsigned_t __gcov_lipo_merge_modu_edges;
-gcov_unsigned_t __gcov_lipo_weak_inclusion;
-gcov_unsigned_t __gcov_lipo_max_mem;
-gcov_unsigned_t __gcov_lipo_comdat_algorithm;
-gcov_unsigned_t __gcov_lipo_random_group_size;
-gcov_unsigned_t __gcov_lipo_cutoff;
-gcov_unsigned_t __gcov_lipo_random_seed;
-gcov_unsigned_t __gcov_lipo_dump_cgraph;
-gcov_unsigned_t __gcov_lipo_propagate_scale;
-#endif
 
 #undef WEAK_ATTR
 

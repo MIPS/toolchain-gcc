@@ -3496,6 +3496,7 @@ finish_id_expression (tree id_expression,
       tree wrap;
       if (VAR_P (decl)
 	  && !cp_unevaluated_operand
+	  && !processing_template_decl
 	  && DECL_THREAD_LOCAL_P (decl)
 	  && (wrap = get_tls_wrapper_fn (decl)))
 	{
@@ -8982,7 +8983,9 @@ cxx_eval_bare_aggregate (const constexpr_call *call, tree t,
 	  constructor_elt *inner = base_field_constructor_elt (n, ce->index);
 	  inner->value = elt;
 	}
-      else if (ce->index && TREE_CODE (ce->index) == NOP_EXPR)
+      else if (ce->index
+	       && (TREE_CODE (ce->index) == NOP_EXPR
+		   || TREE_CODE (ce->index) == POINTER_PLUS_EXPR))
 	{
 	  /* This is an initializer for an empty base; now that we've
 	     checked that it's constant, we can ignore it.  */
