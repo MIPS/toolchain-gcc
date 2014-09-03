@@ -2097,6 +2097,10 @@ static unsigned int initial_ix86_tune_features[X86_TUNE_LAST] = {
      during reassociation of fp computation.  */
   m_ATOM | m_SLM | m_HASWELL,
 
+  /* X86_TUNE_VECTOR_PARALLEL_EXECUTION: Indicates tunings with ability to
+     execute 2 or more vector instructions in parallel.  */
+  m_COREI7 | m_HASWELL,
+
   /* X86_TUNE_GENERAL_REGS_SSE_SPILL: Try to spill general regs to SSE
      regs instead of memory.  */
   m_CORE_ALL,
@@ -42496,6 +42500,16 @@ ix86_reassociation_width (unsigned int opc ATTRIBUTE_UNUSED,
 {
   int res = 1;
 
+  /* Vector part.  */
+  if (VECTOR_MODE_P (mode))
+    {
+      if (TARGET_VECTOR_PARALLEL_EXECUTION)
+	return 2;
+      else
+	return 1;
+    }
+
+  /* Scalar part.  */
   if (INTEGRAL_MODE_P (mode) && TARGET_REASSOC_INT_TO_PARALLEL)
     res = 2;
   else if (FLOAT_MODE_P (mode) && TARGET_REASSOC_FP_TO_PARALLEL)
