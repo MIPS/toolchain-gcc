@@ -41,7 +41,7 @@ see the files COPYING3 and COPYING.RUNTIME respectively.  If not, see
 #define CC1_SPEC \
   LINUX_OR_ANDROID_CC (LINUX_TARGET_CC1_SPEC, \
                        LINUX_TARGET_CC1_SPEC \
-                       " -mstackrealign -mssse3" \
+                       " -mssse3" \
                        " -fno-short-enums" \
                        " " \
                        ANDROID_CC1_SPEC("-fPIC"))
