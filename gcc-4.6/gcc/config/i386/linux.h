@@ -86,7 +86,7 @@ along with GCC; see the file COPYING3.  If not see
 #define CC1_SPEC \
   LINUX_OR_ANDROID_CC (LINUX_TARGET_CC1_SPEC, \
                        LINUX_TARGET_CC1_SPEC \
-                       " -mstackrealign -mssse3" \
+                       " -mssse3" \
                        " -m32 -fno-short-enums" \
                        " " \
                        ANDROID_CC1_SPEC("-fPIC"))
