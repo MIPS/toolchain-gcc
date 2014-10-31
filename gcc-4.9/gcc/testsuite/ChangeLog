@@ -1,3 +1,19 @@
+2014-10-27  Guozhi Wei  <carrot@google.com>
+
+	PR tree-optimization/63530
+	gcc.dg/vect/pr63530.c: New test.
+
+2014-10-21  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/63563
+	* gcc.target/i386/pr63563.c: New test.
+
+2014-09-25  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/63341
+	* gcc.dg/vect/pr63341-1.c: New test.
+	* gcc.dg/vect/pr63341-2.c: New test.
+
 2014-09-04  Guozhi Wei  <carrot@google.com>
 
 	PR target/62040

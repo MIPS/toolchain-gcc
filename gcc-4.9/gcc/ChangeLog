@@ -1,9 +1,36 @@
+2014-10-27  Guozhi Wei  <carrot@google.com>
+
+	PR tree-optimization/63530
+	tree-vect-data-refs.c (vect_create_addr_base_for_vector_ref): Set
+	pointer alignment according to DR_MISALIGNMENT.
+
 2014-10-24  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
 
 	* config/aarch64/aarch64-elf-raw.h (CA53_ERR_835769_SPEC): Define.
 	(LINK_SPEC): Include CA53_ERR_835769_SPEC.
 	* config/aarch64/aarch64-linux.h (CA53_ERR_835769_SPEC): Define.
 	(LINK_SPEC): Include CA53_ERR_835769_SPEC.
+
+2014-10-21  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/63563
+	* tree-vect-data-refs.c (vect_analyze_data_ref_accesses): Bail out
+	if either dra or drb stmts are not normal loads/stores.
+
+2014-09-25  Jakub Jelinek  <jakub@redhat.com>
+
+	PR tree-optimization/63341
+	* tree-vectorizer.h (vect_create_data_ref_ptr,
+	vect_create_addr_base_for_vector_ref): Add another tree argument
+	defaulting to NULL_TREE.
+	* tree-vect-data-refs.c (vect_create_data_ref_ptr): Add byte_offset
+	argument, pass it down to vect_create_addr_base_for_vector_ref.
+	(vect_create_addr_base_for_vector_ref): Add byte_offset argument,
+	add that to base_offset too if non-NULL.
+	* tree-vect-stmts.c (vectorizable_load): Add byte_offset variable,
+	for dr_explicit_realign_optimized set it to vector byte size
+	- 1 instead of setting offset, pass byte_offset down to
+	vect_create_data_ref_ptr.
 
 2014-08-27  Guozhi Wei  <carrot@google.com>
 
