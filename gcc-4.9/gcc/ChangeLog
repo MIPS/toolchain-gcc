@@ -1,3 +1,10 @@
+2014-10-24  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	* config/aarch64/aarch64-elf-raw.h (CA53_ERR_835769_SPEC): Define.
+	(LINK_SPEC): Include CA53_ERR_835769_SPEC.
+	* config/aarch64/aarch64-linux.h (CA53_ERR_835769_SPEC): Define.
+	(LINK_SPEC): Include CA53_ERR_835769_SPEC.
+
 2014-08-27  Guozhi Wei  <carrot@google.com>
 
 	PR target/62262
