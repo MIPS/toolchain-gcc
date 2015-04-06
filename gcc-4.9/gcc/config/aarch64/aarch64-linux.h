@@ -48,7 +48,12 @@
   " %{mfix-cortex-a53-835769:--fix-cortex-a53-835769}"
 #endif
 
-#define LINUX_TARGET_LINK_SPEC LINUX_TARGET_LINK_SPEC0 CA53_ERR_835769_SPEC
+#define CA53_ERR_843419_SPEC \
+  " %{!mno-fix-cortex-a53-843419:--fix-cortex-a53-843419}"
+
+#define LINUX_TARGET_LINK_SPEC LINUX_TARGET_LINK_SPEC0 \
+                               CA53_ERR_835769_SPEC \
+                               CA53_ERR_843419_SPEC
 
 #ifdef TARGET_FIX_ERR_A53_835769_DEFAULT
 #define CA53_ERR_835769_SPEC \
