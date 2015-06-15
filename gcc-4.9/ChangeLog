@@ -1,3 +1,8 @@
+2014-11-19  Renlin Li  <Renlin.Li@arm.com>
+
+	PR middle-end/63762
+	* ira.c (ira): Update preferred class.
+
 2014-07-26  Uros Bizjak  <ubizjak@gmail.com>
 
 	PR target/47230

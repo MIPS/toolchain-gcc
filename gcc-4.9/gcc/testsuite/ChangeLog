@@ -1,3 +1,8 @@
+2014-11-19  Renlin Li  <Renlin.Li@arm.com>
+
+	PR middle-end/63762
+	* gcc.dg/pr63762.c: New test.
+
 2014-10-29  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
 
 	* gcc.target/aarch64/madd_after_asm_1.c: New test.
