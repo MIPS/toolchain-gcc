@@ -1,6 +1,0 @@
-# bionic library tweaks for Android.
-
-# Disable building libunwind functinality.
-# UNWIND_H = 
-LIB2ADDEH = 
-LIB2ADDEHDEP = 
