@@ -137,6 +137,7 @@ static bool gimple_divmod_fixed_value_transform (gimple_stmt_iterator *);
 static bool gimple_mod_pow2_value_transform (gimple_stmt_iterator *);
 static bool gimple_mod_subtract_transform (gimple_stmt_iterator *);
 static bool gimple_stringops_transform (gimple_stmt_iterator *);
+static bool gimple_ic_transform (gimple_stmt_iterator *);
 
 /* Allocate histogram value.  */
 
@@ -696,20 +697,12 @@ check_ic_counter (gimple stmt, gcov_type *count1, gcov_type *count2,
 
   if (*count1 + *count2 > all)
     {
-      /* If (COUNT1 + COUNT2) is greater than ALL by less than around 10% then
-	 just fix COUNT2 up so that (COUNT1 + COUNT2) equals ALL.  */
-      if ((*count1 + *count2 - all) < (all >> 3))
-	*count2 = all - *count1;
-      else
-	{
-          if (dump_enabled_p ())
-            dump_printf_loc (MSG_MISSED_OPTIMIZATION, locus,
-                             "Corrupted topn ic value profile: top two "
-                             "targets's total count (%ld) exceeds bb count "
-                             "(%ld)",
-                             (long)(*count1 + *count2), (long)all);
-	  return true;
-	}
+      /* If (COUNT1 + COUNT2) is greater than ALL, we will fix it. This might
+         not necessarily be a corrupted profile. It may be caused by the sample
+         scaling. We will scale down both count1 and counte2.  */
+      double factor = (double) all / (*count1 + *count2);
+      *count1 *= factor;
+      *count2 *= factor;
     }
   return false;
 }
@@ -1913,7 +1906,7 @@ gimple_ic_transform_mult_targ (gimple stmt, histogram_value histogram)
 /* Perform indirect call (STMT) to guarded direct function call
    transformation using value profile data.  */
 
-bool
+static bool
 gimple_ic_transform (gimple_stmt_iterator *gsi)
 {
   gimple stmt = gsi_stmt (*gsi);
@@ -2355,7 +2348,10 @@ gimple_find_values_to_profile (histogram_values *values)
     for (gsi = gsi_start_bb (bb); !gsi_end_p (gsi); gsi_next (&gsi))
       gimple_values_to_profile (gsi_stmt (gsi), values);
 
-  values->safe_push (gimple_alloc_histogram_value (cfun, HIST_TYPE_TIME_PROFILE, 0, 0));
+  if (PARAM_VALUE (PARAM_PROFILE_VALUES_TIME))
+    values->safe_push (gimple_alloc_histogram_value (cfun,
+                                                     HIST_TYPE_TIME_PROFILE,
+                                                     0, 0));
 
   FOR_EACH_VEC_ELT (*values, i, hist)
     {

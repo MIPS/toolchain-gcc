@@ -3920,6 +3920,12 @@ vect_create_addr_base_for_vector_ref (gimple stmt,
       base_offset = fold_build2 (PLUS_EXPR, sizetype,
 				 base_offset, byte_offset);
     }
+  if (byte_offset)
+    {
+      byte_offset = fold_convert (sizetype, byte_offset);
+      base_offset = fold_build2 (PLUS_EXPR, sizetype,
+				 base_offset, byte_offset);
+    }
 
   /* base + base_offset */
   if (loop_vinfo)

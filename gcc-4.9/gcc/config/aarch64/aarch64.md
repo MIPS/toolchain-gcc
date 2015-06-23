@@ -107,6 +107,10 @@
 
 (define_c_enum "unspecv" [
     UNSPECV_EH_RETURN		; Represent EH_RETURN
+    UNSPECV_GET_FPCR		; Represent fetch of FPCR content.
+    UNSPECV_SET_FPCR		; Represent assign of FPCR content.
+    UNSPECV_GET_FPSR		; Represent fetch of FPSR content.
+    UNSPECV_SET_FPSR		; Represent assign of FPSR content.
   ]
 )
 
@@ -1102,7 +1106,7 @@
   add\\t%x0, %x1, %x2
   sub\\t%x0, %x1, #%n2
   add\\t%d0, %d1, %d2"
-  [(set_attr "type" "alu_imm,alu_reg,alu_imm,alu_reg")
+  [(set_attr "type" "alu_imm,alu_reg,alu_imm,neon_add")
    (set_attr "simd" "*,*,*,yes")]
 )
 
@@ -2782,7 +2786,7 @@
 
 ;; Logical right shift using SISD or Integer instruction
 (define_insn "*aarch64_lshr_sisd_or_int_<mode>3"
-  [(set (match_operand:GPI 0 "register_operand" "=w,w,r")
+  [(set (match_operand:GPI 0 "register_operand" "=w,&w,r")
         (lshiftrt:GPI
           (match_operand:GPI 1 "register_operand" "w,w,r")
           (match_operand:QI 2 "aarch64_reg_or_shift_imm_<mode>" "Us<cmode>,w,rUs<cmode>")))]
@@ -2801,11 +2805,13 @@
            (match_operand:DI 1 "aarch64_simd_register")
            (match_operand:QI 2 "aarch64_simd_register")))]
   "TARGET_SIMD && reload_completed"
-  [(set (match_dup 2)
+  [(set (match_dup 3)
         (unspec:QI [(match_dup 2)] UNSPEC_SISD_NEG))
    (set (match_dup 0)
-        (unspec:DI [(match_dup 1) (match_dup 2)] UNSPEC_SISD_USHL))]
-  ""
+        (unspec:DI [(match_dup 1) (match_dup 3)] UNSPEC_SISD_USHL))]
+  {
+    operands[3] = gen_lowpart (QImode, operands[0]);
+  }
 )
 
 (define_split
@@ -2814,11 +2820,13 @@
            (match_operand:SI 1 "aarch64_simd_register")
            (match_operand:QI 2 "aarch64_simd_register")))]
   "TARGET_SIMD && reload_completed"
-  [(set (match_dup 2)
+  [(set (match_dup 3)
         (unspec:QI [(match_dup 2)] UNSPEC_SISD_NEG))
    (set (match_dup 0)
-        (unspec:SI [(match_dup 1) (match_dup 2)] UNSPEC_USHL_2S))]
-  ""
+        (unspec:SI [(match_dup 1) (match_dup 3)] UNSPEC_USHL_2S))]
+  {
+    operands[3] = gen_lowpart (QImode, operands[0]);
+  }
 )
 
 ;; Arithmetic right shift using SISD or Integer instruction
@@ -3641,6 +3649,37 @@
     emit_move_insn (operands[0], tmp);
   DONE;
 })
+
+;; Write Floating-point Control Register.
+(define_insn "set_fpcr"
+  [(unspec_volatile [(match_operand:SI 0 "register_operand" "r")] UNSPECV_SET_FPCR)]
+  ""
+  "msr\\tfpcr, %0\;isb"
+  [(set_attr "type" "mrs")])
+
+;; Read Floating-point Control Register.
+(define_insn "get_fpcr"
+  [(set (match_operand:SI 0 "register_operand" "=r")
+        (unspec_volatile:SI [(const_int 0)] UNSPECV_GET_FPCR))]
+  ""
+  "mrs\\t%0, fpcr"
+  [(set_attr "type" "mrs")])
+
+;; Write Floating-point Status Register.
+(define_insn "set_fpsr"
+  [(unspec_volatile [(match_operand:SI 0 "register_operand" "r")] UNSPECV_SET_FPSR)]
+  ""
+  "msr\\tfpsr, %0"
+  [(set_attr "type" "mrs")])
+
+;; Read Floating-point Status Register.
+(define_insn "get_fpsr"
+  [(set (match_operand:SI 0 "register_operand" "=r")
+        (unspec_volatile:SI [(const_int 0)] UNSPECV_GET_FPSR))]
+  ""
+  "mrs\\t%0, fpsr"
+  [(set_attr "type" "mrs")])
+
 
 ;; AdvSIMD Stuff
 (include "aarch64-simd.md")
