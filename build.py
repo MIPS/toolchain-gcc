@@ -116,7 +116,7 @@ def main():
     if host is None:
         host = get_default_host()
 
-    ndk_build_tools_path = android_path('prebuilts/ndk/current/build/tools')
+    ndk_build_tools_path = android_path('ndk/build/tools')
     build_env = dict(os.environ)
     build_env['NDK_BUILDTOOLS_PATH'] = ndk_build_tools_path
     build_env['ANDROID_NDK_ROOT'] = ndk_path

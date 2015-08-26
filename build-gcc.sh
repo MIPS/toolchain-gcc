@@ -19,7 +19,7 @@
 #
 
 # include common function and variable definitions
-. $ANDROID_NDK_ROOT/build/tools/prebuilt-common.sh
+. $NDK_BUILDTOOLS_PATH/prebuilt-common.sh
 
 PROGRAM_PARAMETERS="<src-dir> <ndk-dir> <toolchain>"
 
