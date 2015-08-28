@@ -17,129 +17,48 @@
 """Builds GCC for Android."""
 from __future__ import print_function
 
-import argparse
-import inspect
-import multiprocessing
 import os
-import subprocess
-import sys
+import site
+
+site.addsitedir(os.path.join(os.path.dirname(__file__), '../../ndk/build/lib'))
+
+import build_support
 
 
-def android_path(path=''):
-    top = os.getenv('ANDROID_BUILD_TOP', '')
-    return os.path.realpath(os.path.join(top, path))
-
-
-def get_default_package_dir():
-    return android_path('out/ndk')
-
-
-def get_default_host():
-    if sys.platform in ('linux', 'linux2'):
-        return 'linux'
-    elif sys.platform == 'darwin':
-        return 'darwin'
-    else:
-        raise RuntimeError('Unsupported host: {}'.format(sys.platform))
-
-
-ALL_TOOLCHAINS = (
-    'arm-linux-androideabi', 'aarch64-linux-android',
-    'mipsel-linux-android', 'mips64el-linux-android',
-    'x86', 'x86_64',
-)
-
-
-class ArgParser(argparse.ArgumentParser):
+class ArgParser(build_support.ArgParser):
     def __init__(self):
-        super(ArgParser, self).__init__(
-            description=inspect.getdoc(sys.modules[__name__]),
-            formatter_class=argparse.RawDescriptionHelpFormatter)
+        super(ArgParser, self).__init__()
 
         self.add_argument(
-            '--host', choices=('darwin', 'linux', 'windows', 'windows64'),
-            help='Build binaries for given OS (e.g. linux).')
-        self.add_argument(
-            '--package-dir', help='Directory to place the packaged GCC.',
-            default=get_default_package_dir())
-        self.add_argument(
-            '--toolchain', choices=ALL_TOOLCHAINS,
+            '--toolchain', choices=build_support.ALL_TOOLCHAINS,
             help='Toolchain to build. Builds all if not present.')
 
 
-def toolchain_to_arch(toolchain):
-    return {
-        'arm-linux-androideabi': 'arm',
-        'aarch64-linux-android': 'arm64',
-        'mipsel-linux-android': 'mips',
-        'mips64el-linux-android': 'mips64',
-        'x86': 'x86',
-        'x86_64': 'x86_64',
-    }[toolchain]
-
-
-def default_api_level(arch):
-    if '64' in arch:
-        return 21
-    else:
-        return 9
-
-
-def sysroot_path(toolchain):
-    arch = toolchain_to_arch(toolchain)
-    version = default_api_level(arch)
-
-    prebuilt_ndk = 'prebuilts/ndk/current'
-    sysroot_subpath = 'platforms/android-{}/arch-{}'.format(version, arch)
-    return android_path(os.path.join(prebuilt_ndk, sysroot_subpath))
-
-
-def main():
-    args = ArgParser().parse_args()
-
-    if 'ANDROID_BUILD_TOP' not in os.environ:
-        top = os.path.join(os.path.dirname(__file__), '../..')
-        os.environ['ANDROID_BUILD_TOP'] = os.path.realpath(top)
-
-    os.chdir(android_path('toolchain/gcc'))
-
-    toolchain_path = android_path('toolchain')
-    ndk_path = android_path('ndk')
-
+def main(args):
     GCC_VERSION = '4.9'
-    jobs_arg = '-j{}'.format(multiprocessing.cpu_count() * 2)
 
-    package_dir_arg = '--package-dir={}'.format(args.package_dir)
-
-    toolchains = ALL_TOOLCHAINS
+    toolchains = build_support.ALL_TOOLCHAINS
     if args.toolchain is not None:
         toolchains = [args.toolchain]
 
-    host = args.host
-    if host is None:
-        host = get_default_host()
-
-    ndk_build_tools_path = android_path('ndk/build/tools')
-    build_env = dict(os.environ)
-    build_env['NDK_BUILDTOOLS_PATH'] = ndk_build_tools_path
-    build_env['ANDROID_NDK_ROOT'] = ndk_path
-
-    print('Building {} toolchains: {}'.format(host, ' '.join(toolchains)))
+    print('Building {} toolchains: {}'.format(args.host, ' '.join(toolchains)))
     for toolchain in toolchains:
         toolchain_name = '-'.join([toolchain, GCC_VERSION])
-        sysroot_arg = '--sysroot={}'.format(sysroot_path(toolchain))
+        sysroot_arg = '--sysroot={}'.format(
+            build_support.sysroot_path(toolchain))
         build_cmd = [
-            'bash', 'build-gcc.sh', toolchain_path, ndk_path, toolchain_name,
-            package_dir_arg, '--verbose', jobs_arg, sysroot_arg,
+            'bash', 'build-gcc.sh', build_support.toolchain_path(),
+            build_support.ndk_path(), toolchain_name, build_support.jobs_arg(),
+            sysroot_arg,
         ]
 
-        if host in ('windows', 'windows64'):
+        if args.host in ('windows', 'windows64'):
             build_cmd.append('--mingw')
 
-        if host != 'windows':
+        if args.host != 'windows':
             build_cmd.append('--try-64')
 
-        subprocess.check_call(build_cmd, env=build_env)
+        build_support.build(build_cmd, args)
 
 if __name__ == '__main__':
-    main()
+    build_support.run(main, ArgParser)
