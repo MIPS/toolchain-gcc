@@ -1673,7 +1673,7 @@ struct processor_costs atom_cost = {
 };
 
 static stringop_algs slm_memcpy[2] = {
-  {libcall, {{11, loop, false}, {-1, rep_prefix_4_byte, false}}},
+  {libcall, {{11, loop, false}, {-1, libcall, false}}},
   {libcall, {{32, loop, false}, {64, rep_prefix_4_byte, false},
              {8192, rep_prefix_8_byte, false}, {-1, libcall, false}}}};
 static stringop_algs slm_memset[2] = {
