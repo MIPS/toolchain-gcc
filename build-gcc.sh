@@ -181,7 +181,7 @@ TOOLCHAIN_LICENSES=$ANDROID_NDK_ROOT/build/tools/toolchain-licenses
 
 # Without option "--sysroot" (and its variations), GCC will attempt to
 # search path specified by "--with-sysroot" at build time for headers/libs.
-# Path at --with-sysroot contains minimal headers and libs to boostrap
+# Path at --with-sysroot contains minimal headers and libs to bootstrap
 # toolchain build, and it's not needed afterward (NOTE: NDK provides
 # sysroot at specified API level,and Android build explicit lists header/lib
 # dependencies.
