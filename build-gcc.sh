@@ -73,6 +73,10 @@ register_var_option "--package-dir=<path>" PACKAGE_DIR "Create archive tarball i
 ENABLE_LANGUAGES="c,c++"
 register_var_option "--enable-languages=<name>" ENABLE_LANGUAGES "Experimental: specify which languages to build"
 
+BUILD_DEBUGGABLE="no"
+register_var_option "--build-debuggable=<yes|no>" BUILD_DEBUGGABLE "Experimental: build debuggable version of gcc"
+
+
 register_jobs_option
 register_canadian_option
 register_try64_option
@@ -229,7 +233,11 @@ export CXXFLAGS_FOR_TARGET="$ABI_CXXFLAGS_FOR_TARGET"
 export ABI=$HOST_GMP_ABI
 
 # Note that the following flags only apply for "build" in canadian
-CFLAGS_FOR_BUILD="-O2 -s"
+if [ "$BUILD_DEBUGGABLE" = "yes" ] ; then
+  CFLAGS_FOR_BUILD="-O0 -g"
+else
+  CFLAGS_FOR_BUILD="-O2 -s"
+fi
 LDFLAGS_FOR_BUILD=
 
 if [ "$MINGW" = "yes" ] ; then
@@ -470,14 +478,15 @@ run rm -rf $TOOLCHAIN_INSTALL_PATH/$ABI_CONFIGURE_TARGET/lib/*/libstdc++.*
 run rm -rf $TOOLCHAIN_INSTALL_PATH/$ABI_CONFIGURE_TARGET/include/c++
 
 # strip binaries to reduce final package size
-test -z "$STRIP" && STRIP=strip
-
-run $STRIP $TOOLCHAIN_INSTALL_PATH/bin/*
-run $STRIP $TOOLCHAIN_INSTALL_PATH/$ABI_CONFIGURE_TARGET/bin/*
-run $STRIP $TOOLCHAIN_INSTALL_PATH/libexec/gcc/*/*/cc1$HOST_EXE
-run $STRIP $TOOLCHAIN_INSTALL_PATH/libexec/gcc/*/*/cc1plus$HOST_EXE
-run $STRIP $TOOLCHAIN_INSTALL_PATH/libexec/gcc/*/*/collect2$HOST_EXE
-run $STRIP $TOOLCHAIN_INSTALL_PATH/libexec/gcc/*/*/lto*$HOST_EXE
+if [ "$BUILD_DEBUGGABLE" != "yes" ] ; then
+  test -z "$STRIP" && STRIP=strip
+  run $STRIP $TOOLCHAIN_INSTALL_PATH/bin/*
+  run $STRIP $TOOLCHAIN_INSTALL_PATH/$ABI_CONFIGURE_TARGET/bin/*
+  run $STRIP $TOOLCHAIN_INSTALL_PATH/libexec/gcc/*/*/cc1$HOST_EXE
+  run $STRIP $TOOLCHAIN_INSTALL_PATH/libexec/gcc/*/*/cc1plus$HOST_EXE
+  run $STRIP $TOOLCHAIN_INSTALL_PATH/libexec/gcc/*/*/collect2$HOST_EXE
+  run $STRIP $TOOLCHAIN_INSTALL_PATH/libexec/gcc/*/*/lto*$HOST_EXE
+fi
 
 # Some of the files should really be links to save space.
 # This is mostly to reduce the size of the Windows zip archives,
