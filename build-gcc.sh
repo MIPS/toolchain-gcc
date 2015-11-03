@@ -551,6 +551,8 @@ echo "Removing sysroot for $TOOLCHAIN"
 rm -rf $TOOLCHAIN_INSTALL_PATH/sysroot
 
 if [ "$PACKAGE_DIR" ]; then
+    make_repo_prop "$TMPDIR/$TOOLCHAIN_SUBDIR"
+
     ARCHIVE="$TOOLCHAIN-$HOST_TAG.tar.bz2"
     dump "Packaging $ARCHIVE from $TMPDIR/$TOOLCHAIN_SUBDIR"
     pack_archive "$PACKAGE_DIR/$ARCHIVE" "$TMPDIR" "$TOOLCHAIN_SUBDIR"
