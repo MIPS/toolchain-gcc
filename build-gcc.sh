@@ -76,6 +76,9 @@ register_var_option "--enable-languages=<name>" ENABLE_LANGUAGES "Experimental: 
 BUILD_DEBUGGABLE="no"
 register_var_option "--build-debuggable=<yes|no>" BUILD_DEBUGGABLE "Experimental: build debuggable version of gcc"
 
+OBSCURE_PREFIX="yes"
+register_var_option "--obscure-prefix=<yes|no>" OBSCURE_PREFIX "Experimental: obscure sysroot prefix dir by linking to it from /tmp"
+
 
 register_jobs_option
 register_canadian_option
@@ -211,6 +214,21 @@ dump "Sysroot  : Copying: $SYSROOT --> $TOOLCHAIN_BUILD_SYSROOT"
 mkdir -p $TOOLCHAIN_BUILD_SYSROOT && (cd $SYSROOT && tar chf - *) | (cd $TOOLCHAIN_BUILD_SYSROOT && tar xf -)
 if [ $? != 0 ] ; then
     echo "Error while copying sysroot files. See $TMPLOG"
+    exit 1
+fi
+
+PREFIX_LOCATION=$TOOLCHAIN_INSTALL_PATH
+BUILD_SYSROOT_LOCATION=$TOOLCHAIN_BUILD_SYSROOT
+
+# If enabled, use symbolic link to obscure prefix location (b/25513824)
+if [ "$OBSCURE_PREFIX" == "yes" ]; then
+    TAG=`echo $ARGV $$ $RELEASE | md5sum | cut -f1 -d" "`
+    rm -f /tmp/$TAG
+    ln -s $PREFIX_LOCATION /tmp/$TAG
+    PREFIX_LOCATION=/tmp/$TAG
+    BUILD_SYSROOT_LOCATION=/tmp/$TAG/sysroot
+elif [ "$OBSCURE_PREFIX" != "no" ]; then
+    echo "error: illegal value for --obscure-prefix option (must be 'yes' or 'no')"
     exit 1
 fi
 
@@ -366,15 +384,15 @@ $BUILD_SRCDIR/configure --target=$ABI_CONFIGURE_TARGET \
                         --host=$ABI_CONFIGURE_HOST \
                         --build=$ABI_CONFIGURE_BUILD \
                         --disable-nls \
-                        --prefix=$TOOLCHAIN_INSTALL_PATH \
-                        --with-sysroot=$TOOLCHAIN_BUILD_SYSROOT \
+                        --prefix=$PREFIX_LOCATION \
+                        --with-sysroot=$BUILD_SYSROOT_LOCATION \
                         --with-binutils-version=$BINUTILS_VERSION \
                         --with-mpfr-version=$MPFR_VERSION \
                         --with-mpc-version=$MPC_VERSION \
                         --with-gmp-version=$GMP_VERSION \
                         --with-gcc-version=$CONFIGURE_GCC_VERSION \
                         --with-gdb-version=none \
-                        --with-gxx-include-dir=$TOOLCHAIN_INSTALL_PATH/include/c++/$GCC_VERSION \
+                        --with-gxx-include-dir=$PREFIX_LOCATION/include/c++/$GCC_VERSION \
                         --with-bugurl=$DEFAULT_ISSUE_TRACKER_URL \
                         --enable-languages=$ENABLE_LANGUAGES \
                         $EXTRA_CONFIG_FLAGS \
@@ -470,6 +488,11 @@ if [ "$ABI_CONFIGURE_HOST" != "$ABI_CONFIGURE_TARGET" ]; then
 fi
 # remove sysroot
 run rm -rf "$TOOLCHAIN_INSTALL_PATH/sysroot"
+
+# clean up link in /tmp if needed
+if [ "$OBSCURE_PREFIX" == "yes" ]; then
+  rm -f $PREFIX_LOCATION
+fi
 
 # Remove libstdc++ for now (will add it differently later)
 # We had to build it to get libsupc++ which we keep.
