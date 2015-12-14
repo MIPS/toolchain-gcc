@@ -74,7 +74,7 @@ ENABLE_LANGUAGES="c,c++"
 register_var_option "--enable-languages=<name>" ENABLE_LANGUAGES "Experimental: specify which languages to build"
 
 BUILD_DEBUGGABLE="no"
-register_var_option "--build-debuggable=<yes|no>" BUILD_DEBUGGABLE "Experimental: build debuggable version of gcc"
+register_var_option "--build-debuggable=<yes|no>" BUILD_DEBUGGABLE "Experimental: build debuggable version of gcc."
 
 OBSCURE_PREFIX="yes"
 register_var_option "--obscure-prefix=<yes|no>" OBSCURE_PREFIX "Experimental: obscure sysroot prefix dir by linking to it from /tmp"
