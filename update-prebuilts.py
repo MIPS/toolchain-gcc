@@ -46,6 +46,10 @@ class ArgParser(argparse.ArgumentParser):
             help='Build number to pull from the build server.')
 
         self.add_argument(
+            '--dryrun', action='store_true',
+            help='Dry run mode: echo commands but do not execute them.')
+
+        self.add_argument(
             '--use-current-branch', action='store_true',
             help='Do not repo start a new branch for the update.')
 
@@ -104,7 +108,16 @@ def package_name(host, arch):
     return 'gcc-{}-{}-x86_64.tar.bz2'.format(build_arch, host)
 
 
-def download_build(host, arch, build_number, download_dir):
+def invoke_cmd(dryrun, cmds, outfile=None):
+    """Invoke specified command (or echo command if dry-run mode)."""
+    if dryrun:
+        print('cmd: %s' % ' '.join(cmds))
+        return
+    subprocess.check_call(cmds, stdout=outfile)
+
+
+def download_build(host, arch, build_number, download_dir, dryrun):
+    """Download a specific build artifact."""
     url_base = 'https://android-build-uber.corp.google.com'
     path = 'builds/{branch}-{build_host}-{build_name}/{build_num}'.format(
         branch=BRANCH,
@@ -119,29 +132,28 @@ def download_build(host, arch, build_number, download_dir):
     out_file_path = os.path.join(download_dir, pkg_name)
     with open(out_file_path, 'w') as out_file:
         print('Downloading {} to {}'.format(url, out_file_path))
-        subprocess.check_call(
-            ['sso_client', '--location', '--request_timeout', TIMEOUT, url],
-            stdout=out_file)
+        invoke_cmd(dryrun,
+                   ['sso_client', '--location', '--request_timeout', TIMEOUT, url],
+                   outfile=out_file)
     return out_file_path
 
 
-def extract_package(package, install_dir):
+def extract_package(package, install_dir, dryrun):
     # The --strip-components is needed because the git project is in
     # prebuilts/gcc/$HOST/$ARCH/$TRIPLE, rather than a directory above that
     # like it really should have been.
     cmd = ['tar', 'xf', package, '-C', install_dir, '--strip-components=1']
     print('Extracting {}...'.format(package))
-    subprocess.check_call(cmd)
+    invoke_cmd(dryrun, cmd)
 
 
-def delete_old_toolchain(path):
+def delete_old_toolchain(path, dryrun):
     print('Removing old files in {}...'.format(path))
-    subprocess.check_call(
-        ['git', '-C', path, 'rm', '-rf', '--ignore-unmatch', '.'])
+    invoke_cmd(dryrun, ['git', '-C', path, 'rm', '-rf', '--ignore-unmatch', '.'])
 
     # Git doesn't believe in directories, so `git rm -rf` might leave behind
     # empty directories.
-    subprocess.check_call(['git', '-C', path, 'clean', '-df'])
+    invoke_cmd(dryrun, ['git', '-C', path, 'clean', '-df'])
 
 
 def get_prebuilt_subdir(host, arch):
@@ -197,28 +209,30 @@ def get_prebuilt_path(host, arch):
     return android_path(get_prebuilt_subdir(host, arch))
 
 
-def update_gcc(host, arch, build_number, use_current_branch, download_dir):
+def update_gcc(host, arch, build_number, use_current_branch, dryrun, download_dir):
     host_tag = host + '-x86'
     prebuilt_dir = get_prebuilt_path(host_tag, arch)
+    if dryrun:
+      print('cd %s' % prebuilt_dir)
     os.chdir(prebuilt_dir)
 
     if not use_current_branch:
-        subprocess.check_call(
-            ['repo', 'start', 'update-gcc-{}'.format(build_number), '.'])
+        invoke_cmd(dryrun,
+                   ['repo', 'start', 'update-gcc-{}'.format(build_number), '.'])
 
-    package = download_build(host, arch, build_number, download_dir)
+    package = download_build(host, arch, build_number, download_dir, dryrun)
 
     # Remove the old toolchain so we know the package we're building isn't
     # missing anything.
-    delete_old_toolchain(prebuilt_dir)
-    extract_package(package, prebuilt_dir)
+    delete_old_toolchain(prebuilt_dir, dryrun)
+    extract_package(package, prebuilt_dir, dryrun)
 
     print('Adding files to index...')
-    subprocess.check_call(['git', 'add', '.'])
+    invoke_cmd(dryrun, ['git', 'add', '.'])
 
     print('Committing update...')
     message = 'Update prebuilt GCC to build {}.'.format(build_number)
-    subprocess.check_call(['git', 'commit', '-m', message])
+    invoke_cmd(dryrun, ['git', 'commit', '-m', message])
 
 
 def main():
@@ -230,14 +244,15 @@ def main():
     os.makedirs(download_dir)
 
     try:
-        hosts = ('darwin', 'linux')
-        arches = ('arm', 'aarch64', 'mips64', 'x86_64')
+        hosts = ('linux', 'darwin')
+        arches = ('arm', 'aarch64', 'x86_64', 'mips64')
         for host in hosts:
             for arch in arches:
                 update_gcc(host, arch, args.build, args.use_current_branch,
-                           download_dir)
+                           args.dryrun, download_dir)
+
     finally:
-        shutil.rmtree(download_dir)
+      shutil.rmtree(download_dir)
 
 
 if __name__ == '__main__':
