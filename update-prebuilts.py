@@ -160,6 +160,27 @@ def delete_old_toolchain(path, dryrun):
     invoke_cmd(dryrun, ['git', '-C', path, 'clean', '-df'])
 
 
+def get_prebuilt_arch(arch):
+    return {
+        'arm': 'arm',
+        'aarch64': 'aarch64',
+        'mips64': 'mips',
+        'x86_64': 'x86',
+    }[arch]
+
+
+def get_triple(arch):
+    triple_arch = arch
+    if arch == 'mips64':
+        triple_arch = 'mips64el'
+
+    triple = '{}-linux-android'.format(triple_arch)
+    if arch == 'arm':
+        triple += 'eabi'
+
+    return triple
+
+
 def get_prebuilt_subdir(host, arch):
     """Returns the install path for a GCC prebuilt relative to the root.
 
@@ -188,21 +209,9 @@ def get_prebuilt_subdir(host, arch):
     >>> get_prebuilt_subdir('darwin-x86', 'mips64')
     'prebuilts/gcc/darwin-x86/mips/mips64el-linux-android-4.9'
     """
-    prebuilt_arch = {
-        'arm': 'arm',
-        'aarch64': 'aarch64',
-        'mips64': 'mips',
-        'x86_64': 'x86',
-    }[arch]
 
-    triple_arch = arch
-    if arch == 'mips64':
-        triple_arch = 'mips64el'
-
-    triple = '{}-linux-android'.format(triple_arch)
-    if arch == 'arm':
-        triple += 'eabi'
-    triple += '-4.9'
+    prebuilt_arch = get_prebuilt_arch(arch)
+    triple = get_triple(arch) + '-4.9'
 
     return os.path.join('prebuilts/gcc', host, prebuilt_arch, triple)
 
@@ -211,6 +220,48 @@ def get_prebuilt_subdir(host, arch):
 # doctests (no need to know absolute path).
 def get_prebuilt_path(host, arch):
     return android_path(get_prebuilt_subdir(host, arch))
+
+
+def generate_androidkernel_symlinks(arch, prebuilt_dir, dryrun):
+    """Generate an -androidkernel toolchain.
+
+    The kernel doesn't correctly link with gold, the default on x86 and ARM.
+    Generate a fake toolchain consisting of symlinks, with ld pointing to bfd.
+    """
+
+    files = {
+        'ar' : 'ar',
+        'as' : 'as',
+        'cpp' : 'cpp',
+        'ld' : 'ld.bfd',
+        'gcc' : 'gcc',
+        'objcopy' : 'objcopy',
+        'objdump' : 'objdump',
+    }
+
+    original_triple = get_triple(arch)
+    new_triple = original_triple + "kernel"
+
+    if arch == 'arm':
+        # We don't want arm-linux-androideabikernel.
+        new_triple = 'arm-linux-androidkernel'
+
+    bin_dir = os.path.join(prebuilt_dir, 'bin')
+    src_prefix = '{}-'.format(original_triple)
+    link_prefix = '{}-'.format(new_triple)
+    for link, src in files.iteritems():
+        link_path = os.path.join(bin_dir, link_prefix + link)
+        src_path = src_prefix + src
+
+        if dryrun:
+            print('ln -s {} {}'.format(src_path, link_path))
+        else:
+            # Make sure our symlink actually points to something.
+            full_path = os.path.join(bin_dir, src_path)
+            if not os.path.exists(full_path):
+                sys.exit("ERROR: missing file '{}'".format(full_path))
+
+            os.symlink(src_path, link_path)
 
 
 def update_gcc(host, arch, build_number, use_current_branch, dryrun, download_dir, message):
@@ -230,6 +281,7 @@ def update_gcc(host, arch, build_number, use_current_branch, dryrun, download_di
     # missing anything.
     delete_old_toolchain(prebuilt_dir, dryrun)
     extract_package(package, prebuilt_dir, dryrun)
+    generate_androidkernel_symlinks(arch, prebuilt_dir, dryrun)
 
     print('Adding files to index...')
     invoke_cmd(dryrun, ['git', 'add', '.'])
