@@ -53,6 +53,10 @@ class ArgParser(argparse.ArgumentParser):
             '--use-current-branch', action='store_true',
             help='Do not repo start a new branch for the update.')
 
+        self.add_argument(
+            '--message', '-m', metavar='MESSAGE',
+            help='Override the git commit message.')
+
 
 def host_to_build_host(host):
     """Gets the build host name for an NDK host tag.
@@ -209,7 +213,7 @@ def get_prebuilt_path(host, arch):
     return android_path(get_prebuilt_subdir(host, arch))
 
 
-def update_gcc(host, arch, build_number, use_current_branch, dryrun, download_dir):
+def update_gcc(host, arch, build_number, use_current_branch, dryrun, download_dir, message):
     host_tag = host + '-x86'
     prebuilt_dir = get_prebuilt_path(host_tag, arch)
     if dryrun:
@@ -231,7 +235,10 @@ def update_gcc(host, arch, build_number, use_current_branch, dryrun, download_di
     invoke_cmd(dryrun, ['git', 'add', '.'])
 
     print('Committing update...')
-    message = 'Update prebuilt GCC to build {}.'.format(build_number)
+    if message is not None:
+        message = message.decode("string_escape")
+    else:
+        message = 'Update prebuilt GCC to build {}.'.format(build_number)
     invoke_cmd(dryrun, ['git', 'commit', '-m', message])
 
 
@@ -249,10 +256,10 @@ def main():
         for host in hosts:
             for arch in arches:
                 update_gcc(host, arch, args.build, args.use_current_branch,
-                           args.dryrun, download_dir)
+                           args.dryrun, download_dir, args.message)
 
     finally:
-      shutil.rmtree(download_dir)
+        shutil.rmtree(download_dir)
 
 
 if __name__ == '__main__':
