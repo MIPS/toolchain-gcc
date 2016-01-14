@@ -462,7 +462,7 @@ struct conversion_info {
   /* The type of the formal argument.  */
   tree to_type;
 };
-  
+
 struct rejection_reason {
   enum rejection_reason_code code;
   union {
@@ -1589,7 +1589,7 @@ reference_binding (tree rto, tree rfrom, tree expr, bool c_cast_p, int flags,
 	conv->rvaluedness_matches_p
 	  = (TYPE_REF_IS_RVALUE (rto) == TYPE_REF_IS_RVALUE (rfrom));
       else
-	conv->rvaluedness_matches_p 
+	conv->rvaluedness_matches_p
           = (TYPE_REF_IS_RVALUE (rto) == !is_lvalue);
 
       if ((gl_kind & clk_bitfield) != 0
@@ -2490,16 +2490,16 @@ add_builtin_candidate (struct z_candidate **candidates, enum tree_code code,
 	break;
       if (TYPE_PTR_P (type1) && TYPE_PTR_P (type2))
 	break;
-      if (TREE_CODE (type1) == ENUMERAL_TYPE 
+      if (TREE_CODE (type1) == ENUMERAL_TYPE
 	  && TREE_CODE (type2) == ENUMERAL_TYPE)
 	break;
-      if (TYPE_PTR_P (type1) 
+      if (TYPE_PTR_P (type1)
 	  && null_ptr_cst_p (args[1]))
 	{
 	  type2 = type1;
 	  break;
 	}
-      if (null_ptr_cst_p (args[0]) 
+      if (null_ptr_cst_p (args[0])
 	  && TYPE_PTR_P (type2))
 	{
 	  type1 = type2;
@@ -2662,7 +2662,7 @@ add_builtin_candidate (struct z_candidate **candidates, enum tree_code code,
       if (ARITHMETIC_TYPE_P (type1))
 	break;
       return;
- 
+
     default:
       gcc_unreachable ();
     }
@@ -3940,7 +3940,7 @@ print_error_for_call_failure (tree fn, vec<tree, va_gc> *args, bool any_viable_p
    ARGS.  */
 
 tree
-build_new_function_call (tree fn, vec<tree, va_gc> **args, bool koenig_p, 
+build_new_function_call (tree fn, vec<tree, va_gc> **args, bool koenig_p,
 			 tsubst_flags_t complain)
 {
   struct z_candidate *candidates, *cand;
@@ -4041,9 +4041,8 @@ build_operator_new_call (tree fnname, vec<tree, va_gc> **args,
   if (size_check != NULL_TREE)
     {
       tree errval = TYPE_MAX_VALUE (sizetype);
-      if (cxx_dialect >= cxx11 && flag_exceptions
-          /* ANDROID - temporarily disable __cxa_throw_bad_array_new_length call. */
-          && !TARGET_ANDROID)
+      if (cxx_dialect >= cxx11 && flag_exceptions &&
+          DISABLE_CXA_THROW_BAD_ARRAY_NEW_LENGTH)
 	errval = throw_bad_array_new_length ();
       *size = fold_build3 (COND_EXPR, sizetype, size_check,
 			   original_size, errval);
@@ -4234,7 +4233,7 @@ build_op_call_1 (tree obj, vec<tree, va_gc> **args, tsubst_flags_t complain)
 	{
           if (complain & tf_error)
             {
-              error ("call of %<(%T) (%A)%> is ambiguous", 
+              error ("call of %<(%T) (%A)%> is ambiguous",
                      TREE_TYPE (obj), build_tree_list_vec (*args));
               print_z_candidates (location_of (TREE_TYPE (obj)), candidates);
             }
@@ -4463,7 +4462,7 @@ build_conditional_expr_1 (location_t loc, tree arg1, tree arg2, tree arg3,
   if (!arg2)
     {
       if (complain & tf_error)
-	pedwarn (loc, OPT_Wpedantic, 
+	pedwarn (loc, OPT_Wpedantic,
 		 "ISO C++ forbids omitting the middle term of a ?: expression");
 
       /* Make sure that lvalues remain lvalues.  See g++.oliva/ext1.C.  */
@@ -5161,7 +5160,7 @@ add_candidates (tree fns, tree first_arg, const vec<tree, va_gc> *args,
 				fn,
 				ctype,
 				explicit_targs,
-				fn_first_arg, 
+				fn_first_arg,
 				fn_args,
 				return_type,
 				access_path,
@@ -5377,7 +5376,7 @@ build_new_op_1 (location_t loc, enum tree_code code, int flags, tree arg1,
 	     -fpermissive.  */
 	  else
 	    {
-	      const char *msg = (flag_permissive) 
+	      const char *msg = (flag_permissive)
 		? G_("no %<%D(int)%> declared for postfix %qs,"
 		     " trying prefix operator instead")
 		: G_("no %<%D(int)%> declared for postfix %qs");
@@ -5580,8 +5579,8 @@ build_new_op_1 (location_t loc, enum tree_code code, int flags, tree arg1,
       return cp_build_array_ref (input_location, arg1, arg2, complain);
 
     case MEMBER_REF:
-      return build_m_component_ref (cp_build_indirect_ref (arg1, RO_ARROW_STAR, 
-                                                           complain), 
+      return build_m_component_ref (cp_build_indirect_ref (arg1, RO_ARROW_STAR,
+                                                           complain),
                                     arg2, complain);
 
       /* The caller will deal with these.  */
@@ -6112,7 +6111,7 @@ convert_like_real (conversion *convs, tree expr, tree fn, int argnum,
 	 about to bind it to a reference, in which case we need to
 	 leave it as an lvalue.  */
       if (inner >= 0)
-        {   
+        {
           expr = decl_constant_value_safe (expr);
           if (expr == null_node && INTEGRAL_OR_UNSCOPED_ENUMERATION_TYPE_P (totype))
             /* If __null has been converted to an integer type, we do not
@@ -6206,7 +6205,7 @@ convert_like_real (conversion *convs, tree expr, tree fn, int argnum,
 
   expr = convert_like_real (next_conversion (convs), expr, fn, argnum,
 			    convs->kind == ck_ref_bind ? -1 : 1,
-			    convs->kind == ck_ref_bind ? issue_conversion_warnings : false, 
+			    convs->kind == ck_ref_bind ? issue_conversion_warnings : false,
 			    c_cast_p,
 			    complain);
   if (expr == error_mark_node)
@@ -6274,7 +6273,7 @@ convert_like_real (conversion *convs, tree expr, tree fn, int argnum,
 	    return error_mark_node;
 	  }
 
-	/* If necessary, create a temporary. 
+	/* If necessary, create a temporary.
 
            VA_ARG_EXPR and CONSTRUCTOR expressions are special cases
            that need temporaries, even when their types are reference
@@ -6622,7 +6621,7 @@ convert_for_arg_passing (tree type, tree val, tsubst_flags_t complain)
   tree bitfield_type;
 
   /* If VAL is a bitfield, then -- since it has already been converted
-     to TYPE -- it cannot have a precision greater than TYPE.  
+     to TYPE -- it cannot have a precision greater than TYPE.
 
      If it has a smaller precision, we must widen it here.  For
      example, passing "int f:3;" to a function expecting an "int" will
@@ -6636,7 +6635,7 @@ convert_for_arg_passing (tree type, tree val, tsubst_flags_t complain)
      if we call convert_bitfield_to_declared_type, the bitfield will
      be converted to "long long".  */
   bitfield_type = is_bitfield_expr_with_lowered_type (val);
-  if (bitfield_type 
+  if (bitfield_type
       && TYPE_PRECISION (TREE_TYPE (val)) < TYPE_PRECISION (type))
     val = convert_to_integer (TYPE_MAIN_VARIANT (bitfield_type), val);
 
@@ -6718,7 +6717,7 @@ get_function_version_dispatcher (tree fn)
   return dispatcher_decl;
 }
 
-/* fn is a function version dispatcher that is marked used. Mark all the 
+/* fn is a function version dispatcher that is marked used. Mark all the
    semantically identical function versions it will dispatch as used.  */
 
 void
@@ -7059,7 +7058,7 @@ build_over_call (struct z_candidate *cand, int flags, tsubst_flags_t complain)
 				       : complain & (~tf_warning));
 
       val = convert_for_arg_passing (type, val, complain);
-	
+
       if (val == error_mark_node)
         return error_mark_node;
       else
@@ -7099,8 +7098,8 @@ build_over_call (struct z_candidate *cand, int flags, tsubst_flags_t complain)
 
   if (! flag_elide_constructors)
     /* Do things the hard way.  */;
-  else if (cand->num_convs == 1 
-           && (DECL_COPY_CONSTRUCTOR_P (fn) 
+  else if (cand->num_convs == 1
+           && (DECL_COPY_CONSTRUCTOR_P (fn)
                || DECL_MOVE_CONSTRUCTOR_P (fn)))
     {
       tree targ;
@@ -7298,11 +7297,11 @@ build_cxx_call (tree fn, int nargs, tree *argarray,
     return error_mark_node;
 
     /* If it is a built-in array notation function, then the return type of
-     the function is the element type of the array passed in as array 
+     the function is the element type of the array passed in as array
      notation (i.e. the first parameter of the function).  */
-  if (flag_cilkplus && TREE_CODE (fn) == CALL_EXPR) 
+  if (flag_cilkplus && TREE_CODE (fn) == CALL_EXPR)
     {
-      enum built_in_function bif = 
+      enum built_in_function bif =
 	is_cilkplus_reduce_builtin (CALL_EXPR_FN (fn));
       if (bif == BUILT_IN_CILKPLUS_SEC_REDUCE_ADD
 	  || bif == BUILT_IN_CILKPLUS_SEC_REDUCE_MUL
@@ -7310,7 +7309,7 @@ build_cxx_call (tree fn, int nargs, tree *argarray,
 	  || bif == BUILT_IN_CILKPLUS_SEC_REDUCE_MIN
 	  || bif == BUILT_IN_CILKPLUS_SEC_REDUCE
 	  || bif == BUILT_IN_CILKPLUS_SEC_REDUCE_MUTATING)
-	{ 
+	{
 	  if (call_expr_nargs (fn) == 0)
 	    {
 	      error_at (EXPR_LOCATION (fn), "Invalid builtin arguments");
@@ -7318,13 +7317,13 @@ build_cxx_call (tree fn, int nargs, tree *argarray,
 	    }
 	  /* for bif == BUILT_IN_CILKPLUS_SEC_REDUCE_ALL_ZERO or
 	     BUILT_IN_CILKPLUS_SEC_REDUCE_ANY_ZERO or
-	     BUILT_IN_CILKPLUS_SEC_REDUCE_ANY_NONZERO or 
+	     BUILT_IN_CILKPLUS_SEC_REDUCE_ANY_NONZERO or
 	     BUILT_IN_CILKPLUS_SEC_REDUCE_ALL_NONZERO or
 	     BUILT_IN_CILKPLUS_SEC_REDUCE_MIN_IND or
              BUILT_IN_CILKPLUS_SEC_REDUCE_MAX_IND
 	     The pre-defined return-type is the correct one.  */
-	  tree array_ntn = CALL_EXPR_ARG (fn, 0); 
-	  TREE_TYPE (fn) = TREE_TYPE (array_ntn); 
+	  tree array_ntn = CALL_EXPR_ARG (fn, 0);
+	  TREE_TYPE (fn) = TREE_TYPE (array_ntn);
 	  return fn;
 	}
     }
@@ -7385,7 +7384,7 @@ build_java_interface_fn_ref (tree fn, tree instance)
 
   /* Look up the pointer to the runtime java.lang.Class object for `instance'.
      This is the first entry in the vtable.  */
-  klass_ref = build_vtbl_ref (cp_build_indirect_ref (instance, RO_NULL, 
+  klass_ref = build_vtbl_ref (cp_build_indirect_ref (instance, RO_NULL,
                                                      tf_warning_or_error),
 			      integer_zero_node);
 
@@ -7569,7 +7568,7 @@ build_special_member_call (tree instance, tree name, vec<tree, va_gc> **args,
 
   if ((complain & tf_error)
       && (flags & LOOKUP_DELEGATING_CONS)
-      && name == complete_ctor_identifier 
+      && name == complete_ctor_identifier
       && TREE_CODE (ret) == CALL_EXPR
       && (DECL_ABSTRACT_ORIGIN (TREE_OPERAND (CALL_EXPR_FN (ret), 0))
 	  == current_function_decl))
@@ -8746,7 +8745,7 @@ joust (struct z_candidate *cand1, struct z_candidate *cand2, bool warn,
 	    source = TREE_TYPE (source);
 	  if (warning (OPT_Wconversion, "choosing %qD over %qD", w->fn, l->fn)
 	      && warning (OPT_Wconversion, "  for conversion from %qT to %qT",
-			  source, w->second_conv->type)) 
+			  source, w->second_conv->type))
 	    {
 	      inform (input_location, "  because conversion sequence for the argument is better");
 	    }
@@ -8847,7 +8846,7 @@ joust (struct z_candidate *cand1, struct z_candidate *cand2, bool warn,
       tree f2 = TREE_TYPE (cand2->fn);
       tree p1 = TYPE_ARG_TYPES (f1);
       tree p2 = TYPE_ARG_TYPES (f2);
-     
+
       /* Check if cand1->fn and cand2->fn are versions of the same function.  It
          is possible that cand1->fn and cand2->fn are function versions but of
          different functions.  Check types to see if they are versions of the same

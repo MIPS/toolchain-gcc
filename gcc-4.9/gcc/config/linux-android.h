@@ -60,3 +60,13 @@
 
 #define ANDROID_ENDFILE_SPEC \
   "%{shared: crtend_so%O%s;: crtend_android%O%s}"
+
+#define PROFILE_OR_COV_LINK_SPEC \
+    "%{fprofile-arcs|fprofile-generate*|coverage:-lgcov " \
+      LINUX_OR_ANDROID_LD("", "-lgcc") "}" SANITIZER_SPEC
+
+//
+// For Android apparently we want to temporarily
+// disable __cxa_throw_bad_array_new_length
+//
+#define DISABLE_CXA_THROW_BAD_ARRAY_NEW_LENGTH 1

@@ -751,6 +751,11 @@ proper position among the other output files.  */
     %{fvtable-verify=preinit: -lvtv -u_vtable_map_vars_start -u_vtable_map_vars_end}}"
 #endif
 
+/* Overridable by target. */
+#ifndef PROFILE_OR_COV_LINK_SPEC
+#define PROFILE_OR_COV_LINK_SPEC ""
+#endif
+
 /* -u* was put back because both BSD and SysV seem to support it.  */
 /* %{static:} simply prevents an error message if the target machine
    doesn't handle -static.  */
@@ -777,9 +782,7 @@ proper position among the other output files.  */
     %{fopenmp|ftree-parallelize-loops=*:%:include(libgomp.spec)%(link_gomp)}\
     %{fcilkplus:%:include(libcilkrts.spec)%(link_cilkrts)}\
     %{fgnu-tm:%:include(libitm.spec)%(link_itm)}\
-    %(mflib) " STACK_SPLIT_SPEC "\
-    %{fprofile-arcs|fprofile-generate*|coverage:-lgcov " \
-      LINUX_OR_ANDROID_LD("", "-lgcc") "}" SANITIZER_SPEC " \
+    %(mflib) " STACK_SPLIT_SPEC PROFILE_OR_COV_LINK_SPEC "\
     %{!nostdlib:%{!nodefaultlibs:%(link_ssp) %(link_gcc_c_sequence)}}\
     %{!nostdlib:%{!nostartfiles:%E}} %{T*} }}}}}}"
 #endif
@@ -5401,7 +5404,7 @@ do_spec_1 (const char *spec, int inswitch, const char *soft_matched_part)
 		     "%{foo=*:bar%*}%{foo=*:one%*two}"
 
 		   matches -foo=hello then it will produce:
-		   
+
 		     barhello onehellotwo
 		*/
 		if (*p == 0 || *p == '}')
@@ -6344,7 +6347,7 @@ set_func_reorder_linker_plugin_spec (void)
   int i;
   const char *plugin_opt_none = "group=none";
   const char *plugin_opt_callgraph = "group=callgraph";
-  
+
   /* Find the linker plugin that does function ordering.  */
   func_reorder_linker_plugin_file_spec = find_a_file (&exec_prefixes,
 					    FRPLUGINSONAME, R_OK, false);
@@ -7218,7 +7221,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\n"
 	  lto_gcc_spec = argv[0];
 
 	  /* The function reordering linker plugin will be loaded if the option
-	     -freorder-functions= is present in the command-line.  */ 
+	     -freorder-functions= is present in the command-line.  */
 	  if (switch_matches (freorder_functions_,
 		freorder_functions_ + strlen (freorder_functions_), 1))
 	    set_func_reorder_linker_plugin_spec ();
@@ -8487,9 +8490,9 @@ static unsigned HOST_WIDE_INT
 get_random_number (void)
 {
   unsigned HOST_WIDE_INT ret = 0;
-  int fd; 
+  int fd;
 
-  fd = open ("/dev/urandom", O_RDONLY); 
+  fd = open ("/dev/urandom", O_RDONLY);
   if (fd >= 0)
     {
       read (fd, &ret, sizeof (HOST_WIDE_INT));
@@ -8741,16 +8744,16 @@ replace_extension_spec_func (int argc, const char **argv)
   return result;
 }
 
-/* Insert backslash before spaces in ORIG (usually a file path), to 
+/* Insert backslash before spaces in ORIG (usually a file path), to
    avoid being broken by spec parser.
 
    This function is needed as do_spec_1 treats white space (' ' and '\t')
    as the end of an argument. But in case of -plugin /usr/gcc install/xxx.so,
    the file name should be treated as a single argument rather than being
-   broken into multiple. Solution is to insert '\\' before the space in a 
+   broken into multiple. Solution is to insert '\\' before the space in a
    file name.
-   
-   This function converts and only converts all occurrence of ' ' 
+
+   This function converts and only converts all occurrence of ' '
    to '\\' + ' ' and '\t' to '\\' + '\t'.  For example:
    "a b"  -> "a\\ b"
    "a  b" -> "a\\ \\ b"
