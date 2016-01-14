@@ -38,7 +38,7 @@
   "%{" NOANDROID "|tno-android-ld:" LINUX_SPEC ";:" ANDROID_SPEC "}"
 
 #define ANDROID_LINK_SPEC \
-  "%{shared: -Bsymbolic} -z noexecstack -z relro -z now"
+  "-z noexecstack -z relro -z now"
 
 #define ANDROID_CC1_SPEC(ANDROID_PIC_DEFAULT)				\
   "%{!mglibc:%{!muclibc:%{!mbionic: -mbionic}}} "			\
