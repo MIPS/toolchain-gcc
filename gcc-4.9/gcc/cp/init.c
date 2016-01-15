@@ -388,7 +388,7 @@ build_value_init_noctor (tree type, tsubst_flags_t complain)
     {
       gcc_assert (!TYPE_HAS_COMPLEX_DFLT (type)
 		  || errorcount != 0);
-
+	
       if (TREE_CODE (type) != UNION_TYPE)
 	{
 	  tree field;
@@ -1217,7 +1217,7 @@ expand_virtual_init (tree binfo, tree decl)
     }
 
   /* Compute the location of the vtpr.  */
-  vtbl_ptr = build_vfield_ref (cp_build_indirect_ref (decl, RO_NULL,
+  vtbl_ptr = build_vfield_ref (cp_build_indirect_ref (decl, RO_NULL, 
                                                       tf_warning_or_error),
 			       TREE_TYPE (binfo));
   gcc_assert (vtbl_ptr != error_mark_node);
@@ -2586,8 +2586,10 @@ build_new_1 (vec<tree, va_gc> **placement, tree type, tree nelts,
 	    }
 	  /* Perform the overflow check.  */
 	  tree errval = TYPE_MAX_VALUE (sizetype);
-	  if (cxx_dialect >= cxx11 && flag_exceptions &&
-              DISABLE_CXA_THROW_BAD_ARRAY_NEW_LENGTH)
+	  if (cxx_dialect >= cxx11 && flag_exceptions
+              /* ANDROID - temporarily disable __cxa_throw_bad_array_new_length
+                 call. */
+              && !TARGET_ANDROID)
 	    errval = throw_bad_array_new_length ();
 	  if (outer_nelts_check != NULL_TREE)
             size = fold_build3 (COND_EXPR, sizetype, outer_nelts_check,
@@ -3218,7 +3220,7 @@ build_vec_delete_1 (tree base, tree maxindex, tree type,
                  "even if they are declared when the class is defined");
        }
       return build_builtin_delete_call (base);
-    }
+    } 
 
   size_exp = size_in_bytes (type);
 
@@ -3379,7 +3381,7 @@ get_temp_regvar (tree type, tree init)
   decl = create_temporary_var (type);
   add_decl_expr (decl);
 
-  finish_expr_stmt (cp_build_modify_expr (decl, INIT_EXPR, init,
+  finish_expr_stmt (cp_build_modify_expr (decl, INIT_EXPR, init, 
 					  tf_warning_or_error));
 
   return decl;
@@ -3768,7 +3770,7 @@ build_vec_init (tree base, tree maxindex, tree init,
 	    from = NULL_TREE;
 
 	  if (from_array == 2)
-	    elt_init = cp_build_modify_expr (to, NOP_EXPR, from,
+	    elt_init = cp_build_modify_expr (to, NOP_EXPR, from, 
 					     complain);
 	  else if (type_build_ctor_call (type))
 	    elt_init = build_aggr_init (to, from, 0, complain);
