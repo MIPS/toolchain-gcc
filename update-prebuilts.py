@@ -54,6 +54,10 @@ class ArgParser(argparse.ArgumentParser):
             help='Do not repo start a new branch for the update.')
 
         self.add_argument(
+            '--cachedir', metavar='CACHEDIR',
+            help='Draw build artifacts from cache dir.')
+
+        self.add_argument(
             '--message', '-m', metavar='MESSAGE',
             help='Override the git commit message.')
 
@@ -120,8 +124,16 @@ def invoke_cmd(dryrun, cmds, outfile=None):
     subprocess.check_call(cmds, stdout=outfile)
 
 
-def download_build(host, arch, build_number, download_dir, dryrun):
+def download_build(host, arch, build_number, download_dir, dryrun, cachedir):
     """Download a specific build artifact."""
+    pkg_name = package_name(host, arch)
+    if cachedir:
+        cached_pkg = os.path.join(cachedir, pkg_name)
+        if os.path.exists(cached_pkg):
+            print('Reusing existing copy of {} from '
+                  '{}'.format(pkg_name, cachedir))
+            return cached_pkg
+
     url_base = 'https://android-build-uber.corp.google.com'
     path = 'builds/{branch}-{build_host}-{build_name}/{build_num}'.format(
         branch=BRANCH,
@@ -129,15 +141,14 @@ def download_build(host, arch, build_number, download_dir, dryrun):
         build_name=build_name(host, arch),
         build_num=build_number)
 
-    pkg_name = package_name(host, arch)
     url = '{}/{}/{}'.format(url_base, path, pkg_name)
-
     TIMEOUT = '60'  # In seconds.
     out_file_path = os.path.join(download_dir, pkg_name)
     with open(out_file_path, 'w') as out_file:
         print('Downloading {} to {}'.format(url, out_file_path))
         invoke_cmd(dryrun,
-                   ['sso_client', '--location', '--request_timeout', TIMEOUT, url],
+                   ['sso_client', '--location',
+                    '--request_timeout', TIMEOUT, url],
                    outfile=out_file)
     return out_file_path
 
@@ -153,7 +164,8 @@ def extract_package(package, install_dir, dryrun):
 
 def delete_old_toolchain(path, dryrun):
     print('Removing old files in {}...'.format(path))
-    invoke_cmd(dryrun, ['git', '-C', path, 'rm', '-rf', '--ignore-unmatch', '.'])
+    invoke_cmd(dryrun, ['git', '-C', path,
+                        'rm', '-rf', '--ignore-unmatch', '.'])
 
     # Git doesn't believe in directories, so `git rm -rf` might leave behind
     # empty directories.
@@ -230,13 +242,13 @@ def generate_androidkernel_symlinks(arch, prebuilt_dir, dryrun):
     """
 
     files = {
-        'ar' : 'ar',
-        'as' : 'as',
-        'cpp' : 'cpp',
-        'ld' : 'ld.bfd',
-        'gcc' : 'gcc',
-        'objcopy' : 'objcopy',
-        'objdump' : 'objdump',
+        'ar': 'ar',
+        'as': 'as',
+        'cpp': 'cpp',
+        'ld': 'ld.bfd',
+        'gcc': 'gcc',
+        'objcopy': 'objcopy',
+        'objdump': 'objdump',
     }
 
     original_triple = get_triple(arch)
@@ -264,18 +276,21 @@ def generate_androidkernel_symlinks(arch, prebuilt_dir, dryrun):
             os.symlink(src_path, link_path)
 
 
-def update_gcc(host, arch, build_number, use_current_branch, dryrun, download_dir, message):
+def update_gcc(host, arch, build_number, use_current_branch,
+               dryrun, download_dir, message, cachedir):
     host_tag = host + '-x86'
     prebuilt_dir = get_prebuilt_path(host_tag, arch)
     if dryrun:
-      print('cd %s' % prebuilt_dir)
+        print('cd %s' % prebuilt_dir)
     os.chdir(prebuilt_dir)
 
     if not use_current_branch:
         invoke_cmd(dryrun,
-                   ['repo', 'start', 'update-gcc-{}'.format(build_number), '.'])
+                   ['repo', 'start',
+                    'update-gcc-{}'.format(build_number), '.'])
 
-    package = download_build(host, arch, build_number, download_dir, dryrun)
+    package = download_build(host, arch, build_number,
+                             download_dir, dryrun, cachedir)
 
     # Remove the old toolchain so we know the package we're building isn't
     # missing anything.
@@ -288,7 +303,7 @@ def update_gcc(host, arch, build_number, use_current_branch, dryrun, download_di
 
     print('Committing update...')
     if message is not None:
-        message = message.decode("string_escape")
+        message = message.decode('string_escape')
     else:
         message = 'Update prebuilt GCC to build {}.'.format(build_number)
     invoke_cmd(dryrun, ['git', 'commit', '-m', message])
@@ -308,7 +323,8 @@ def main():
         for host in hosts:
             for arch in arches:
                 update_gcc(host, arch, args.build, args.use_current_branch,
-                           args.dryrun, download_dir, args.message)
+                           args.dryrun, download_dir, args.message,
+                           args.cachedir)
 
     finally:
         shutil.rmtree(download_dir)
