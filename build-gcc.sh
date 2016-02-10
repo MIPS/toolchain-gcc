@@ -380,8 +380,15 @@ fi
 # Put our freshly-built GNU sed ahead of the system one on the path.
 export PATH=$BUILD_OUT/sed/:$PATH
 
+if [ -f $SRC_DIR/gcc/gcc-$GCC_VERSION/gcc/BASE-VER ] ; then
+    INCLUDE_VERSION=`cat $SRC_DIR/gcc/gcc-$GCC_VERSION/gcc/BASE-VER`
+else
+    INCLUDE_VERSION=$GCC_VERSION
+fi
+
 cd $BUILD_OUT && run \
 $BUILD_SRCDIR/configure --target=$ABI_CONFIGURE_TARGET \
+                        --enable-bionic-libs \
                         --enable-initfini-array \
                         --host=$ABI_CONFIGURE_HOST \
                         --build=$ABI_CONFIGURE_BUILD \
@@ -394,7 +401,7 @@ $BUILD_SRCDIR/configure --target=$ABI_CONFIGURE_TARGET \
                         --with-gmp-version=$GMP_VERSION \
                         --with-gcc-version=$CONFIGURE_GCC_VERSION \
                         --with-gdb-version=none \
-                        --with-gxx-include-dir=$PREFIX_LOCATION/include/c++/$GCC_VERSION \
+                        --with-gxx-include-dir=$PREFIX_LOCATION/include/c++/$INCLUDE_VERSION \
                         --with-bugurl=$DEFAULT_ISSUE_TRACKER_URL \
                         --enable-languages=$ENABLE_LANGUAGES \
                         $EXTRA_CONFIG_FLAGS \
