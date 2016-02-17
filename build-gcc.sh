@@ -452,14 +452,21 @@ if [ $? != 0 ] ; then
     fi
 fi
 
+function install_missing_libs () {
+    (cd "$1" &&
+        find . \( -name "*.a" -o -name "*.la" -o -name "*.spec" \) -exec install -D "{}" "$2/{}" \;)
+}
+
 if [ "$MINGW" = "yes" -o "$DARWIN" = "yes" ] ; then
     # For some reasons, libraries in $ABI_CONFIGURE_TARGET (*) are not installed.
     # Hack here to copy them over.
     # (*) FYI: libgcc.a and libgcov.a not installed there in the first place
     INSTALL_TARGET_LIB_PATH="$BUILD_OUT/host-$ABI_CONFIGURE_BUILD/install/$ABI_CONFIGURE_TARGET/lib"
     TOOLCHAIN_TARGET_LIB_PATH="$TOOLCHAIN_INSTALL_PATH/$ABI_CONFIGURE_TARGET/lib"
-    (cd "$INSTALL_TARGET_LIB_PATH" &&
-        find . \( -name "*.a" -o -name "*.la" -o -name "*.spec" \) -exec install -D "{}" "$TOOLCHAIN_TARGET_LIB_PATH/{}" \;)
+    install_missing_libs "${INSTALL_TARGET_LIB_PATH}" "${TOOLCHAIN_TARGET_LIB_PATH}"
+    if [ -d "${INSTALL_TARGET_LIB_PATH}64" ]; then
+        install_missing_libs "${INSTALL_TARGET_LIB_PATH}64" "${TOOLCHAIN_TARGET_LIB_PATH}64"
+    fi
 fi
 
 # don't forget to copy the GPL and LGPL license files
