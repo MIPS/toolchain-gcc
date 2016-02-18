@@ -244,6 +244,8 @@ def generate_androidkernel_symlinks(arch, prebuilt_dir, dryrun):
     files = {
         'ar': 'ar',
         'as': 'as',
+        'size': 'size',
+        'nm': 'nm',
         'cpp': 'cpp',
         'ld': 'ld.bfd',
         'gcc': 'gcc',
