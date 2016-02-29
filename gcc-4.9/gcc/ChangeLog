@@ -1,3 +1,10 @@
+2016-01-22  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
+
+	PR target/69403
+	* config/arm/thumb2.md (*thumb2_ior_scc_strict_it): Convert to
+	define_insn_and_split.  Ensure operands[1] and operands[0] do not
+	get assigned the same register.
+
 2015-03-26  Bill Schmidt  <wschmidt@linux.vnet.ibm.com>
 
 	Backport of r214242, r214254, and bug fix patches from mainline
@@ -656,12 +663,6 @@
 	(sh_optimize_sett_clrt::execute): Do nothing if find_last_ccreg_values
 	returned false.
 
-2014-11-22  Uros Bizjak  <ubizjak@gmail.com>
-
-       * params.def (PARAM_MAX_COMPLETELY_PEELED_INSNS): Increase to 200.
-       * config/i386/i386.c (ix86_option_override_internal): Do not increase
-       PARAM_MAX_COMPLETELY_PEELED_INSNS.
-
 2014-11-22  Oleg Endo  <olegendo@gcc.gnu.org>
 
 	Backport from mainline
@@ -681,6 +682,12 @@
 	PR target/60111
 	* config/sh/sh.c: Use signed char for signed field.
 
+2014-11-22  Uros Bizjak  <ubizjak@gmail.com>
+
+       * params.def (PARAM_MAX_COMPLETELY_PEELED_INSNS): Increase to 200.
+       * config/i386/i386.c (ix86_option_override_internal): Do not increase
+       PARAM_MAX_COMPLETELY_PEELED_INSNS.
+
 2014-11-21  Bill Schmidt  <wschmidt@linux.vnet.ibm.com>
 
 	PR target/63673
@@ -693,6 +700,12 @@
 	PR tree-optimization/61750
 	* tree-ssa-forwprop.c (simplify_vce): Verify type sizes
 	match for the resulting VIEW_CONVERT_EXPR.
+
+2014-11-19  Wilco Dijkstra  <wdijkstr@arm.com>
+
+	PR target/61915
+	* config/aarch64/aarch64.c (generic_regmove_cost): Increase FP move
+	cost.
 
 2014-11-19  Uros Bizjak  <ubizjak@gmail.com>
 
@@ -839,9 +852,9 @@
 2014-11-04  Jiong Wang  <jiong.wang@arm.com>
 2014-11-04  Wilco Dijkstra  <wilco.dijkstra@arm.com>
 
-	PR target/63293
-	* config/aarch64/aarch64.c (aarch64_expand_epiloue): Add barriers before
-	stack adjustment.
+       PR target/63293
+       * config/aarch64/aarch64.c (aarch64_expand_epiloue): Add barriers before
+       stack adjustment.
 
 2014-10-31  DJ Delorie  <dj@redhat.com>
 
@@ -904,13 +917,6 @@
 
 	PR sanitizer/63638
 	* asan.c (enum asan_check_flags): Fixed ASAN_CHECK_LAST.
-
-2014-10-24  Kyrylo Tkachov  <kyrylo.tkachov@arm.com>
-
-	* config/aarch64/aarch64-elf-raw.h (CA53_ERR_835769_SPEC): Define.
-	(LINK_SPEC): Include CA53_ERR_835769_SPEC.
-	* config/aarch64/aarch64-linux.h (CA53_ERR_835769_SPEC): Define.
-	(LINK_SPEC): Include CA53_ERR_835769_SPEC.
 
 2014-10-24  Markus Trippelsdorf  <markus@trippelsdorf.de>
 
@@ -1245,17 +1251,6 @@
 	also check CALL_INSN_FUNCTION_USAGE for clobbers again after
 	killing regs_invalidated_by_call.
 
-2014-10-08  Rong Xu  <xur@google.com>
-
-	* gcov-tool.c (profile_overlap): New driver function
-	to compute profile overlap. 
-	(print_overlap_usage_message): New.
-	(overlap_usage): New.
-	(do_overlap): New.
-	(print_usage): Add calls to overlap function.
-	(main): Ditto.
-	* doc/gcov-tool.texi: Add documentation.
-
 2014-10-08  Oleg Endo  <olegendo@gcc.gnu.org>
 
 	Backport from mainline
@@ -1535,12 +1530,6 @@
 	PR target/61853
 	* config/pa/pa.c (pa_function_value): Directly handle aggregates
 	that fit exactly in a word or double word.
-
-2014-09-15  Sharad Singhai  <singhai@google.com>
-
-	Google Ref b/17114943
-
-	* l-ipo.c (promote_static_var_func): Update RTL with the unique name.
 
 2014-09-15  Markus Trippelsdorf  <markus@trippelsdorf.de>
 
@@ -3446,6 +3435,16 @@
 	PR target/60969
 	* config/i386/i386.md (*movsf_internal): Set MODE to SI for
 	alternative 12.
+
+2014-05-16  James Greenhalgh  <james.greenhalgh@arm.com>
+           Philipp Tomsich  <philipp.tomsich@theobroma-systems.com>
+
+       * config/aarch64/aarch64.c (aarch64_strip_shift_or_extend): Rename
+       to...
+       (aarch64_strip_extend): ...this, don't strip shifts, check RTX is
+       well formed.
+       (aarch64_rtx_mult_cost): New.
+       (aarch64_rtx_costs): Use it, refactor as appropriate.
 
 2014-05-16  Vladimir Makarov  <vmakarov@redhat.com>
 

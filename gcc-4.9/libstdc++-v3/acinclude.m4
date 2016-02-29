@@ -2317,6 +2317,32 @@ AC_DEFUN([GLIBCXX_ENABLE_VTABLE_VERIFY], [
 ])
 
 dnl
+dnl Use Bionic libstdc++ libraries.
+dnl
+dnl --enable-bionic-libs defines _GLIBCXX_BIONIC_LIBS to 1
+dnl --disable-bionic-libs defines _GLIBCXX_BIONIC_LIBS to 0
+
+dnl  +  Usage:  GLIBCXX_ENABLE_BIONIC_LIBS[(DEFAULT)]
+dnl       Where DEFAULT is `yes' or `no'.
+dnl
+AC_DEFUN([GLIBCXX_ENABLE_BIONIC_LIBS], [
+
+  GLIBCXX_ENABLE(bionic-libs,$1,,[enable bionic libs])
+
+  AC_MSG_CHECKING([for bionic libs support])
+  AC_MSG_RESULT([$enable_bionic_libs])
+
+  if test $enable_bionic_libs = yes; then
+    USE_BIONIC_LIBS="TRUE"
+  else
+    USE_BIONIC_LIBS="FALSE"
+  fi
+
+  AC_SUBST(USE_BIONIC_LIBS)
+  GLIBCXX_CONDITIONAL(ENABLE_BIONIC_LIBS, test $enable_bionic_libs = yes)
+])
+
+dnl
 dnl Check for parallel mode pre-requisites, including OpenMP support.
 dnl
 dnl  +  Usage:  GLIBCXX_ENABLE_PARALLEL
