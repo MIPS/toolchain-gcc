@@ -389,6 +389,7 @@ fi
 cd $BUILD_OUT && run \
 $BUILD_SRCDIR/configure --target=$ABI_CONFIGURE_TARGET \
                         --enable-bionic-libs \
+                        --enable-libatomic-ifuncs=no \
                         --enable-initfini-array \
                         --host=$ABI_CONFIGURE_HOST \
                         --build=$ABI_CONFIGURE_BUILD \
