@@ -245,6 +245,7 @@ def generate_androidkernel_symlinks(arch, prebuilt_dir, dryrun):
         'ar': 'ar',
         'as': 'as',
         'size': 'size',
+        'strip': 'strip',
         'nm': 'nm',
         'cpp': 'cpp',
         'ld': 'ld.bfd',
