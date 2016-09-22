@@ -569,8 +569,26 @@ do_relink_bin () {
         $ABI_CONFIGURE_TARGET-$DST_FILE$HOST_EXE
 }
 
+# $1: The file to be replaced by wrapper.
+do_install_gcc_wrapper() {
+  WRAPPER=$SRC_DIR/gcc/compiler_wrapper
+  local DST_FILE=$TOOLCHAIN_INSTALL_PATH/bin/$ABI_CONFIGURE_TARGET-$1
+  local REAL_DST_FILE=$TOOLCHAIN_INSTALL_PATH/bin/real-$ABI_CONFIGURE_TARGET-$1
+  if [ ! -f "$WRAPPER" ]; then
+      echo "ERROR: Can't install wrapper because $WRAPPER doesn't exist"
+      exit 1
+  fi
+  if [ ! -f "$DST_FILE$HOST_EXE" ]; then
+      echo "ERROR: Can't install wrapper because $DST_FILE$HOST_EXE doesn't exist"
+  fi
+  mv $DST_FILE$HOST_EXE $REAL_DST_FILE
+  cp -p $WRAPPER $DST_FILE$HOST_EXE
+}
+
 do_relink_bin c++ g++
 do_relink_bin gcc-$GCC_VERSION gcc
+do_install_gcc_wrapper gcc
+do_install_gcc_wrapper g++
 # symlink ld to either ld.gold or ld.bfd
 case "$TOOLCHAIN" in
     aarch64*)
