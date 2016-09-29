@@ -252,6 +252,7 @@ def generate_androidkernel_symlinks(arch, prebuilt_dir, dryrun):
         'gcc': 'gcc',
         'objcopy': 'objcopy',
         'objdump': 'objdump',
+        'readelf': 'readelf',
     }
 
     original_triple = get_triple(arch)
