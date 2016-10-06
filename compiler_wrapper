@@ -29,7 +29,7 @@ class CompilerWrapper():
 
   def process_gomacc_command(self):
     """Return the gomacc command if '--gomacc-path' is set."""
-    gomacc = self.custom_flag['--gomacc-path']
+    gomacc = self.custom_flags['--gomacc-path']
     if gomacc and os.path.isfile(gomacc):
       self.argv0 = gomacc
       self.execargs += [gomacc]
@@ -38,7 +38,7 @@ class CompilerWrapper():
     i = 0
     args = []
     while i < len(self.args):
-      if self.args[i] in self.custom_flag:
+      if self.args[i] in self.custom_flags:
         self.custom_flags[self.args[i]] = self.args[i + 1]
         i = i + 2
       else:
