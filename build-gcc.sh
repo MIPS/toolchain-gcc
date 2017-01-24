@@ -406,7 +406,8 @@ $BUILD_SRCDIR/configure --target=$ABI_CONFIGURE_TARGET \
                         --with-bugurl=$DEFAULT_ISSUE_TRACKER_URL \
                         --enable-languages=$ENABLE_LANGUAGES \
                         $EXTRA_CONFIG_FLAGS \
-                        $ABI_CONFIGURE_EXTRA_FLAGS
+                        $ABI_CONFIGURE_EXTRA_FLAGS \
+                        --disable-multilib
 if [ $? != 0 ] ; then
     dump "Error while trying to configure toolchain build. See $TMPLOG"
     exit 1
