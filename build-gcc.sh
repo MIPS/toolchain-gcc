@@ -386,6 +386,14 @@ else
     INCLUDE_VERSION=$GCC_VERSION
 fi
 
+
+MULTILIB_FLAG=""
+if [[ ${ABI_CONFIGURE_TARGET} == "mips64el-linux-android" ]] ; then
+  MULTILIB_FLAG="--disable-multilib"
+elif [[ ${ABI_CONFIGURE_TARGET} == "mipsel-linux-android" ]] ; then
+  MULTILIB_FLAG="--disable-multilib"
+fi
+
 cd $BUILD_OUT && run \
 $BUILD_SRCDIR/configure --target=$ABI_CONFIGURE_TARGET \
                         --enable-bionic-libs \
@@ -407,7 +415,8 @@ $BUILD_SRCDIR/configure --target=$ABI_CONFIGURE_TARGET \
                         --enable-languages=$ENABLE_LANGUAGES \
                         $EXTRA_CONFIG_FLAGS \
                         $ABI_CONFIGURE_EXTRA_FLAGS \
-                        --disable-multilib
+                        $MULTILIB_FLAG
+
 if [ $? != 0 ] ; then
     dump "Error while trying to configure toolchain build. See $TMPLOG"
     exit 1
