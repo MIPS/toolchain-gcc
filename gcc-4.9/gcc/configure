@@ -27052,7 +27052,8 @@ EOF
     esac
   fi
 fi
-
+# Disable gcc linker PIE support with copy reloc
+gcc_cv_ld_pie_copyreloc=no
 cat >>confdefs.h <<_ACEOF
 #define HAVE_LD_PIE_COPYRELOC `if test x"$gcc_cv_ld_pie_copyreloc" = xyes; then echo 1; else echo 0; fi`
 _ACEOF
