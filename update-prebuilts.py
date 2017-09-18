@@ -62,30 +62,18 @@ class ArgParser(argparse.ArgumentParser):
             help='Override the git commit message.')
 
 
-def host_to_build_host(host):
-    """Gets the build host name for an NDK host tag.
+def build_target(host, arch):
+    """Gets the toolchain build target name for the specified host and arch.
 
-    The Windows builds are done from Linux.
-    """
-    return {
-        'darwin': 'mac',
-        'linux': 'linux',
-        'windows': 'linux',
-    }[host]
+    The builds targets are named by combining the host and arch values.
 
+    >>> build_target('darwin', 'arm')
+    'arm_mac'
 
-def build_name(host, arch):
-    """Gets the release build name for an NDK host tag.
+    >>> build_target('darwin', 'aarch64')
+    'arm64_mac'
 
-    The builds are named by a short identifier like "linux" or "win64".
-
-    >>> build_name('darwin', 'arm')
-    'arm'
-
-    >>> build_name('darwin', 'aarch64')
-    'arm64'
-
-    >>> build_name('linux', 'x86')
+    >>> build_target('linux', 'x86')
     'linux_x86'
     """
     build_arch = arch
@@ -93,7 +81,7 @@ def build_name(host, arch):
         build_arch = 'arm64'
 
     if host == 'darwin':
-        return build_arch
+        return build_arch + '_mac'
 
     return host + '_' + build_arch
 
@@ -134,22 +122,14 @@ def download_build(host, arch, build_number, download_dir, dryrun, cachedir):
                   '{}'.format(pkg_name, cachedir))
             return cached_pkg
 
-    url_base = 'https://android-build-uber.corp.google.com'
-    path = 'builds/{branch}-{build_host}-{build_name}/{build_num}'.format(
-        branch=BRANCH,
-        build_host=host_to_build_host(host),
-        build_name=build_name(host, arch),
-        build_num=build_number)
-
-    url = '{}/{}/{}'.format(url_base, path, pkg_name)
-    TIMEOUT = '60'  # In seconds.
     out_file_path = os.path.join(download_dir, pkg_name)
-    with open(out_file_path, 'w') as out_file:
-        print('Downloading {} to {}'.format(url, out_file_path))
-        invoke_cmd(dryrun,
-                   ['sso_client', '--location',
-                    '--request_timeout', TIMEOUT, url],
-                   outfile=out_file)
+    print('Downloading {} to {}'.format(pkg_name, out_file_path))
+    invoke_cmd(dryrun,
+               ['/google/data/ro/projects/android/fetch_artifact',
+                '--branch={}'.format(BRANCH),
+                '--bid={}'.format(build_number),
+                '--target={}'.format(build_target(host, arch)),
+                pkg_name, out_file_path])
     return out_file_path
 
 
