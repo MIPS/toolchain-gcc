@@ -323,7 +323,7 @@ def main():
 
     try:
         hosts = ('linux', 'darwin')
-        arches = ('arm', 'aarch64', 'x86_64', 'mips64')
+        arches = ('arm', 'aarch64', 'x86_64')
         for host in hosts:
             for arch in arches:
                 update_gcc(host, arch, args.build, args.use_current_branch,
