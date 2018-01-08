@@ -28,16 +28,6 @@ extern bool ix86_target_stack_probe (void);
 extern bool ix86_can_use_return_insn_p (void);
 extern void ix86_setup_frame_addresses (void);
 
-/* Section names for function patch prologue and epilogue section. See
-   ix86_output_function_nops_prologue_epilogue() in i386.c for details.  */
-#define FUNCTION_PATCH_PROLOGUE_SECTION "_function_patch_prologue"
-#define FUNCTION_PATCH_EPILOGUE_SECTION "_function_patch_epilogue"
-
-extern bool ix86_output_function_nops_prologue_epilogue (FILE *,
-                                                         const char *,
-                                                         const char *,
-                                                         int);
-
 extern HOST_WIDE_INT ix86_initial_elimination_offset (int, int);
 extern void ix86_expand_prologue (void);
 extern void ix86_maybe_emit_epilogue_vzeroupper (void);
@@ -322,6 +312,8 @@ extern enum attr_cpu ix86_schedule;
 #endif
 
 extern const char * ix86_output_call_insn (rtx insn, rtx call_op);
+extern const char * ix86_output_indirect_jmp (rtx call_op, bool ret_p);
+extern const char * ix86_output_function_return (bool long_p);
 extern bool adjacent_mem_locations (rtx mem1, rtx mem2);
 
 #ifdef RTX_CODE

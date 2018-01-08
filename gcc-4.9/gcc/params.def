@@ -1338,15 +1338,6 @@ DEFPARAM (PARAM_MAX_SLSR_CANDIDATE_SCAN,
 	  "strength reduction",
 	  50, 1, 999999)
 
-/* Parameters to be used with -mpatch-functions-for-instrumentation.
-   See config/i386/i386.opt  */
-DEFPARAM (PARAM_FUNCTION_PATCH_MIN_INSTRUCTIONS,
-          "function-patch-min-instructions",
-          "Minimum number of instructions in the function without loop before "
-          "the function is qualified for patching for instrumentation (for use "
-          "with -mpatch-functions-for-instrumentation)",
-          200, 0, 0)
-
 DEFPARAM (PARAM_ASAN_STACK,
          "asan-stack",
          "Enable asan stack protection",

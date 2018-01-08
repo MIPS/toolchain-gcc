@@ -2267,53 +2267,6 @@ struct GTY(()) stack_local_entry {
   struct stack_local_entry *next;
 };
 
-/* Structure describing stack frame layout.
-   Stack grows downward:
-
-   [arguments]
-					<- ARG_POINTER
-   saved pc
-
-   saved static chain			if ix86_static_chain_on_stack
-
-   saved frame pointer			if frame_pointer_needed
-					<- HARD_FRAME_POINTER
-   [saved regs]
-					<- regs_save_offset
-   [padding0]
-
-   [saved SSE regs]
-					<- sse_regs_save_offset
-   [padding1]          |
-		       |		<- FRAME_POINTER
-   [va_arg registers]  |
-		       |
-   [frame]	       |
-		       |
-   [padding2]	       | = to_allocate
-					<- STACK_POINTER
-  */
-struct ix86_frame
-{
-  int nsseregs;
-  int nregs;
-  int va_arg_size;
-  int red_zone_size;
-  int outgoing_arguments_size;
-
-  /* The offsets relative to ARG_POINTER.  */
-  HOST_WIDE_INT frame_pointer_offset;
-  HOST_WIDE_INT hard_frame_pointer_offset;
-  HOST_WIDE_INT stack_pointer_offset;
-  HOST_WIDE_INT hfp_save_offset;
-  HOST_WIDE_INT reg_save_offset;
-  HOST_WIDE_INT sse_reg_save_offset;
-
-  /* When save_regs_using_mov is set, emit prologue using
-     move instead of push instructions.  */
-  bool save_regs_using_mov;
-};
-
 /* Which cpu are we scheduling for.  */
 enum attr_cpu ix86_schedule;
 
@@ -2403,7 +2356,7 @@ static unsigned int ix86_function_arg_boundary (enum machine_mode,
 						const_tree);
 static rtx ix86_static_chain (const_tree, bool);
 static int ix86_function_regparm (const_tree, const_tree);
-static void ix86_compute_frame_layout (struct ix86_frame *);
+static void ix86_compute_frame_layout (void);
 static bool ix86_expand_vector_init_one_nonzero (bool, enum machine_mode,
 						 rtx, rtx, int);
 static void ix86_add_new_builtins (HOST_WIDE_INT);
@@ -2558,12 +2511,19 @@ make_pass_insert_vzeroupper (gcc::context *ctxt)
   return new pass_insert_vzeroupper (ctxt);
 }
 
-/* Return true if a red-zone is in use.  */
+/* Return true if a red-zone is in use.  We can't use red-zone when
+   there are local indirect jumps, like "indirect_jump" or "tablejump",
+   which jumps to another place in the function, since "call" in the
+   indirect thunk pushes the return address onto stack, destroying
+   red-zone.  */
 
 static inline bool
 ix86_using_red_zone (void)
 {
-  return TARGET_RED_ZONE && !TARGET_64BIT_MS_ABI;
+  return (TARGET_RED_ZONE
+          && !TARGET_64BIT_MS_ABI
+          && (!cfun->machine->has_local_indirect_jump
+              || cfun->machine->indirect_branch_type == indirect_branch_keep));
 }
 
 /* Return a string that documents the current -m options.  The caller is
@@ -4963,6 +4923,65 @@ ix86_reset_previous_fndecl (void)
   ix86_previous_fndecl = NULL_TREE;
 }
 
+/* Set the indirect_branch_type field from the function FNDECL.  */
+
+static void
+ix86_set_indirect_branch_type (tree fndecl)
+{
+  if (cfun->machine == NULL)
+    return;
+
+  if (cfun->machine->indirect_branch_type == indirect_branch_unset)
+    {
+      tree attr = lookup_attribute ("indirect_branch",
+                                    DECL_ATTRIBUTES (fndecl));
+      if (attr != NULL)
+        {
+          tree args = TREE_VALUE (attr);
+          if (args == NULL)
+            gcc_unreachable ();
+          tree cst = TREE_VALUE (args);
+          if (strcmp (TREE_STRING_POINTER (cst), "keep") == 0)
+            cfun->machine->indirect_branch_type = indirect_branch_keep;
+          else if (strcmp (TREE_STRING_POINTER (cst), "thunk") == 0)
+            cfun->machine->indirect_branch_type = indirect_branch_thunk;
+          else if (strcmp (TREE_STRING_POINTER (cst), "thunk-inline") == 0)
+            cfun->machine->indirect_branch_type = indirect_branch_thunk_inline;
+          else if (strcmp (TREE_STRING_POINTER (cst), "thunk-extern") == 0)
+            cfun->machine->indirect_branch_type = indirect_branch_thunk_extern;
+          else
+            gcc_unreachable ();
+        }
+      else
+        cfun->machine->indirect_branch_type = ix86_indirect_branch;
+    }
+
+  if (cfun->machine->function_return_type == indirect_branch_unset)
+    {
+      tree attr = lookup_attribute ("function_return",
+                                    DECL_ATTRIBUTES (fndecl));
+      if (attr != NULL)
+        {
+          tree args = TREE_VALUE (attr);
+          if (args == NULL)
+            gcc_unreachable ();
+          tree cst = TREE_VALUE (args);
+          if (strcmp (TREE_STRING_POINTER (cst), "keep") == 0)
+            cfun->machine->function_return_type = indirect_branch_keep;
+          else if (strcmp (TREE_STRING_POINTER (cst), "thunk") == 0)
+            cfun->machine->function_return_type = indirect_branch_thunk;
+          else if (strcmp (TREE_STRING_POINTER (cst), "thunk-inline") == 0)
+            cfun->machine->function_return_type = indirect_branch_thunk_inline;
+          else if (strcmp (TREE_STRING_POINTER (cst), "thunk-extern") == 0)
+            cfun->machine->function_return_type = indirect_branch_thunk_extern;
+          else
+            gcc_unreachable ();
+        }
+      else
+        cfun->machine->function_return_type = ix86_function_return;
+    }
+}
+
 /* Establish appropriate back-end context for processing the function
    FNDECL.  The argument might be NULL to indicate processing at top
    level, outside of any function scope.  */
@@ -4981,6 +5000,8 @@ ix86_set_current_function (tree fndecl)
       tree new_tree = (fndecl
 		       ? DECL_FUNCTION_SPECIFIC_TARGET (fndecl)
 		       : NULL_TREE);
+
+      ix86_set_indirect_branch_type (fndecl);
 
       ix86_previous_fndecl = fndecl;
       if (old_tree == new_tree)
@@ -9074,7 +9095,6 @@ symbolic_reference_mentioned_p (rtx op)
 bool
 ix86_can_use_return_insn_p (void)
 {
-  struct ix86_frame frame;
 
   if (! reload_completed || frame_pointer_needed)
     return 0;
@@ -9084,7 +9104,8 @@ ix86_can_use_return_insn_p (void)
   if (crtl->args.pops_args && crtl->args.size >= 32768)
     return 0;
 
-  ix86_compute_frame_layout (&frame);
+  ix86_compute_frame_layout ();
+  struct ix86_frame &frame = cfun->machine->frame;
   return (frame.stack_pointer_offset == UNITS_PER_WORD
 	  && (frame.nregs + frame.nsseregs) == 0);
 }
@@ -9147,6 +9168,217 @@ ix86_setup_frame_addresses (void)
 # endif
 #endif
 
+static int indirectlabelno;
+static bool indirect_thunk_needed = false;
+
+static int indirect_thunks_used;
+
+#ifndef INDIRECT_LABEL
+# define INDIRECT_LABEL "LIND"
+#endif
+
+/* Fills in the label name that should be used for the indirect thunk.  */
+
+static void
+indirect_thunk_name (char name[32], int regno, bool ret_p)
+{
+  if (regno >= 0 && ret_p)
+    gcc_unreachable ();
+
+  if (USE_HIDDEN_LINKONCE)
+    {
+      if (regno >= 0)
+        {
+          const char *reg_prefix;
+          if (!REX_INT_REGNO_P (regno))
+            reg_prefix = TARGET_64BIT ? "r" : "e";
+          else
+            reg_prefix = "";
+          sprintf (name, "__x86.indirect_thunk.%s%s",
+                   reg_prefix, reg_names[regno]);
+        }
+      else
+        {
+          const char *ret = ret_p ? "return" : "indirect";
+          sprintf (name, "__x86.%s_thunk", ret);
+        }
+    }
+  else
+    {
+      if (regno >= 0)
+        ASM_GENERATE_INTERNAL_LABEL (name, "LITR", regno);
+      else
+        {
+          if (ret_p)
+            ASM_GENERATE_INTERNAL_LABEL (name, "LRT", 0);
+          else
+            ASM_GENERATE_INTERNAL_LABEL (name, "LIT", 0);
+        }
+    }
+}
+
+static void
+output_indirect_thunk (int regno)
+{
+  char indirectlabel1[32];
+  char indirectlabel2[32];
+
+  ASM_GENERATE_INTERNAL_LABEL (indirectlabel1, INDIRECT_LABEL,
+                              indirectlabelno++);
+  ASM_GENERATE_INTERNAL_LABEL (indirectlabel2, INDIRECT_LABEL,
+                              indirectlabelno++);
+
+  /* Call */
+  fputs ("\tcall\t", asm_out_file);
+  assemble_name_raw (asm_out_file, indirectlabel2);
+  fputc ('\n', asm_out_file);
+
+  ASM_OUTPUT_INTERNAL_LABEL (asm_out_file, indirectlabel1);
+
+  switch (ix86_indirect_branch_loop)
+    {
+    case indirect_branch_loop_lfence:
+      /* lfence.  */
+      fprintf (asm_out_file, "\tlfence\n");
+      break;
+    case indirect_branch_loop_pause:
+      /* pause.  */
+      fprintf (asm_out_file, "\tpause\n");
+      break;
+    case indirect_branch_loop_nop:
+      /* nop.  */
+      fprintf (asm_out_file, "\tnop\n");
+      break;
+    default:
+      gcc_unreachable ();
+    }
+
+  /* Jump.  */
+  fputs ("\tjmp\t", asm_out_file);
+  assemble_name_raw (asm_out_file, indirectlabel1);
+  fputc ('\n', asm_out_file);
+
+  ASM_OUTPUT_INTERNAL_LABEL (asm_out_file, indirectlabel2);
+
+  if (regno >= 0)
+    {
+      /* MOV.  */
+      rtx xops[2];
+      xops[0] = gen_rtx_MEM (word_mode, stack_pointer_rtx);
+      xops[1] = gen_rtx_REG (word_mode, regno);
+      output_asm_insn ("mov\t{%1, %0|%0, %1}", xops);
+    }
+  else
+    {
+      /* LEA.  */
+      rtx xops[2];
+      xops[0] = stack_pointer_rtx;
+      xops[1] = plus_constant (Pmode, stack_pointer_rtx, UNITS_PER_WORD);
+      output_asm_insn ("lea\t{%E1, %0|%0, %E1}", xops);
+    }
+
+  fputs ("\tret\n", asm_out_file);
+}
+
+static void
+output_indirect_thunk_function (int regno)
+{
+  char name[32];
+  tree decl;
+
+  /* Create __x86.indirect_thunk.  */
+  indirect_thunk_name (name, regno, false);
+  decl = build_decl (BUILTINS_LOCATION, FUNCTION_DECL,
+                    get_identifier (name),
+                    build_function_type_list (void_type_node, NULL_TREE));
+  DECL_RESULT (decl) = build_decl (BUILTINS_LOCATION, RESULT_DECL,
+                                  NULL_TREE, void_type_node);
+  TREE_PUBLIC (decl) = 1;
+  TREE_STATIC (decl) = 1;
+  DECL_IGNORED_P (decl) = 1;
+
+#if TARGET_MACHO
+  if (TARGET_MACHO)
+    {
+      switch_to_section (darwin_sections[text_coal_section]);
+      fputs ("\t.weak_definition\t", asm_out_file);
+      assemble_name (asm_out_file, name);
+      fputs ("\n\t.private_extern\t", asm_out_file);
+      assemble_name (asm_out_file, name);
+      putc ('\n', asm_out_file);
+      ASM_OUTPUT_LABEL (asm_out_file, name);
+      DECL_WEAK (decl) = 1;
+    }
+  else
+#endif
+    if (USE_HIDDEN_LINKONCE)
+      {
+       DECL_COMDAT_GROUP (decl) = DECL_ASSEMBLER_NAME (decl);
+
+       targetm.asm_out.unique_section (decl, 0);
+       switch_to_section (get_named_section (decl, NULL, 0));
+
+       targetm.asm_out.globalize_label (asm_out_file, name);
+       fputs ("\t.hidden\t", asm_out_file);
+       assemble_name (asm_out_file, name);
+       putc ('\n', asm_out_file);
+       ASM_DECLARE_FUNCTION_NAME (asm_out_file, name, decl);
+      }
+    else
+      {
+       switch_to_section (text_section);
+       ASM_OUTPUT_LABEL (asm_out_file, name);
+      }
+
+  if (regno < 0)
+    {
+      /* Create alias for __x86.return_thunk.  */
+      char alias[32];
+
+      indirect_thunk_name (alias, regno, true);
+      ASM_OUTPUT_DEF (asm_out_file, alias, name);
+#if TARGET_MACHO
+      if (TARGET_MACHO)
+        {
+          fputs ("\t.weak_definition\t", asm_out_file);
+          assemble_name (asm_out_file, alias);
+          fputs ("\n\t.private_extern\t", asm_out_file);
+          assemble_name (asm_out_file, alias);
+          putc ('\n', asm_out_file);
+        }
+#else
+      if (USE_HIDDEN_LINKONCE)
+        {
+          fputs ("\t.globl\t", asm_out_file);
+          assemble_name (asm_out_file, alias);
+          putc ('\n', asm_out_file);
+          fputs ("\t.hidden\t", asm_out_file);
+          assemble_name (asm_out_file, alias);
+          putc ('\n', asm_out_file);
+        }
+#endif
+    }
+
+  DECL_INITIAL (decl) = make_node (BLOCK);
+  current_function_decl = decl;
+  allocate_struct_function (decl, false);
+  init_function_start (decl);
+  /* We're about to hide the function body from callees of final_* by
+     emitting it directly; tell them we're a thunk, if they care.  */
+  cfun->is_thunk = true;
+  first_function_block_is_cold = false;
+  /* Make sure unwind info is emitted for the thunk if needed.  */
+  final_start_function (emit_barrier (), asm_out_file, 1);
+
+  output_indirect_thunk (regno);
+
+  final_end_function ();
+  init_insn_lengths ();
+  free_after_compilation (cfun);
+  set_cfun (NULL);
+  current_function_decl = NULL;
+}
+
 static int pic_labels_used;
 
 /* Fills in the label name that should be used for a pc thunk for
@@ -9173,10 +9405,23 @@ ix86_code_end (void)
   rtx xops[2];
   int regno;
 
+  if (indirect_thunk_needed)
+    output_indirect_thunk_function (-1);
+
+  for (regno = FIRST_REX_INT_REG; regno <= LAST_REX_INT_REG; regno++)
+    {
+      int i = regno - FIRST_REX_INT_REG + SP_REG + 1;
+      if ((indirect_thunks_used & (1 << i)))
+        output_indirect_thunk_function (regno);
+    }
+
   for (regno = AX_REG; regno <= SP_REG; regno++)
     {
       char name[32];
       tree decl;
+
+      if ((indirect_thunks_used & (1 << regno)))
+        output_indirect_thunk_function (regno);
 
       if (!(pic_labels_used & (1 << regno)))
 	continue;
@@ -9479,8 +9724,8 @@ ix86_can_eliminate (const int from, const int to)
 HOST_WIDE_INT
 ix86_initial_elimination_offset (int from, int to)
 {
-  struct ix86_frame frame;
-  ix86_compute_frame_layout (&frame);
+  ix86_compute_frame_layout ();
+  struct ix86_frame &frame = cfun->machine->frame;
 
   if (from == ARG_POINTER_REGNUM && to == HARD_FRAME_POINTER_REGNUM)
     return frame.hard_frame_pointer_offset;
@@ -9519,8 +9764,9 @@ ix86_builtin_setjmp_frame_value (void)
 /* Fill structure ix86_frame about frame of currently computed function.  */
 
 static void
-ix86_compute_frame_layout (struct ix86_frame *frame)
+ix86_compute_frame_layout (void)
 {
+  struct ix86_frame *frame = &cfun->machine->frame;
   unsigned HOST_WIDE_INT stack_alignment_needed;
   HOST_WIDE_INT offset;
   unsigned HOST_WIDE_INT preferred_alignment;
@@ -10736,7 +10982,6 @@ ix86_expand_prologue (void)
   struct machine_function *m = cfun->machine;
   rtx insn, t;
   bool pic_reg_used;
-  struct ix86_frame frame;
   HOST_WIDE_INT allocate;
   bool int_registers_saved;
   bool sse_registers_saved;
@@ -10758,7 +11003,8 @@ ix86_expand_prologue (void)
   m->fs.sp_offset = INCOMING_FRAME_SP_OFFSET;
   m->fs.sp_valid = true;
 
-  ix86_compute_frame_layout (&frame);
+  ix86_compute_frame_layout ();
+  struct ix86_frame &frame = m->frame;
 
   if (!TARGET_64BIT && ix86_function_ms_hook_prologue (current_function_decl))
     {
@@ -11298,10 +11544,10 @@ static rtx
 ix86_set_fp_insn ()
 {
   rtx r, seq;
-  struct ix86_frame frame;
   HOST_WIDE_INT offset;
 
-  ix86_compute_frame_layout (&frame);
+  ix86_compute_frame_layout ();
+  struct ix86_frame &frame = cfun->machine->frame;
   gcc_assert (frame_pointer_partially_needed);
   offset = frame.stack_pointer_offset - frame.hard_frame_pointer_offset;
 
@@ -11491,12 +11737,12 @@ ix86_expand_epilogue (int style)
 {
   struct machine_function *m = cfun->machine;
   struct machine_frame_state frame_state_save = m->fs;
-  struct ix86_frame frame;
   bool restore_regs_via_mov;
   bool using_drap;
 
   ix86_finalize_stack_realign_flags ();
-  ix86_compute_frame_layout (&frame);
+  ix86_compute_frame_layout ();
+  struct ix86_frame &frame = m->frame;
 
   m->fs.sp_valid = (!frame_pointer_needed
 		    || (crtl->sp_is_unchanging
@@ -11835,244 +12081,11 @@ ix86_expand_epilogue (int style)
   m->fs = frame_state_save;
 }
 
-
-/* True if the current function should be patched with nops at prologue and
-   returns.  */
-static bool patch_current_function_p = false;
-
 static inline bool
 has_attribute (const char* attribute_name)
 {
   return lookup_attribute (attribute_name,
                            DECL_ATTRIBUTES (current_function_decl)) != NULL;
-}
-
-/* Return true if we patch the current function. By default a function
-   is patched if it has loops or if the number of insns is greater than
-   patch_functions_min_instructions (number of insns roughly translates
-   to number of instructions).  */
-
-static bool
-check_should_patch_current_function (void)
-{
-  int num_insns = 0;
-  rtx insn;
-  const char *func_name = NULL;
-  struct loops *loops;
-  int num_loops = 0;
-  int min_functions_instructions;
-
-  /* If a function has an attribute forcing patching on or off, do as it
-     indicates.  */
-  if (has_attribute ("always_patch_for_instrumentation"))
-    return true;
-  else if (has_attribute ("never_patch_for_instrumentation"))
-    return false;
-
-  /* Patch the function if it has at least a loop.  */
-  if (!patch_functions_ignore_loops)
-    {
-      if (DECL_STRUCT_FUNCTION (current_function_decl)->cfg)
-        {
-          loops = flow_loops_find (NULL);
-          num_loops = loops->larray->length();
-          /* FIXME - Deallocating the loop causes a seg-fault.  */
-#if 0
-          flow_loops_free (loops);
-#endif
-          /* We are not concerned with the function body as a loop.  */
-          if (num_loops > 1)
-            return true;
-        }
-    }
-
-  /* Else, check if function has more than patch_functions_min_instrctions.  */
-
-  /* Borrowed this code from rest_of_handle_final() in final.c.  */
-  func_name = XSTR (XEXP (DECL_RTL (current_function_decl), 0), 0);
-  if (!patch_functions_dont_always_patch_main &&
-      func_name &&
-      strcmp("main", func_name) == 0)
-    return true;
-
-  min_functions_instructions =
-      PARAM_VALUE (PARAM_FUNCTION_PATCH_MIN_INSTRUCTIONS);
-  if (min_functions_instructions > 0)
-    {
-      /* Calculate the number of instructions in this function and only emit
-         function patch for instrumentation if it is greater than
-         patch_functions_min_instructions.  */
-      for (insn = get_insns (); insn; insn = NEXT_INSN (insn))
-        {
-          if (NONDEBUG_INSN_P (insn))
-            ++num_insns;
-        }
-      if (num_insns < min_functions_instructions)
-        return false;
-    }
-
-  return true;
-}
-
-/* Emit the 11-byte patch space for the function prologue for functions that
-   qualify.  */
-
-static void
-ix86_output_function_prologue (FILE *file,
-                               HOST_WIDE_INT size ATTRIBUTE_UNUSED)
-{
-  /* Only for 64-bit target.  */
-  if (TARGET_64BIT && patch_functions_for_instrumentation)
-    {
-      patch_current_function_p = check_should_patch_current_function();
-      /* Emit the instruction 'jmp 09' followed by 9 bytes to make it 11-bytes
-         of nop.  */
-      ix86_output_function_nops_prologue_epilogue (
-          file,
-          FUNCTION_PATCH_PROLOGUE_SECTION,
-          ASM_BYTE"0xeb,0x09",
-          9);
-    }
-}
-
-/* Emit the nop bytes at function prologue or return (including tail call
-   jumps). The number of nop bytes generated is at least 8.
-   Also emits a section named SECTION_NAME, which is a backpointer section
-   holding the addresses of the nop bytes in the text section.
-   SECTION_NAME is either '_function_patch_prologue' or
-   '_function_patch_epilogue'. The backpointer section can be used to navigate
-   through all the function entry and exit points which are patched with nops.
-   PRE_INSTRUCTIONS are the instructions, if any, at the start of the nop byte
-   sequence. NUM_REMAINING_NOPS are the number of nop bytes to fill,
-   excluding the number of bytes in PRE_INSTRUCTIONS.
-   Returns true if the function was patched, false otherwise.  */
-
-bool
-ix86_output_function_nops_prologue_epilogue (FILE *file,
-                                             const char *section_name,
-                                             const char *pre_instructions,
-                                             int num_remaining_nops)
-{
-  static int labelno = 0;
-  char label[32], section_label[32];
-  section *section = NULL;
-  int num_actual_nops = num_remaining_nops - sizeof(void *);
-  unsigned int section_flags = SECTION_RELRO;
-  char *section_name_comdat = NULL;
-  const char *decl_section_name = NULL;
-  const char *func_name = NULL;
-  char *section_name_function_sections = NULL;
-  size_t len;
-
-  gcc_assert (num_remaining_nops >= 0);
-
-  if (!patch_current_function_p)
-    return false;
-
-  ASM_GENERATE_INTERNAL_LABEL (label, "LFPEL", labelno);
-  ASM_GENERATE_INTERNAL_LABEL (section_label, "LFPESL", labelno++);
-
-  /* Align the start of nops to 2-byte boundary so that the 2-byte jump
-     instruction can be patched atomically at run time.  */
-  ASM_OUTPUT_ALIGN (file, 1);
-
-  /* Emit nop bytes. They look like the following:
-       $LFPEL0:
-         <pre_instruction>
-         0x90 (repeated num_actual_nops times)
-         .quad $LFPESL0 - .
-     followed by section 'section_name' which contains the address
-     of instruction at 'label'.
-   */
-  ASM_OUTPUT_INTERNAL_LABEL (file, label);
-  if (pre_instructions)
-    fprintf (file, "%s\n", pre_instructions);
-
-  while (num_actual_nops-- > 0)
-    asm_fprintf (file, ASM_BYTE"0x90\n");
-
-  fprintf (file, ASM_QUAD);
-  /* Output "section_label - ." for the relative address of the entry in
-     the section 'section_name'.  */
-  assemble_name_raw (file, section_label);
-  fprintf (file, " - .");
-  fprintf (file, "\n");
-
-  /* Emit the backpointer section. For functions belonging to comdat group,
-     we emit a different section named '<section_name>.foo' where 'foo' is
-     the name of the comdat section. This section is later renamed to
-     '<section_name>' by ix86_elf_asm_named_section().
-     We emit a unique section name for the back pointer section for comdat
-     functions because otherwise the 'get_section' call may return an existing
-     non-comdat section with the same name, leading to references from
-     non-comdat section to comdat functions.
-  */
-  if (current_function_decl != NULL_TREE &&
-      DECL_ONE_ONLY (current_function_decl) &&
-      HAVE_COMDAT_GROUP)
-    {
-      decl_section_name =
-          TREE_STRING_POINTER (DECL_SECTION_NAME (current_function_decl));
-      len = strlen (decl_section_name) + strlen (section_name) + 2;
-      section_name_comdat = (char *) alloca (len);
-      sprintf (section_name_comdat, "%s.%s", section_name, decl_section_name);
-      section_name = section_name_comdat;
-      section_flags |= SECTION_LINKONCE;
-    }
-  else if (flag_function_sections)
-    {
-      func_name = XSTR (XEXP (DECL_RTL (current_function_decl), 0), 0);
-      if (func_name)
-        {
-          len = strlen (func_name) + strlen (section_name) + 2;
-          section_name_function_sections = (char *) alloca (len);
-          sprintf (section_name_function_sections, "%s.%s", section_name,
-                   func_name);
-          section_name = section_name_function_sections;
-        }
-    }
-  section = get_section (section_name, section_flags, current_function_decl);
-  switch_to_section (section);
-  /* Align the section to 8-byte boundary.  */
-  ASM_OUTPUT_ALIGN (file, 3);
-
-  /* Emit address of the start of nop bytes in the section:
-       $LFPESP0:
-         .quad $LFPEL0
-   */
-  ASM_OUTPUT_INTERNAL_LABEL (file, section_label);
-  fprintf(file, ASM_QUAD);
-  assemble_name_raw (file, label);
-  fprintf (file, "\n");
-
-  /* Switching back to text section.  */
-  switch_to_section (current_function_section ());
-  return true;
-}
-
-/* Strips the characters after '_function_patch_prologue' or
-   '_function_patch_epilogue' and emits the section.  */
-
-static void
-ix86_elf_asm_named_section (const char *name, unsigned int flags,
-                            tree decl)
-{
-  const char *section_name = name;
-  if (!flag_function_sections && HAVE_COMDAT_GROUP && flags & SECTION_LINKONCE)
-    {
-      const int prologue_section_name_length =
-          sizeof(FUNCTION_PATCH_PROLOGUE_SECTION) - 1;
-      const int epilogue_section_name_length =
-          sizeof(FUNCTION_PATCH_EPILOGUE_SECTION) - 1;
-
-      if (strncmp (name, FUNCTION_PATCH_PROLOGUE_SECTION,
-                   prologue_section_name_length) == 0)
-        section_name = FUNCTION_PATCH_PROLOGUE_SECTION;
-      else if (strncmp (name, FUNCTION_PATCH_EPILOGUE_SECTION,
-                        epilogue_section_name_length) == 0)
-        section_name = FUNCTION_PATCH_EPILOGUE_SECTION;
-    }
-  default_elf_asm_named_section (section_name, flags, decl);
 }
 
 /* Reset from the function's potential modifications.  */
@@ -12196,7 +12209,6 @@ static GTY(()) rtx split_stack_fn_large;
 void
 ix86_expand_split_stack_prologue (void)
 {
-  struct ix86_frame frame;
   HOST_WIDE_INT allocate;
   unsigned HOST_WIDE_INT args_size;
   rtx label, limit, current, jump_insn, allocate_rtx, call_insn, call_fusage;
@@ -12207,7 +12219,8 @@ ix86_expand_split_stack_prologue (void)
   gcc_assert (flag_split_stack && reload_completed);
 
   ix86_finalize_stack_realign_flags ();
-  ix86_compute_frame_layout (&frame);
+  ix86_compute_frame_layout ();
+  struct ix86_frame &frame = cfun->machine->frame;
   allocate = frame.stack_pointer_offset - INCOMING_FRAME_SP_OFFSET;
 
   /* This is the label we will branch to if we have enough stack
@@ -14918,6 +14931,7 @@ put_condition_code (enum rtx_code code, enum machine_mode mode, bool reverse,
    If CODE is 'h', pretend the reg is the 'high' byte register.
    If CODE is 'y', print "st(0)" instead of "st", if the reg is stack op.
    If CODE is 'd', duplicate the operand for AVX instruction.
+   If CODE is 'V', print naked register name without %.
  */
 
 void
@@ -14927,7 +14941,7 @@ print_reg (rtx x, int code, FILE *file)
   unsigned int regno;
   bool duplicated = code == 'd' && TARGET_AVX;
 
-  if (ASSEMBLER_DIALECT == ASM_ATT)
+  if (ASSEMBLER_DIALECT == ASM_ATT && code != 'V')
     putc ('%', file);
 
   if (x == pc_rtx)
@@ -15128,6 +15142,7 @@ get_some_local_dynamic_name (void)
    & -- print some in-use local-dynamic symbol name.
    H -- print a memory address offset by 8; used for sse high-parts
    Y -- print condition for XOP pcom* instruction.
+   V -- print naked register name without %.
    + -- print a branch hint as 'cs' or 'ds' prefix
    ; -- print a semicolon (after prefixes due to bug in older gas).
    ~ -- print "i" if TARGET_AVX2, "f" otherwise.
@@ -15353,6 +15368,7 @@ ix86_print_operand (FILE *file, rtx x, int code)
 	case 'X':
 	case 'P':
 	case 'p':
+	case 'V':
 	  break;
 
 	case 's':
@@ -25288,6 +25304,145 @@ ix86_expand_call (rtx retval, rtx fnaddr, rtx callarg1,
   return call;
 }
 
+static void
+ix86_output_indirect_branch (rtx call_op, const char *xasm,
+                             bool sibcall_p)
+{
+  char thunk_name_buf[32];
+  char *thunk_name;
+  char push_buf[64];
+  int regno;
+
+  if (REG_P (call_op))
+    regno = REGNO (call_op);
+  else
+    regno = -1;
+
+  if (cfun->machine->indirect_branch_type
+      != indirect_branch_thunk_inline)
+    {
+      if (cfun->machine->indirect_branch_type == indirect_branch_thunk)
+        {
+          if (regno >= 0)
+            {
+              int i = regno;
+              if (i >= FIRST_REX_INT_REG)
+                i -= (FIRST_REX_INT_REG - SP_REG - 1);
+              indirect_thunks_used |= 1 << i;
+            }
+          else
+            indirect_thunk_needed = true;
+        }
+      indirect_thunk_name (thunk_name_buf, regno, false);
+      thunk_name = thunk_name_buf;
+    }
+  else
+    thunk_name = NULL;
+
+  snprintf (push_buf, sizeof (push_buf), "push{%c}\t%s",
+            TARGET_64BIT ? 'q' : 'l', xasm);
+
+  if (sibcall_p)
+    {
+      if (regno < 0)
+        output_asm_insn (push_buf, &call_op);
+      if (thunk_name != NULL)
+        fprintf (asm_out_file, "\tjmp\t%s\n", thunk_name);
+      else
+        output_indirect_thunk (regno);
+    }
+  else
+    {
+      if (regno >= 0 && thunk_name != NULL)
+        {
+          fprintf (asm_out_file, "\tcall\t%s\n", thunk_name);
+          return;
+        }
+
+      char indirectlabel1[32];
+      char indirectlabel2[32];
+
+      ASM_GENERATE_INTERNAL_LABEL (indirectlabel1,
+                                   INDIRECT_LABEL,
+                                   indirectlabelno++);
+      ASM_GENERATE_INTERNAL_LABEL (indirectlabel2,
+                                   INDIRECT_LABEL,
+                                   indirectlabelno++);
+
+      /* Jump.  */
+      fputs ("\tjmp\t", asm_out_file);
+      assemble_name_raw (asm_out_file, indirectlabel2);
+      fputc ('\n', asm_out_file);
+
+      ASM_OUTPUT_INTERNAL_LABEL (asm_out_file, indirectlabel1);
+
+      if (MEM_P (call_op))
+        {
+          struct ix86_address parts;
+          rtx addr = XEXP (call_op, 0);
+          if (ix86_decompose_address (addr, &parts)
+              && parts.base == stack_pointer_rtx)
+            {
+              /* Since call will adjust stack by -UNITS_PER_WORD,
+                 we must convert "disp(stack, index, scale)" to
+                 "disp+UNITS_PER_WORD(stack, index, scale)".  */
+              if (parts.index)
+                {
+                  addr = gen_rtx_MULT (Pmode, parts.index,
+                                       GEN_INT (parts.scale));
+                  addr = gen_rtx_PLUS (Pmode, stack_pointer_rtx,
+                                       addr);
+                }
+              else
+                addr = stack_pointer_rtx;
+
+              rtx disp;
+              if (parts.disp != NULL_RTX)
+                disp = plus_constant (Pmode, parts.disp,
+                                      UNITS_PER_WORD);
+              else
+                disp = GEN_INT (UNITS_PER_WORD);
+
+              addr = gen_rtx_PLUS (Pmode, addr, disp);
+              call_op = gen_rtx_MEM (GET_MODE (call_op), addr);
+            }
+        }
+
+      if (regno < 0)
+        output_asm_insn (push_buf, &call_op);
+
+      if (thunk_name != NULL)
+        fprintf (asm_out_file, "\tjmp\t%s\n", thunk_name);
+      else
+        output_indirect_thunk (regno);
+
+      ASM_OUTPUT_INTERNAL_LABEL (asm_out_file, indirectlabel2);
+
+      /* Call.  */
+      fputs ("\tcall\t", asm_out_file);
+      assemble_name_raw (asm_out_file, indirectlabel1);
+      fputc ('\n', asm_out_file);
+    }
+}
+
+const char *
+ix86_output_indirect_jmp (rtx call_op, bool ret_p)
+{
+  if (cfun->machine->indirect_branch_type != indirect_branch_keep)
+    {
+      /* We can't have red-zone if this isn't a function return since
+        "call" in the indirect thunk pushes the return address onto
+        stack, destroying red-zone.  */
+      if (!ret_p && ix86_red_zone_size != 0)
+        gcc_unreachable ();
+
+      ix86_output_indirect_branch (call_op, "%0", true);
+      return "";
+    }
+  else
+    return "jmp\t%A0";
+}
+
 /* Return true if the function being called was marked with attribute "noplt"
    or using -fno-plt and we are compiling for non-PIC and x86_64.  We need to
    handle the non-PIC case in the backend because there is no easy interface
@@ -25313,12 +25468,43 @@ ix86_nopic_noplt_attribute_p (rtx call_op)
   return false;
 }
 
+const char *
+ix86_output_function_return (bool long_p)
+{
+  if (cfun->machine->function_return_type != indirect_branch_keep)
+    {
+      char thunk_name[32];
+
+      if (cfun->machine->function_return_type
+          != indirect_branch_thunk_inline)
+        {
+          bool need_thunk = (cfun->machine->function_return_type
+                             == indirect_branch_thunk);
+          indirect_thunk_name (thunk_name, -1, true);
+          indirect_thunk_needed |= need_thunk;
+          fprintf (asm_out_file, "\tjmp\t%s\n", thunk_name);
+        }
+      else
+        output_indirect_thunk (-1);
+
+      return "";
+    }
+
+  if (!long_p)
+    return "ret";
+
+  return "rep%; ret";
+}
+
 /* Output the assembly for a call instruction.  */
 
 const char *
 ix86_output_call_insn (rtx insn, rtx call_op)
 {
   bool direct_p = constant_call_address_operand (call_op, VOIDmode);
+  bool output_indirect_p
+      = (!TARGET_SEH
+         && cfun->machine->indirect_branch_type != indirect_branch_keep);
   bool seh_nop_p = false;
   const char *xasm;
 
@@ -25333,18 +25519,17 @@ ix86_output_call_insn (rtx insn, rtx call_op)
       else if (TARGET_SEH)
 	xasm = "rex.W jmp %A0";
       else
-	xasm = "jmp\t%A0";
+        {
+          if (output_indirect_p)
+            xasm = "%0";
+          else
+            xasm = "jmp\t%A0";
+        }
 
-      /* Just before the sibling call, add 11-bytes of nops to patch function
-         exit: 2 bytes for 'jmp 09' and remaining 9 bytes.  */
-      if (TARGET_64BIT && patch_functions_for_instrumentation)
-        ix86_output_function_nops_prologue_epilogue (
-            asm_out_file,
-            FUNCTION_PATCH_EPILOGUE_SECTION,
-            ASM_BYTE"0xeb, 0x09",
-            9);
-
-      output_asm_insn (xasm, &call_op);
+      if (output_indirect_p && !direct_p)
+        ix86_output_indirect_branch (call_op, xasm, true);
+      else
+        output_asm_insn (xasm, &call_op);
       return "";
     }
 
@@ -25383,9 +25568,17 @@ ix86_output_call_insn (rtx insn, rtx call_op)
   else if (direct_p)
     xasm = "call\t%P0";
   else
-    xasm = "call\t%A0";
+    {
+      if (output_indirect_p)
+        xasm = "%0";
+      else
+        xasm = "call\t%A0";
+    }
 
-  output_asm_insn (xasm, &call_op);
+  if (output_indirect_p && !direct_p)
+    ix86_output_indirect_branch (call_op, xasm, false);
+  else
+    output_asm_insn (xasm, &call_op);
 
   if (seh_nop_p)
     return "nop";
@@ -38956,7 +39149,7 @@ ix86_handle_struct_attribute (tree *node, tree name,
 
 static tree
 ix86_handle_fndecl_attribute (tree *node, tree name,
-                              tree args ATTRIBUTE_UNUSED,
+                              tree args,
                               int flags ATTRIBUTE_UNUSED, bool *no_add_attrs)
 {
   if (TREE_CODE (*node) != FUNCTION_DECL)
@@ -38965,6 +39158,51 @@ ix86_handle_fndecl_attribute (tree *node, tree name,
                name);
       *no_add_attrs = true;
     }
+
+  if (is_attribute_p ("indirect_branch", name))
+    {
+      tree cst = TREE_VALUE (args);
+      if (TREE_CODE (cst) != STRING_CST)
+        {
+          warning (OPT_Wattributes,
+                   "%qE attribute requires a string constant argument",
+                   name);
+          *no_add_attrs = true;
+        }
+      else if (strcmp (TREE_STRING_POINTER (cst), "keep") != 0
+               && strcmp (TREE_STRING_POINTER (cst), "thunk") != 0
+               && strcmp (TREE_STRING_POINTER (cst), "thunk-inline") != 0
+               && strcmp (TREE_STRING_POINTER (cst), "thunk-extern") != 0)
+        {
+          warning (OPT_Wattributes,
+                   "argument to %qE attribute is not "
+                   "(keep|thunk|thunk-inline|thunk-extern)", name);
+          *no_add_attrs = true;
+        }
+    }
+
+  if (is_attribute_p ("function_return", name))
+    {
+      tree cst = TREE_VALUE (args);
+      if (TREE_CODE (cst) != STRING_CST)
+        {
+          warning (OPT_Wattributes,
+                   "%qE attribute requires a string constant argument",
+                   name);
+          *no_add_attrs = true;
+        }
+      else if (strcmp (TREE_STRING_POINTER (cst), "keep") != 0
+               && strcmp (TREE_STRING_POINTER (cst), "thunk") != 0
+               && strcmp (TREE_STRING_POINTER (cst), "thunk-inline") != 0
+               && strcmp (TREE_STRING_POINTER (cst), "thunk-extern") != 0)
+        {
+          warning (OPT_Wattributes,
+                   "argument to %qE attribute is not "
+                   "(keep|thunk|thunk-inline|thunk-extern)", name);
+          *no_add_attrs = true;
+        }
+    }
+
   return NULL_TREE;
 }
 
@@ -42660,6 +42898,10 @@ static const struct attribute_spec ix86_attribute_table[] =
     false },
   { "callee_pop_aggregate_return", 1, 1, false, true, true,
     ix86_handle_callee_pop_aggregate_return, true },
+  { "indirect_branch", 1, 1, true, false, false,
+    ix86_handle_fndecl_attribute, false },
+  { "function_return", 1, 1, true, false, false,
+    ix86_handle_fndecl_attribute, false },
   /* End element.  */
   { NULL,        0, 0, false, false, false, NULL, false }
 };
@@ -47385,14 +47627,8 @@ adjacent_mem_locations (rtx mem1, rtx mem2)
 #undef TARGET_BUILTIN_RECIPROCAL
 #define TARGET_BUILTIN_RECIPROCAL ix86_builtin_reciprocal
 
-#undef TARGET_ASM_FUNCTION_PROLOGUE
-#define TARGET_ASM_FUNCTION_PROLOGUE ix86_output_function_prologue
-
 #undef TARGET_ASM_FUNCTION_EPILOGUE
 #define TARGET_ASM_FUNCTION_EPILOGUE ix86_output_function_epilogue
-
-#undef TARGET_ASM_NAMED_SECTION
-#define TARGET_ASM_NAMED_SECTION ix86_elf_asm_named_section
 
 #undef TARGET_ENCODE_SECTION_INFO
 #ifndef SUBTARGET_ENCODE_SECTION_INFO
