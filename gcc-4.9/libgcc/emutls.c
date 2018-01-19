@@ -60,6 +60,7 @@ static __gthread_mutex_t emutls_mutex = __GTHREAD_MUTEX_INIT;
 static __gthread_mutex_t emutls_mutex;
 #endif
 static __gthread_key_t emutls_key;
+static int emutls_key_created = 0;
 static pointer emutls_size;
 
 static void
@@ -86,8 +87,17 @@ emutls_init (void)
 #endif
   if (__gthread_key_create (&emutls_key, emutls_destroy) != 0)
     abort ();
+  emutls_key_created = 1;
 }
 #endif
+
+__attribute__((destructor))
+static void
+unregister_emutls_key (void)
+{
+  if (emutls_key_created)
+    __gthread_key_delete (emutls_key);
+}
 
 static void *
 emutls_alloc (struct __emutls_object *obj)
